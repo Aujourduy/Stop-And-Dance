@@ -8,14 +8,11 @@ Aucune tâche en cours.
 
 ## 🔴 À faire (Haute priorité)
 
-### Sprint Planning
-- Lancer bmad-sprint-planning pour sélectionner les stories du premier sprint
-- Définir la charge et les priorités
-- **Fichier :** `_bmad-output/planning-artifacts/sprint-01-plan.md`
-
-### Après Sprint Planning
-- Créer les story files détaillées (bmad-create-story)
-- Commencer le développement (bmad-dev-story)
+### Story 1.3 - Application Configuration (Environment, Jobs, Timezone)
+- Configurer dotenv-rails (.env.example + .env)
+- Configurer Solid Queue (queues, retry strategy, cron placeholder)
+- Configurer timezone (Europe/Paris display, UTC storage)
+- **Fichier :** `_bmad-output/planning-artifacts/epic-01-stories.md` (lignes 141-204)
 
 ---
 
@@ -32,6 +29,15 @@ Aucune tâche basse priorité pour le moment.
 ---
 
 ## ✅ Complété
+
+### Session 3 (26 mars 2026)
+- Story 1.1 vérifiée (7 migrations up, tous tests passent)
+- **Story 1.2 complétée** : Realistic Seed Data for UI Development
+  - 4 professeurs avec bios françaises réalistes
+  - 20 événements futurs (mix atelier/stage, gratuit/payant, en ligne/présentiel)
+  - 6 événements passés (pour tester scope Event.futurs)
+  - Idempotence validée (find_or_create_by!)
+  - Tous acceptance criteria validés
 
 ### Session 1 (23 mars 2026)
 - Installation BMAD Method dans le projet Rails 3graces-v2
