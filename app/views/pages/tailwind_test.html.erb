@@ -70,5 +70,18 @@
       <p class="font-sans text-white text-lg">Inter sans-serif (body text)</p>
     </section>
 
+    <!-- Tag component test -->
+    <section class="space-y-4">
+      <h2 class="text-white text-2xl font-sans font-semibold">Tag Component Test</h2>
+      <div class="flex flex-wrap gap-3">
+        <%= render 'shared/tag', text: 'Atelier', variant: 'atelier' %>
+        <%= render 'shared/tag', text: 'Stage', variant: 'stage' %>
+        <%= render 'shared/tag', text: 'Gratuit', variant: 'gratuit' %>
+        <%= render 'shared/tag', text: 'En ligne', variant: 'en_ligne' %>
+        <%= render 'shared/tag', text: 'En présentiel', variant: 'en_presentiel' %>
+        <%= render 'shared/tag', text: 'Default', variant: 'unknown' %>
+      </div>
+    </section>
+
   </div>
 </div>
