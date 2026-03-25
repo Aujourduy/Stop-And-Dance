@@ -23,6 +23,13 @@
   --breakpoint-2xl: 1728px;
 }
 
+/* Accessibility: Focus indicators */
+@layer base {
+  a:focus, button:focus, input:focus, select:focus, textarea:focus {
+    @apply outline-2 outline-offset-2 outline-terracotta;
+  }
+}
+
 /* Custom layer for reusable patterns */
 @layer components {
   .btn-primary {

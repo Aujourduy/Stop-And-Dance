@@ -8,18 +8,18 @@
 
     <%# Icons %>
     <div class="flex items-center gap-4">
-      <button data-action="click->mobile-drawer#toggle" class="text-2xl">
+      <button data-action="click->mobile-drawer#toggle" class="text-2xl" aria-label="Open navigation menu">
         ☰
       </button>
     </div>
   </header>
 
   <%# Drawer overlay %>
-  <div data-mobile-drawer-target="overlay" class="hidden fixed inset-0 bg-black/50 z-40" data-action="click->mobile-drawer#close"></div>
+  <div data-mobile-drawer-target="overlay" class="hidden fixed inset-0 bg-black/50 z-40" data-action="click->mobile-drawer#close" aria-hidden="true"></div>
 
   <%# Drawer panel %>
-  <aside data-mobile-drawer-target="panel" class="hidden fixed top-0 right-0 h-full w-64 bg-dark-bg text-white z-50 p-6 transform transition-transform">
-    <button data-action="click->mobile-drawer#close" class="absolute top-4 right-4 text-2xl">×</button>
+  <aside data-mobile-drawer-target="panel" class="hidden fixed top-0 right-0 h-full w-64 bg-dark-bg text-white z-50 p-6 transform transition-transform" aria-hidden="true">
+    <button data-action="click->mobile-drawer#close" class="absolute top-4 right-4 text-2xl" aria-label="Close navigation menu">×</button>
 
     <nav class="mt-12 flex flex-col gap-4">
       <%= link_to "Accueil", root_path, class: "text-lg hover:text-terracotta transition-colors" %>
