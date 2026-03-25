@@ -2,19 +2,20 @@
 
 ## 🟢 En cours
 
-### Création de l'Architecture Technique
-- **Statut :** En cours - lancement bmad-architect agent
-- **Prochaine étape :** Générer `docs/architecture.md` à partir du PRD
-- **Fichier :** `docs/architecture.md`
+Aucune tâche en cours.
 
 ---
 
 ## 🔴 À faire (Haute priorité)
 
-### Après l'Architecture
-- Créer les epics et stories (bmad-create-epics-and-stories)
-- Sprint planning
-- Commencer le développement
+### Sprint Planning
+- Lancer bmad-sprint-planning pour sélectionner les stories du premier sprint
+- Définir la charge et les priorités
+- **Fichier :** `_bmad-output/planning-artifacts/sprint-01-plan.md`
+
+### Après Sprint Planning
+- Créer les story files détaillées (bmad-create-story)
+- Commencer le développement (bmad-dev-story)
 
 ---
 

@@ -43,3 +43,45 @@ Historique de toutes les sessions de travail sur le projet.
 - Finaliser les exigences fonctionnelles dans `docs/prd.md`
 - Compléter les exigences non-fonctionnelles
 - Passer à l'architecture technique (bmad-create-architecture)
+
+---
+
+## Session 2 - 25 mars 2026
+
+**Résumé :** Finalisation Epic Stories (1-9) avec corrections review
+
+**Réalisations principales :**
+- Génération récapitulatif corrections appliquées aux 9 epics
+- Documentation complète des 15+ corrections transversales
+- Création `EPIC_REVIEW_CORRECTIONS.md` avec détails avant/après
+- Mise à jour `SUIVI_ENCOURS.md` : epics/stories complets, next = Sprint Planning
+
+**Fichiers créés/modifiés :**
+- `_bmad-output/planning-artifacts/EPIC_REVIEW_CORRECTIONS.md` (créé)
+- `SUIVI_ENCOURS.md` (mis à jour)
+- `_bmad-output/planning-artifacts/all-epics.md` (fichier de travail, à supprimer)
+
+**Corrections principales appliquées :**
+- Epic 1: photo_url ajouté, bio nullable, slug défini une fois
+- Epic 3: scrapers spécialisés supprimés (MVP), Claude CLI syntax fixé, ScrapingDispatchJob créé
+- Epic 4: root route corrigé, Pagy syntax fixé
+- Epic 6: migration doublon supprimé
+- Epic 8: meta-tags gem ajouté, slug routing only
+- Epic 9: detect_scraper réutilisé, Pagy fixé dans 3 controllers
+
+**Total :** 48 stories across 9 epics
+
+**Décisions techniques confirmées :**
+- Pagy gem pour pagination (NOT Kaminari)
+- Claude CLI headless pour parsing HTML
+- ScrapingDispatchJob pattern pour Solid Queue cron
+- Slug generation centralisé dans Epic 1
+
+**Difficultés rencontrées :**
+- Doublons détectés entre epics (slug, Newsletter migration)
+- Syntax errors Claude CLI et Pagy nécessitant corrections transversales
+
+**Prochaine session :**
+- Lancer bmad-sprint-planning pour sélectionner stories du premier sprint
+- Définir charge et priorités
+- Créer story files détaillées (bmad-create-story)
