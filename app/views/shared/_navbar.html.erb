@@ -1,0 +1,17 @@
+<nav class="hidden lg:block bg-dark-bg text-white py-4 sticky top-0 z-50">
+  <div class="container mx-auto px-4 flex items-center justify-between">
+    <%# Logo %>
+    <%= link_to root_path, class: "font-script italic text-terracotta text-2xl" do %>
+      AU JOUR duy
+    <% end %>
+
+    <%# Navigation links %>
+    <div class="flex items-center gap-6">
+      <%= link_to "Accueil", root_path, class: "hover:text-terracotta transition-colors" %>
+      <%# Note: evenements_path will be defined in Epic 4 %>
+      <%= link_to "Agenda", "#", class: "hover:text-terracotta transition-colors" %>
+      <%= link_to "Newsletter", "#", class: "hover:text-terracotta transition-colors", data: { action: "click->newsletter#open" } %>
+      <%= link_to "L'espace des proposants", proposants_path, class: "hover:text-terracotta transition-colors" %>
+    </div>
+  </div>
+</nav>

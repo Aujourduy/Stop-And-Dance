@@ -1,0 +1,33 @@
+<div class="lg:hidden" data-controller="mobile-drawer">
+  <%# Mobile header %>
+  <header class="bg-dark-bg text-white py-4 px-4 flex items-center justify-between sticky top-0 z-50">
+    <%# Logo %>
+    <%= link_to root_path, class: "font-script italic text-terracotta text-xl" do %>
+      AU JOUR duy
+    <% end %>
+
+    <%# Icons %>
+    <div class="flex items-center gap-4">
+      <button data-action="click->mobile-drawer#toggle" class="text-2xl">
+        ☰
+      </button>
+    </div>
+  </header>
+
+  <%# Drawer overlay %>
+  <div data-mobile-drawer-target="overlay" class="hidden fixed inset-0 bg-black/50 z-40" data-action="click->mobile-drawer#close"></div>
+
+  <%# Drawer panel %>
+  <aside data-mobile-drawer-target="panel" class="hidden fixed top-0 right-0 h-full w-64 bg-dark-bg text-white z-50 p-6 transform transition-transform">
+    <button data-action="click->mobile-drawer#close" class="absolute top-4 right-4 text-2xl">×</button>
+
+    <nav class="mt-12 flex flex-col gap-4">
+      <%= link_to "Accueil", root_path, class: "text-lg hover:text-terracotta transition-colors" %>
+      <%# Note: evenements_path will be defined in Epic 4 %>
+      <%= link_to "Agenda", "#", class: "text-lg hover:text-terracotta transition-colors" %>
+      <%= link_to "S'inscrire à la newsletter", "#", class: "text-lg hover:text-terracotta transition-colors" %>
+      <%= link_to "Liens", "#", class: "text-lg hover:text-terracotta transition-colors" %>
+      <%= link_to "L'espace des proposants", proposants_path, class: "text-lg hover:text-terracotta transition-colors" %>
+    </nav>
+  </aside>
+</div>
