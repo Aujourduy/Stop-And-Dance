@@ -10,7 +10,13 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  # root "posts#index"
+  root "pages#home"
+
+  # Static pages
+  get "/a-propos", to: "pages#about", as: :about
+  get "/contact", to: "pages#contact"
+  get "/proposants", to: "pages#proposants", as: :proposants  # "Publier ateliers" form
+  get "/actualites", to: "pages#actualites", as: :actualites  # Stub page
 
   # Tailwind test page (temporary - for validation only)
   get "tailwind_test" => "pages#tailwind_test" if Rails.env.development?
