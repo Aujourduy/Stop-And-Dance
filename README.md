@@ -1,24 +1,42 @@
-# README
+# 3 Graces - Community Event Calendar
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Rails 8 application for aggregating and displaying events from Paris spiritual/holistic communities.
 
-Things you may want to cover:
+## Prerequisites
 
-* Ruby version
+* Ruby 3.3+
+* PostgreSQL 16+
+* Rails 8.1+
 
-* System dependencies
+## Configuration
 
-* Configuration
+**Environment Variables:**
 
-* Database creation
+Copy `.env.example` to `.env` and set your production credentials before running the app:
 
-* Database initialization
+```bash
+cp .env.example .env
+```
 
-* How to run the test suite
+Edit `.env` with your actual credentials (never commit this file).
 
-* Services (job queues, cache servers, search engines, etc.)
+## Setup
 
-* Deployment instructions
+```bash
+bundle install
+rails db:create db:migrate db:seed
+```
 
-* ...
+## Running the Application
+
+```bash
+rails server
+```
+
+## Background Jobs
+
+Development mode runs jobs inline (immediately). To test worker processes:
+
+```bash
+rails solid_queue:start
+```

@@ -79,6 +79,11 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
+  # ISO 8601 log format with timezone
+  config.log_formatter = proc do |severity, datetime, progname, msg|
+    "[#{datetime.iso8601}] #{severity} -- #{progname}: #{msg}\n"
+  end
+
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
   #   "example.com",     # Allow requests from example.com
