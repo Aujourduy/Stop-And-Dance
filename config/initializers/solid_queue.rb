@@ -19,13 +19,4 @@ end
 # - scraping: Web scraping jobs (priority: 0)
 # - notifications: Email notifications (priority: 10 - high)
 #
-# Recurring tasks (cron):
-# Placeholder - will be activated in Epic 3 (Story 3.x: Automated Scraping)
-# Schedule: Daily scraping at 3:00 AM Paris time
-# Example (to activate later):
-# SolidQueue::RecurringTask.create!(
-#   key: "daily_scraping",
-#   schedule: "0 3 * * *",
-#   class_name: "ScrapingJob",
-#   queue_name: "scraping"
-# )
+# Recurring tasks configured in config/recurring.yml (Story 3.6)
