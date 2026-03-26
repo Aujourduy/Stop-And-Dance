@@ -8,14 +8,14 @@ class ProfessorsController < ApplicationController
     # Load upcoming events
     @upcoming_events = @professor.events.futurs.order(:date_debut).limit(10)
 
-    # Set SEO metadata (Epic 8: SeoMetadata concern)
-    # set_professor_metadata(@professor) if respond_to?(:set_professor_metadata, true)
+    # Set SEO metadata
+    set_professor_metadata(@professor)
   end
 
   def stats
     # Public stats page (no authentication required)
-    # Set SEO metadata (Epic 8: SeoMetadata concern)
-    # set_stats_metadata(@professor) if respond_to?(:set_stats_metadata, true)
+    # Set SEO metadata
+    set_stats_metadata(@professor)
   end
 
   def redirect_to_site

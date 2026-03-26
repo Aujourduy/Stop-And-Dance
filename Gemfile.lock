@@ -167,6 +167,8 @@ GEM
     marcel (1.1.0)
     mcp (0.9.0)
       json-schema (>= 4.1)
+    meta-tags (2.23.0)
+      actionpack (>= 6.0.0)
     mini_magick (5.3.1)
       logger
     mini_mime (1.1.5)
@@ -371,6 +373,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kamal
+  meta-tags
   pagy
   pg (~> 1.1)
   propshaft

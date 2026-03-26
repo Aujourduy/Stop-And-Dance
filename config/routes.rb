@@ -32,6 +32,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # Sitemap
+  get '/sitemap.xml', to: 'sitemaps#index', defaults: { format: 'xml' }
+
   # Tailwind test page (temporary - for validation only)
   get "tailwind_test" => "pages#tailwind_test" if Rails.env.development?
 end

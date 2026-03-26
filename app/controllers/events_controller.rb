@@ -31,9 +31,8 @@ class EventsController < ApplicationController
     # Increment professor consultation counter (atomic SQL)
     Professor.increment_counter(:consultations_count, @event.professor_id) if @event.professor_id
 
-    # Set SEO metadata (concern mixed in ApplicationController)
-    # set_event_metadata defined in Epic 8 (SeoMetadata concern)
-    # set_event_metadata(@event) if respond_to?(:set_event_metadata, true)
+    # Set SEO metadata
+    set_event_metadata(@event)
   end
 
   private
