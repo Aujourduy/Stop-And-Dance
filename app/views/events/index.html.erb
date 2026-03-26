@@ -23,7 +23,7 @@
     <%# Main column: Event list (70% on desktop) %>
     <div>
       <h1 class="text-3xl font-script italic mb-8">
-        Agenda des Ateliers (<%= @atelier_count %> ateliers) et Stages (<%= @stage_count %> stages)
+        Agenda des Ateliers (<%= @atelier_count %>) et Stages (<%= @stage_count %>)
       </h1>
 
       <%= turbo_frame_tag "events-list", data: { controller: "infinite-scroll" } do %>
