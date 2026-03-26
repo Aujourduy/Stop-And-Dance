@@ -23,7 +23,16 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-beige">
+  <body class="bg-beige" <%= "data-controller=debug-design" if Rails.env.development? %>>
+    <%# Debug Design Mode (Development only) %>
+    <% if Rails.env.development? %>
+      <div data-debug-design-target="banner" class="hidden fixed top-0 left-0 right-0 bg-red-600 text-white text-center py-2 z-[9998] font-bold">
+        MODE DEBUG DESIGN - Appuyez sur Ctrl+Shift+D pour désactiver
+      </div>
+      <div data-debug-design-target="tooltip" class="hidden fixed bg-gray-900 text-white p-3 rounded shadow-lg z-[9999] pointer-events-none" style="max-width: 300px;">
+      </div>
+    <% end %>
+
     <%# Skip to main content link (accessibility) %>
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 bg-terracotta text-white px-4 py-2 rounded">
       Skip to main content
