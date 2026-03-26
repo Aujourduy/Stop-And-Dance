@@ -153,6 +153,24 @@ Epic 1 DÉBUT → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → Epic 1 FIN (Do
 
 ---
 
+## Fin de session — Mise à jour état projet
+
+Avant le dernier commit de la session :
+
+1. **Mettre à jour** `docs/etat-projet.md` :
+   - Date de dernière mise à jour
+   - Epics terminés (nb stories)
+   - Epic en cours + prochaine story
+   - Fonctionnalités implémentées
+   - Problèmes résolus/connus
+   - Prochaines étapes
+
+2. **Lancer** `bin/sync-gist.sh` pour synchroniser vers Gist GitHub
+   - claude.ai peut ainsi lire l'état du projet (repo privé inaccessible)
+   - Gist secret, credentials dans ~/.env-3graces (GIST_ID, GIST_TOKEN)
+
+---
+
 ## Contexte serveur
 
 ### Infrastructure locale
