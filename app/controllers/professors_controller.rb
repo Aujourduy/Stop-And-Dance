@@ -1,5 +1,5 @@
 class ProfessorsController < ApplicationController
-  before_action :find_professor, only: [:show, :stats, :redirect_to_site]
+  before_action :find_professor, only: [ :show, :stats, :redirect_to_site ]
 
   def show
     # Increment consultation counter (atomic SQL)
@@ -22,8 +22,17 @@ class ProfessorsController < ApplicationController
     # Increment outbound clicks counter (atomic SQL)
     Professor.increment_counter(:clics_sortants_count, @professor.id)
 
+    # Verify URL scheme before redirect (security: prevent non-HTTP redirects)
+    uri = URI.parse(@professor.site_web)
+    unless %w[http https].include?(uri.scheme&.downcase)
+      redirect_to root_path, alert: "URL invalide", status: :see_other
+      return
+    end
+
     # Redirect to professor's website
     redirect_to @professor.site_web, allow_other_host: true, status: :see_other
+  rescue URI::InvalidURIError
+    redirect_to root_path, alert: "URL invalide", status: :see_other
   end
 
   private

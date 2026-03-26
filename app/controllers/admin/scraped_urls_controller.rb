@@ -1,6 +1,6 @@
 class Admin::ScrapedUrlsController < Admin::ApplicationController
   include Pagy::Method
-  before_action :find_scraped_url, only: [:show, :edit, :update, :destroy, :scrape_now, :preview]
+  before_action :find_scraped_url, only: [ :show, :edit, :update, :destroy, :scrape_now, :preview ]
 
   def index
     # Pagy syntax: @pagy, @records = pagy(scope, limit: N)

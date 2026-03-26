@@ -18,7 +18,7 @@ class Event < ApplicationRecord
   before_validation :generate_slug
 
   # Scopes
-  scope :futurs, -> { where('date_debut >= ?', Time.current) }
+  scope :futurs, -> { where("date_debut >= ?", Time.current) }
 
   # Helper methods
   def type_event_humanized

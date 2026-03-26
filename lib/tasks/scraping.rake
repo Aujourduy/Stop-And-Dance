@@ -14,7 +14,7 @@ namespace :scraping do
   end
 
   desc "Run scraping for specific URL by ID: rake scraping:run[123]"
-  task :run, [:scraped_url_id] => :environment do |t, args|
+  task :run, [ :scraped_url_id ] => :environment do |t, args|
     scraped_url = ScrapedUrl.find(args[:scraped_url_id])
 
     puts "Enqueueing scraping for: #{scraped_url.url}"
@@ -23,7 +23,7 @@ namespace :scraping do
   end
 
   desc "Dry-run test scraping for URL (no DB write): rake scraping:test[123]"
-  task :test, [:scraped_url_id] => :environment do |t, args|
+  task :test, [ :scraped_url_id ] => :environment do |t, args|
     scraped_url = ScrapedUrl.find(args[:scraped_url_id])
 
     puts "\n=== DRY-RUN TEST: #{scraped_url.url} ==="

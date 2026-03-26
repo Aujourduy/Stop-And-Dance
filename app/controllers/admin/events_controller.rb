@@ -1,6 +1,6 @@
 class Admin::EventsController < Admin::ApplicationController
   include Pagy::Method
-  before_action :find_event, only: [:show, :edit, :update]
+  before_action :find_event, only: [ :show, :edit, :update ]
 
   def index
     @pagy, @events = pagy(

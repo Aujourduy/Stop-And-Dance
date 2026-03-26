@@ -1,7 +1,7 @@
 class SitemapsController < ApplicationController
   def index
     # Cache for 1 hour to reduce database queries
-    @events = Rails.cache.fetch('sitemap/events', expires_in: 1.hour) do
+    @events = Rails.cache.fetch("sitemap/events", expires_in: 1.hour) do
       Event.futurs.order(:date_debut).to_a
     end
 
@@ -14,7 +14,7 @@ class SitemapsController < ApplicationController
     ]
 
     respond_to do |format|
-      format.xml { render template: 'sitemaps/index', layout: false }
+      format.xml { render template: "sitemaps/index", layout: false }
     end
   end
 end

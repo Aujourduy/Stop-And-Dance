@@ -7,6 +7,6 @@ class CreateEventSources < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :event_sources, [:event_id, :scraped_url_id], unique: true
+    add_index :event_sources, [ :event_id, :scraped_url_id ], unique: true
   end
 end

@@ -46,7 +46,7 @@ class EventsController < ApplicationController
     if params[:date_debut].present?
       begin
         date = Date.parse(params[:date_debut])
-        scope = scope.where('date_debut >= ?', date)
+        scope = scope.where("date_debut >= ?", date)
       rescue ArgumentError
         # Invalid date format, ignore filter
       end

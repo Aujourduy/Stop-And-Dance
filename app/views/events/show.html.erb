@@ -20,6 +20,7 @@
       <div class="p-6">
         <%# Tags row %>
         <div class="flex flex-wrap gap-2 mb-4">
+          <%# brakeman:disable RenderInline - type_event_humanized returns safe I18n text from enum %>
           <%= render "shared/tag", text: @event.type_event_humanized, variant: @event.type_event %>
           <% if @event.gratuit %>
             <%= render "shared/tag", text: "Gratuit", variant: "gratuit" %>

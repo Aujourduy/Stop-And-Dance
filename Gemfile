@@ -32,7 +32,7 @@ gem "solid_cable"
 gem "bootsnap", require: false
 
 # Environment variables management
-gem "dotenv-rails", groups: [:development, :test]
+gem "dotenv-rails", groups: [ :development, :test ]
 
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 gem "kamal", require: false

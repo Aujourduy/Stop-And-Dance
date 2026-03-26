@@ -11,7 +11,7 @@ class ClaudeCliIntegration
     prompt = build_prompt(html, notes_correctrices)
 
     # Write prompt to temp file
-    prompt_file = Tempfile.new(["claude_prompt", ".txt"])
+    prompt_file = Tempfile.new([ "claude_prompt", ".txt" ])
     prompt_file.write(prompt)
     prompt_file.close
 
@@ -88,11 +88,15 @@ class ClaudeCliIntegration
       return { success: false, error: "Claude CLI not authenticated" }
     end
 
-    # Execute command - read prompt from file and pass via stdin
+    # Execute command - pass prompt via stdin
     # Use --dangerously-skip-permissions for headless mode
-    command = "cat #{prompt_file_path} | #{CLAUDE_CLI_PATH} --dangerously-skip-permissions"
+    prompt_content = File.read(prompt_file_path)
 
-    output, status = Open3.capture2e(command, timeout: TIMEOUT_SECONDS)
+    output, status = Open3.capture2e(
+      CLAUDE_CLI_PATH, "--dangerously-skip-permissions",
+      stdin_data: prompt_content,
+      timeout: TIMEOUT_SECONDS
+    )
 
     if status.success?
       { success: true, output: output }

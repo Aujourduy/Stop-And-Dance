@@ -1,0 +1,25 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 5,
+      "fingerprint": "a8799a62805dd917552c708b6e18be06bf6eee34ed28d47daa1ff9e0a3f039d5",
+      "check_name": "RenderInline",
+      "message": "Unescaped model attribute rendered inline",
+      "file": "app/views/events/show.html.erb",
+      "line": 24,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "render(text => Event.includes(:professor).find_by(:slug => params[:id]).type_event_humanized, { :variant => Event.includes(:professor).find_by(:slug => params[:id]).type_event })",
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        79
+      ],
+      "note": "False positive: type_event_humanized returns safe I18n text from enum, ERB automatically escapes output with <%= %>"
+    }
+  ],
+  "updated": "2026-03-26 17:25:00 +0100",
+  "brakeman_version": "8.0.4"
+}

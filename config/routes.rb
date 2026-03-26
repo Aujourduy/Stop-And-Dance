@@ -19,13 +19,13 @@ Rails.application.routes.draw do
   get "/actualites", to: "pages#actualites", as: :actualites  # Stub page
 
   # Events (public French routes)
-  resources :evenements, only: [:index, :show], path: "evenements", controller: "events"
+  resources :evenements, only: [ :index, :show ], path: "evenements", controller: "events"
 
   # Newsletter subscriptions
-  resources :newsletters, only: [:create]
+  resources :newsletters, only: [ :create ]
 
   # Professors (public French routes)
-  resources :professeurs, only: [:show], path: "professeurs", controller: "professors" do
+  resources :professeurs, only: [ :show ], path: "professeurs", controller: "professors" do
     member do
       get :stats # Public stats page
       get :redirect_to_site # Intermediate redirect to track clicks
@@ -33,19 +33,19 @@ Rails.application.routes.draw do
   end
 
   # Sitemap
-  get '/sitemap.xml', to: 'sitemaps#index', defaults: { format: 'xml' }
+  get "/sitemap.xml", to: "sitemaps#index", defaults: { format: "xml" }
 
   # Admin namespace
   namespace :admin do
-    root to: 'scraped_urls#index'
+    root to: "scraped_urls#index"
     resources :scraped_urls do
       member do
         post :scrape_now
         get :preview
       end
     end
-    resources :change_logs, only: [:index, :show]
-    resources :events, only: [:index, :show, :edit, :update]
+    resources :change_logs, only: [ :index, :show ]
+    resources :events, only: [ :index, :show, :edit, :update ]
   end
 
   # Tailwind test page (temporary - for validation only)

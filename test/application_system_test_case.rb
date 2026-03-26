@@ -2,7 +2,7 @@ require "test_helper"
 require "capybara/playwright"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :playwright, using: :chromium, screen_size: [1400, 1400], options: {
+  driven_by :playwright, using: :chromium, screen_size: [ 1400, 1400 ], options: {
     headless: true,
     playwright_cli_executable_path: "./node_modules/.bin/playwright"
   }
