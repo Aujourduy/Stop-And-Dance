@@ -81,6 +81,9 @@ export default class extends Controller {
     this.currentElement = target
     target.style.outline = "2px solid #C2623F"
 
+    // Générer identifiant unique pour l'élément
+    const uniqueId = this.getUniqueIdentifier(target)
+
     // Récupérer les styles calculés
     const styles = window.getComputedStyle(target)
     const tagName = target.tagName.toLowerCase()
@@ -118,7 +121,9 @@ export default class extends Controller {
 
     const info = `
       <div class="text-sm space-y-2">
-        <div class="font-bold text-lg border-b border-gray-700 pb-2 mb-2">${selector}</div>
+        <div class="bg-gray-800 text-white p-3 rounded font-mono text-base font-bold mb-3 break-all">${uniqueId}</div>
+        <div class="text-xs text-gray-700 mb-2">Sélecteur CSS complet :</div>
+        <div class="font-medium text-sm mb-2">${selector}</div>
         ${textDisplay}
         <div><strong>BG:</strong> ${bgColor}</div>
         <div><strong>Text:</strong> ${textColor}</div>
@@ -150,6 +155,66 @@ export default class extends Controller {
 
     // Cacher l'infobulle
     this.tooltipTarget.classList.add("hidden")
+  }
+
+  // Générer un identifiant unique pour l'élément
+  getUniqueIdentifier(element) {
+    // Priorité 1 : ID HTML
+    if (element.id) {
+      return `#${element.id}`
+    }
+
+    // Priorité 2 : data-debug-id
+    if (element.dataset.debugId) {
+      return `[data-debug-id="${element.dataset.debugId}"]`
+    }
+
+    // Priorité 3 : data-testid
+    if (element.dataset.testid) {
+      return `[data-testid="${element.dataset.testid}"]`
+    }
+
+    // Priorité 4 : Générer un sélecteur CSS unique
+    return this.generateCssPath(element)
+  }
+
+  // Générer un chemin CSS unique pour l'élément
+  generateCssPath(element) {
+    if (element.tagName === 'HTML') return 'html'
+    if (element.tagName === 'BODY') return 'body'
+
+    let path = []
+    let current = element
+
+    while (current && current.tagName !== 'HTML') {
+      let selector = current.tagName.toLowerCase()
+
+      // Ajouter l'ID si présent
+      if (current.id) {
+        selector += `#${current.id}`
+        path.unshift(selector)
+        break // Un ID est unique, on peut s'arrêter
+      }
+
+      // Ajouter nth-child si nécessaire pour différencier les frères
+      if (current.parentElement) {
+        const siblings = Array.from(current.parentElement.children)
+        const sameTagSiblings = siblings.filter(s => s.tagName === current.tagName)
+
+        if (sameTagSiblings.length > 1) {
+          const index = sameTagSiblings.indexOf(current) + 1
+          selector += `:nth-of-type(${index})`
+        }
+      }
+
+      path.unshift(selector)
+      current = current.parentElement
+
+      // Limiter la profondeur à 5 niveaux pour la lisibilité
+      if (path.length >= 5) break
+    }
+
+    return path.join(' > ')
   }
 
   // Utilitaire pour convertir rgb() en hex

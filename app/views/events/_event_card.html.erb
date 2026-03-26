@@ -1,7 +1,7 @@
 <%# locals: event %>
 <%= link_to evenement_path(event.slug),
             class: "block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 mb-4",
-            data: { turbo_frame: "event_modal" } do %>
+            data: { turbo_frame: "event_modal", debug_id: "event-card-#{event.id}" } do %>
 
   <div class="flex gap-4">
     <%# Event photo (80x80 square) %>

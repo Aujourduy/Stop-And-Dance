@@ -3,11 +3,11 @@
 <section class="container mx-auto px-4 py-12">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
     <%# Note: evenements_path will be defined in Epic 4 %>
-    <%= link_to "AGENDA", "#", class: "btn-primary text-center" %>
-    <%= link_to "PUBLIER ATELIERS", proposants_path, class: "btn-primary text-center" %>
-    <%= link_to "ACTUALITÉS", actualites_path, class: "btn-primary text-center" %>
-    <%= link_to "QUI EST DUY", about_path, class: "btn-primary text-center" %>
-    <%= link_to "ME CONTACTER", contact_path, class: "btn-primary text-center" %>
-    <%= link_to "DONATIONS", "#", class: "btn-primary text-center", target: "_blank" %>
+    <%= link_to "AGENDA", "#", class: "btn-primary text-center", data: { debug_id: "cta-agenda" } %>
+    <%= link_to "PUBLIER ATELIERS", proposants_path, class: "btn-primary text-center", data: { debug_id: "cta-publier-ateliers" } %>
+    <%= link_to "ACTUALITÉS", actualites_path, class: "btn-primary text-center", data: { debug_id: "cta-actualites" } %>
+    <%= link_to "QUI EST DUY", about_path, class: "btn-primary text-center", data: { debug_id: "cta-qui-est-duy" } %>
+    <%= link_to "ME CONTACTER", contact_path, class: "btn-primary text-center", data: { debug_id: "cta-me-contacter" } %>
+    <%= link_to "DONATIONS", "#", class: "btn-primary text-center", target: "_blank", data: { debug_id: "cta-donations" } %>
   </div>
 </section>
