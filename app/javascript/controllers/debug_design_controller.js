@@ -84,6 +84,7 @@ export default class extends Controller {
     // Récupérer les styles calculés
     const styles = window.getComputedStyle(target)
     const tagName = target.tagName.toLowerCase()
+    const elementId = target.id ? `#${target.id}` : ""
     const classes = target.className || "(no classes)"
 
     // Texte de l'élément (tronqué si trop long)
@@ -113,10 +114,11 @@ export default class extends Controller {
 
     // Construire le contenu de l'infobulle
     const textDisplay = textContent ? `<div class="bg-white bg-opacity-20 p-2 rounded text-xs italic border-l-4 border-gray-700">"${textContent}"</div>` : ""
+    const selector = `${tagName}${elementId}${classes ? '.' + classes.split(' ').join('.') : ''}`
 
     const info = `
       <div class="text-sm space-y-2">
-        <div class="font-bold text-lg border-b border-gray-700 pb-2 mb-2">${tagName}.${classes}</div>
+        <div class="font-bold text-lg border-b border-gray-700 pb-2 mb-2">${selector}</div>
         ${textDisplay}
         <div><strong>BG:</strong> ${bgColor}</div>
         <div><strong>Text:</strong> ${textColor}</div>
