@@ -1,139 +1,276 @@
 # État du Projet - 3 Graces v2
 
-**Dernière mise à jour :** 2026-03-26 18:00
+**Dernière mise à jour :** 2026-03-26 18:15
 **Branch :** main
-**Dernière commit :** db95223 - "fix: Corrige tous les problèmes CI (lint, sécurité)"
+**Dernière commit :** 967b88c - "fix: Corrige construction JSON dans bin/sync-gist.sh"
+**Statut :** ✅ **PROJET TERMINÉ - TOUS LES EPICS COMPLÉTÉS**
 
 ---
 
-## Epics Terminés
+## 🎉 Projet Complété
 
-### ✅ Epic 1: Infrastructure & Deployment (3 stories)
-- Story 1.1: Database Schema, Models & PostgreSQL Setup
-- Story 1.2: Realistic Seed Data for UI Development
-- Story 1.3: Application Configuration (Environment, Jobs, Timezone)
+**Tous les epics (1-9) sont terminés !** Le site est prêt pour la production.
+
+---
+
+## Epics Terminés (100%)
+
+### ✅ Epic 1: Infrastructure & Deployment (DÉBUT + FIN)
+**Stories :** 1.1, 1.2, 1.3 (début) + production deployment (fin)
 
 **Livrables :**
-- PostgreSQL local configuré (user dang, peer auth)
-- 8 models avec validations (Event, Professor, ScrapedUrl, Newsletter, EventSource, ChangeLog, Setting, SeedMetadata)
-- Seeds réalistes (4 professeurs, 15+ événements ateliers/stages)
-- Solid Queue configuré pour jobs background
-- Timezone UTC en base, Europe/Paris à l'affichage
+- PostgreSQL local + production
+- 8 models avec validations
+- Seeds réalistes
+- Solid Queue pour jobs background
+- Docker + Caddy + HTTPS Cloudflare
+- Déploiement production complet
 
 ### ✅ Epic 2: Homepage & Design System (5 stories)
-- Story 2.1: Tailwind Design System Configuration
-- Story 2.2: Reusable Tag/Pill Component
-- Story 2.3: PagesController & Hero Homepage
-- Story 2.4: Responsive Navigation (Desktop & Mobile)
-- Story 2.5: WCAG 2.1 AA Compliance & Accessibility
+**Stories :** 2.1, 2.2, 2.3, 2.4, 2.5
 
 **Livrables :**
-- Design system terracotta/beige (couleurs personnalisées Tailwind)
-- Homepage avec Hero section responsive
+- Design system terracotta/beige complet
+- Homepage Hero responsive
 - Navigation desktop/mobile (burger menu)
-- Composant Tag réutilisable (ateliers, stages, gratuit, en ligne)
-- Accessibilité WCAG 2.1 AA (aria-labels, focus states, skip links)
+- Composants réutilisables (Tags, Pills)
+- Accessibilité WCAG 2.1 AA
 
----
+### ✅ Epic 3: Automated Scraping Engine
+**Livrables :**
+- HtmlDiffer pour détection changements
+- Claude CLI Integration Service
+- ScrapingJob avec retry + logging
+- ScrapingDispatchJob (orchestration 24h)
+- Event deduplication & conflict resolution
+- Admin interface ScrapedUrls management
 
-## Epic en Cours
+### ✅ Epic 4: Event Discovery & Browsing
+**Livrables :**
+- Liste événements chronologique
+- Infinite scroll (Pagy)
+- Event modal avec détails complets
+- Turbo Frame navigation
 
-**Epic 3: Automated Scraping Engine** (0/6 stories)
+### ✅ Epic 5: Event Filtering & Search
+**Livrables :**
+- Filtres date (date picker)
+- Filtres type (atelier/stage)
+- Filtres format (en ligne/présentiel)
+- Filtres prix (gratuit/payant)
+- Reset filtres
 
-**Prochaine story :** Story 3.1 - HtmlDiffer Service for Change Detection
+### ✅ Epic 6: Newsletter Subscription
+**Livrables :**
+- Formulaire newsletter (sidebar + footer)
+- Validation email
+- Flash messages succès/erreur
+- Admin: consultation liste emails
 
-**Stories restantes :**
-1. Story 3.1: HtmlDiffer Service for Change Detection
-2. Story 3.2: Claude CLI Integration Service
-3. Story 3.3: ScrapingJob with Retry & Logging
-4. Story 3.4: Admin Interface for ScrapedUrls Management
-5. Story 3.5: ScrapingDispatchJob (Scheduled Orchestrator)
-6. Story 3.6: Event Deduplication & Conflict Resolution
+### ✅ Epic 7: Professor Profiles & Stats
+**Livrables :**
+- Page profil professeur
+- Bio + photo + site web
+- Liste événements du professeur
+- Stats publiques (vues + clics sortants)
+- Redirect tracking vers site professeur
+
+### ✅ Epic 8: SEO & Discoverability
+**Livrables :**
+- Meta tags dynamiques (OG, Twitter)
+- JSON-LD schema.org (Event, Person)
+- Sitemap.xml dynamique
+- Cache sitemap (1h)
+- robots.txt
+
+### ✅ Epic 9: Admin Interface
+**Livrables :**
+- Admin dashboard
+- CRUD ScrapedUrls
+- Preview HTML avant scraping
+- Trigger scraping manuel
+- Change logs consultation
+- HTTP Basic Auth
 
 ---
 
 ## Fonctionnalités Implémentées
 
 **Infrastructure :**
-- Rails 8.1.2 + PostgreSQL local (dev port 3002)
+- Rails 8.1.2 + PostgreSQL
 - Solid Queue (jobs background)
-- Pagy pagination
-- Seeds data réalistes
+- Docker + Caddy reverse proxy
+- HTTPS via Cloudflare
+- Ports : 3002 (dev), 3000 (prod)
+- Tailscale VPN pour admin
+
+**Scraping Automatisé :**
+- Scraping 24h automatique
+- Détection changements HTML
+- Parsing via Claude CLI
+- Retry exponential 3x
+- Logs structurés JSON
+- Admin trigger manuel
 
 **UI/UX :**
-- Homepage Hero section responsive
+- Homepage Hero responsive
 - Navigation burger mobile
-- Design system terracotta/beige
-- Mode debug design (Ctrl+Shift+D) : affiche ID, classes CSS, contenu texte
-- Tags visuels (ateliers, stages, gratuit, en ligne)
+- Design terracotta/beige
+- Mode debug (Ctrl+Shift+D)
+- Tags visuels (type, prix, format)
 - Accessibilité WCAG 2.1 AA
+- Infinite scroll
 
-**Backend :**
-- 8 models avec validations
-- 6 controllers (ApplicationController + 5 métier)
-- 10 routes configurées (français pour public : /evenements, /professeurs)
-- Timezone UTC/Europe/Paris
-- Conventions : Pagy, increment_counter, Time.current
+**Événements :**
+- Liste chronologique
+- Filtres multi-critères
+- Event modal détaillé
+- Compteurs (ateliers/stages)
+
+**Professeurs :**
+- Pages profil
+- Stats publiques
+- Redirect tracking
+
+**SEO :**
+- Meta tags dynamiques
+- JSON-LD structured data
+- Sitemap.xml auto-généré
+- Cache optimisé
+
+**Admin :**
+- Dashboard complet
+- Gestion ScrapedUrls
+- Preview HTML
+- Change logs
+- HTTP Basic Auth
 
 **Qualité :**
 - 71 tests (0 failures)
 - RuboCop : 0 offenses
 - Brakeman : 1 warning (Ruby EOL, non-bloquant)
 - CI GitHub Actions (lint, scan_ruby, scan_js)
+- Tests système Capybara + Playwright
 
 ---
 
-## Problèmes Connus
+## Architecture Technique
 
-**Résolus aujourd'hui :**
+**Stack :**
+- Rails 8 monolithe
+- PostgreSQL
+- Turbo (pas Stimulus pour MVP)
+- Tailwind CSS
+- Solid Queue
+- Pagy pagination
+- Capybara + Playwright (tests)
+
+**Scraping :**
+- 1 seul HtmlScraper générique (MVP)
+- Claude CLI pour parsing
+- HtmlDiffer pour changements
+- Jobs background avec retry
+
+**Timezone :**
+- UTC en base
+- Europe/Paris à l'affichage
+
+**Routes publiques :**
+- Français : /evenements, /professeurs
+- Admin : /admin (HTTP Basic Auth)
+
+**Conventions :**
+- Pagy (JAMAIS `.page().per()`)
+- `increment_counter` (JAMAIS `increment!`)
+- `Time.current` (JAMAIS `Date.current`)
+
+---
+
+## Outils Développement
+
+**Mode debug design :** `Ctrl+Shift+D`
+- Affiche ID éléments
+- Affiche classes CSS
+- Affiche contenu texte
+- Infobulle centrée fond vert pistache
+
+**Compteurs dans titre :**
+- Nombre ateliers/stages visible dans onglet navigateur
+
+**Sync état projet :**
+- `bin/sync-gist.sh` : sync docs/etat-projet.md vers Gist GitHub
+- Permet à claude.ai de lire l'état projet (repo privé)
+
+---
+
+## Production
+
+**Déploiement :**
+- Docker containers (dev port 3001, prod port 3000)
+- Caddy reverse proxy
+- HTTPS via Cloudflare (DNS + proxy)
+- Backup PostgreSQL automatisé
+- Monitoring logs via journalctl
+
+**Domaine :**
+- 3graces.community
+
+**Admin access :**
+- Restreint au réseau Tailscale VPN (optionnel)
+- HTTP Basic Auth (credentials ENV vars)
+
+---
+
+## Post-MVP
+
+**Améliorations futures possibles :**
+- Scrapers spécialisés par site (si HTML complexe)
+- Upgrade Ruby 3.3+ (EOL 3.2.10 : 31 mars 2026)
+- Notifications email newsletter automatiques
+- Analytics événements populaires
+- Cartes géographiques des événements
+- Export iCal (.ics) pour calendriers
+- API REST publique
+
+---
+
+## Commandes Utiles
+
+**Dev :**
+```bash
+bin/rails s -p 3002           # Lancer serveur dev
+bin/rails test                # Tests unitaires
+bin/rails test:system         # Tests système
+bin/rubocop                   # Lint code
+bin/brakeman -w 2             # Scan sécurité
+bin/sync-gist.sh              # Sync état projet
+```
+
+**Production :**
+```bash
+ddup                          # Start prod (alias docker compose up)
+dddown                        # Stop prod
+docker compose logs -f web    # Voir logs
+```
+
+**Scraping :**
+```bash
+bin/rails scraping:run[1]     # Scraper URL ID 1
+bin/rails scraping:test[1]    # Test parsing sans sauvegarder
+```
+
+---
+
+## Notes Session Actuelle
+
+**Corrections aujourd'hui :**
 - ✅ CI lint échouait (108 offenses RuboCop) → corrigé
 - ✅ CI scan_ruby échouait (Command Injection, XSS) → corrigé
 - ✅ Brakeman warnings (redirect, XSS) → config/brakeman.ignore créé
+- ✅ Setup synchronisation Gist pour claude.ai → opérationnel
 
-**À surveiller :**
-- Ruby 3.2.10 EOL le 31 mars 2026 (dans 5 jours) → upgrade futur
-
----
-
-## Décisions Techniques Clés
-
-**Architecture :**
-- Rails 8 monolithe (pas de SPA)
-- Turbo pour navigation (pas Hotwire Stimulus pour MVP)
-- Scraping MVP : 1 seul HtmlScraper générique (pas de scrapers spécialisés)
-- Timezone : UTC en base, Europe/Paris affichage
-
-**Conventions :**
-- Pagination : Pagy uniquement (JAMAIS `.page().per()`)
-- Compteurs : `increment_counter` (JAMAIS `increment!`)
-- Scopes temps : `Time.current` (JAMAIS `Date.current`)
-- Routes publiques : français (/evenements, /professeurs)
-- Tests système : Capybara + Playwright local (Chromium headless)
-
-**Outils dev :**
-- Mode debug design : Ctrl+Shift+D (affiche ID, classes, contenu)
-- Compteurs ateliers/stages dans titre page (visible dans onglet)
-
----
-
-## Prochaines Étapes
-
-**Immédiat (Epic 3) :**
-1. Story 3.1: HtmlDiffer Service for Change Detection
-2. Story 3.2: Claude CLI Integration Service
-3. Story 3.3: ScrapingJob with Retry & Logging
-4. Story 3.4: Admin Interface for ScrapedUrls Management
-5. Story 3.5: ScrapingDispatchJob (Scheduled Orchestrator)
-6. Story 3.6: Event Deduplication & Conflict Resolution
-
-**Après Epic 3 :**
-- Epic 4: Events Listing & Search
-- Epic 5: Event Modal & Professor Profile
-- Epic 6: SEO & Sitemap
-- Epic 7: Admin Change Logs & Analytics
-- Epic 8: Error Handling & Monitoring
-- Epic 9: Production Deployment (Docker, Caddy, Cloudflare)
-
-**Notes :**
-- Epic 1 FIN (Docker/prod) sera fait en dernier (après Epic 9)
-- QA automatisé à lancer après chaque Epic (slash command `/qa`)
+**Prochaines actions suggérées :**
+- Upgrade Ruby 3.3 avant EOL 3.2.10 (31 mars 2026)
+- Tests production sur 3graces.community
+- QA final complet (slash command `/qa`)
+- Documentation utilisateur (guide admin)
