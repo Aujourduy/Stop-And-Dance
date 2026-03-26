@@ -26,10 +26,10 @@
   <body class="bg-beige" <%= "data-controller=debug-design" if Rails.env.development? %>>
     <%# Debug Design Mode (Development only) %>
     <% if Rails.env.development? %>
-      <div data-debug-design-target="banner" class="hidden fixed top-0 left-0 right-0 bg-red-600 text-white text-center py-2 font-bold" style="z-index: 9998;">
+      <div data-debug-design-target="banner" class="hidden fixed top-0 left-0 right-0 bg-red-600 text-white text-center py-2 font-bold" style="z-index: 2147483647;">
         MODE DEBUG DESIGN - Appuyez sur Ctrl+Shift+D pour désactiver
       </div>
-      <div data-debug-design-target="tooltip" class="hidden fixed p-4 rounded-lg shadow-2xl z-[9999] pointer-events-none" style="left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: #93C572; color: #1A1A1A; min-width: 320px; max-width: 400px;">
+      <div data-debug-design-target="tooltip" class="hidden fixed p-4 rounded-lg shadow-2xl pointer-events-none" style="left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: #93C572; color: #1A1A1A; min-width: 320px; max-width: 400px; z-index: 2147483647;">
       </div>
     <% end %>
 
