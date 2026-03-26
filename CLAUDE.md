@@ -153,21 +153,38 @@ Epic 1 DÉBUT → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → Epic 1 FIN (Do
 
 ---
 
-## Fin de session — Mise à jour état projet
+## Mise à jour état projet — AVANT chaque commit significatif
 
-Avant le dernier commit de la session :
+**IMPORTANT** : Mettre à jour `docs/etat-projet.md` + sync Gist **AVANT chaque commit significatif** (pas typos, mais features/corrections/stories).
+
+**Pourquoi ?**
+- Si session interrompue, état cohérent dans Gist
+- claude.ai voit toujours l'état réel du projet
+- Trace historique précise dans git
+
+**Process AVANT chaque commit significatif :**
 
 1. **Mettre à jour** `docs/etat-projet.md` :
    - Date de dernière mise à jour
-   - Epics terminés (nb stories)
+   - Epics/stories terminés
    - Epic en cours + prochaine story
    - Fonctionnalités implémentées
    - Problèmes résolus/connus
    - Prochaines étapes
 
-2. **Lancer** `bin/sync-gist.sh` pour synchroniser vers Gist GitHub
-   - claude.ai peut ainsi lire l'état du projet (repo privé inaccessible)
-   - Gist secret, credentials dans ~/.env-3graces (GIST_ID, GIST_TOKEN)
+2. **Lancer** `bin/sync-gist.sh`
+   - Synchronise vers Gist GitHub (secret)
+   - claude.ai peut lire l'état (repo privé inaccessible)
+   - Credentials : ~/.env-3graces (GIST_ID, GIST_TOKEN)
+
+3. **Commit** avec docs/etat-projet.md inclus
+
+**Exemples de commits significatifs :**
+- ✅ Story terminée (feat: Story X.X)
+- ✅ Epic terminé (feat: Epic X)
+- ✅ Correction bug majeur (fix: problème bloquant)
+- ✅ Refactor important (refactor: architecture)
+- ❌ Fix typo (docs: correction typo) → pas besoin de maj état
 
 ---
 
