@@ -1,0 +1,38 @@
+<%= form_with model: [:admin, scraped_url], class: "space-y-6" do |f| %>
+  <% if scraped_url.errors.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+      <ul class="list-disc list-inside">
+        <% scraped_url.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :url, "URL", class: "block font-bold mb-2" %>
+    <%= f.url_field :url, class: "w-full px-3 py-2 border rounded", placeholder: "https://example.com/agenda", required: true %>
+  </div>
+
+  <div>
+    <%= f.label :statut_scraping, "Statut", class: "block font-bold mb-2" %>
+    <%= f.select :statut_scraping,
+                 [['Actif', 'actif'], ['Pause', 'pause'], ['Erreur', 'erreur']],
+                 {},
+                 class: "w-full px-3 py-2 border rounded" %>
+  </div>
+
+  <div>
+    <%= f.label :notes_correctrices, "Notes correctrices (pour Claude)", class: "block font-bold mb-2" %>
+    <%= f.text_area :notes_correctrices,
+                    class: "w-full px-3 py-2 border rounded font-mono",
+                    rows: 10,
+                    placeholder: "Instructions pour corriger les erreurs de parsing..." %>
+    <p class="text-sm text-gray-600 mt-1">Ces notes sont envoyées à Claude CLI pour corriger les erreurs de parsing.</p>
+  </div>
+
+  <div class="flex gap-4">
+    <%= f.submit "Enregistrer", class: "bg-terracotta text-white px-6 py-2 rounded hover:bg-terracotta-dark cursor-pointer" %>
+    <%= link_to "Annuler", @scraped_url.persisted? ? admin_scraped_url_path(@scraped_url) : admin_scraped_urls_path, class: "bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600" %>
+  </div>
+<% end %>

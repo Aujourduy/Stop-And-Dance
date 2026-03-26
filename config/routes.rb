@@ -35,6 +35,19 @@ Rails.application.routes.draw do
   # Sitemap
   get '/sitemap.xml', to: 'sitemaps#index', defaults: { format: 'xml' }
 
+  # Admin namespace
+  namespace :admin do
+    root to: 'scraped_urls#index'
+    resources :scraped_urls do
+      member do
+        post :scrape_now
+        get :preview
+      end
+    end
+    resources :change_logs, only: [:index, :show]
+    resources :events, only: [:index, :show, :edit, :update]
+  end
+
   # Tailwind test page (temporary - for validation only)
   get "tailwind_test" => "pages#tailwind_test" if Rails.env.development?
 end

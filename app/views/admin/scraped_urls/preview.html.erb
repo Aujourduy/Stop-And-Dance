@@ -1,0 +1,29 @@
+<div class="mb-6">
+  <%= link_to "← Retour", admin_scraped_url_path(@scraped_url), class: "text-terracotta hover:underline" %>
+</div>
+
+<h1 class="text-3xl font-bold mb-6">Preview Scraping</h1>
+
+<% if @error %>
+  <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-6">
+    <strong>Erreur:</strong> <%= @error %>
+  </div>
+<% else %>
+  <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <h2 class="text-xl font-bold mb-4">Résultat du parsing</h2>
+    <% if @parse_result[:error] %>
+      <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+        <%= @parse_result[:error] %>
+      </div>
+    <% else %>
+      <div class="prose max-w-none">
+        <pre class="bg-gray-50 p-4 rounded overflow-x-auto"><%= JSON.pretty_generate(@parse_result) %></pre>
+      </div>
+    <% end %>
+  </div>
+
+  <details class="bg-white rounded-lg shadow p-6">
+    <summary class="font-bold cursor-pointer">HTML brut (cliquer pour voir)</summary>
+    <pre class="mt-4 bg-gray-50 p-4 rounded overflow-x-auto text-xs"><%= @html %></pre>
+  </details>
+<% end %>

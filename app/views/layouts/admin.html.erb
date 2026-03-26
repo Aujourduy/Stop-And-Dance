@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin - 3 Graces</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= display_meta_tags %>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-100">
+    <%# Admin navbar %>
+    <nav class="bg-dark-bg text-white py-4 mb-8">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between">
+          <h1 class="text-xl font-bold">Admin - 3 Graces</h1>
+          <div class="flex items-center gap-6">
+            <%= link_to "URLs", admin_scraped_urls_path, class: "hover:text-terracotta" %>
+            <%= link_to "Changements", admin_change_logs_path, class: "hover:text-terracotta" %>
+            <%= link_to "Événements", admin_events_path, class: "hover:text-terracotta" %>
+            <%= link_to "← Site public", root_path, class: "hover:text-terracotta" %>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container mx-auto px-4 pb-12">
+      <%# Flash messages %>
+      <% if flash.any? %>
+        <% flash.each do |type, message| %>
+          <div class="<%= type == 'alert' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' %> px-4 py-3 rounded mb-4">
+            <%= message %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <%= yield %>
+    </main>
+  </body>
+</html>

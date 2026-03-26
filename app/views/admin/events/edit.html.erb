@@ -1,0 +1,47 @@
+<h1 class="text-3xl font-bold mb-6">Modifier Événement</h1>
+
+<div class="bg-white rounded-lg shadow p-6">
+  <%= form_with model: [:admin, @event], class: "space-y-4" do |f| %>
+    <% if @event.errors.any? %>
+      <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+        <ul><% @event.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :titre, class: "block font-bold mb-1" %>
+      <%= f.text_field :titre, class: "w-full px-3 py-2 border rounded" %>
+    </div>
+
+    <div>
+      <%= f.label :description, class: "block font-bold mb-1" %>
+      <%= f.text_area :description, class: "w-full px-3 py-2 border rounded", rows: 5 %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :date_debut, class: "block font-bold mb-1" %>
+        <%= f.datetime_local_field :date_debut, class: "w-full px-3 py-2 border rounded" %>
+      </div>
+      <div>
+        <%= f.label :date_fin, class: "block font-bold mb-1" %>
+        <%= f.datetime_local_field :date_fin, class: "w-full px-3 py-2 border rounded" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :lieu, class: "block font-bold mb-1" %>
+      <%= f.text_field :lieu, class: "w-full px-3 py-2 border rounded" %>
+    </div>
+
+    <div>
+      <%= f.label :prix_normal, class: "block font-bold mb-1" %>
+      <%= f.number_field :prix_normal, step: 0.01, class: "w-full px-3 py-2 border rounded" %>
+    </div>
+
+    <div class="flex gap-4 pt-4">
+      <%= f.submit "Enregistrer", class: "bg-terracotta text-white px-6 py-2 rounded hover:bg-terracotta-dark cursor-pointer" %>
+      <%= link_to "Annuler", admin_event_path(@event), class: "bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600" %>
+    </div>
+  <% end %>
+</div>
