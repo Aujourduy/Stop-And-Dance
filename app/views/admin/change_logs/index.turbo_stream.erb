@@ -3,7 +3,7 @@
     <tr>
       <td class="px-6 py-4 text-sm"><%= log.created_at.strftime("%d/%m/%Y %H:%M") %></td>
       <td class="px-6 py-4 text-sm">
-        <%= link_to log.scraped_url.url.truncate(40), admin_scraped_url_path(log.scraped_url), class: "text-terracotta hover:underline" %>
+        <%= link_to log.scraped_url.url.truncate(40), admin_scraped_url_path(log.scraped_url), class: "text-terracotta hover:underline", data: { turbo_frame: "_top" } %>
       </td>
       <td class="px-6 py-4 text-sm text-gray-900">
         <span class="text-red-600">-<%= log.changements_detectes["lines_removed"] || 0 %></span>

@@ -19,7 +19,7 @@
         <% @scraped_urls.each do |url| %>
           <tr>
             <td class="px-6 py-4">
-              <%= link_to admin_scraped_url_path(url), class: "text-terracotta hover:underline" do %>
+              <%= link_to admin_scraped_url_path(url), class: "text-terracotta hover:underline", data: { turbo_frame: "_top" } do %>
                 <div class="font-medium"><%= url.nom.presence || url.url.truncate(40) %></div>
                 <% if url.nom.present? %>
                   <div class="text-xs text-gray-500"><%= url.url.truncate(50) %></div>
@@ -39,9 +39,9 @@
               <%= url.updated_at.strftime("%d/%m/%Y %H:%M") %>
             </td>
             <td class="px-6 py-4 text-right text-sm font-medium space-x-2">
-              <%= link_to "Voir", admin_scraped_url_path(url), class: "text-blue-600 hover:underline" %>
-              <%= link_to "Modifier", edit_admin_scraped_url_path(url), class: "text-blue-600 hover:underline" %>
-              <%= button_to "Scraper", scrape_now_admin_scraped_url_path(url), method: :post, class: "text-green-600 hover:underline inline" %>
+              <%= link_to "Voir", admin_scraped_url_path(url), class: "text-blue-600 hover:underline", data: { turbo_frame: "_top" } %>
+              <%= link_to "Modifier", edit_admin_scraped_url_path(url), class: "text-blue-600 hover:underline", data: { turbo_frame: "_top" } %>
+              <%= button_to "Scraper", scrape_now_admin_scraped_url_path(url), method: :post, class: "text-green-600 hover:underline inline", data: { turbo_frame: "_top" } %>
             </td>
           </tr>
         <% end %>
