@@ -609,6 +609,7 @@ puts 'Exported to tmp/events_export.json'
 
 ## 11. Ressources
 
+- **Interface admin web** : `docs/guide-admin.md` (gérer sources via navigateur)
 - **Architecture technique** : `docs/scraping-architecture.md`
 - **Logs scraping** : `log/development.log` ou `log/production.log`
 - **Console Rails** : `bin/rails console`
