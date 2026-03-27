@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_150010) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_27_155112) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -100,14 +100,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_150010) do
   create_table "scraped_urls", force: :cascade do |t|
     t.text "commentaire"
     t.datetime "created_at", null: false
+    t.jsonb "data_attributes", default: {}, null: false
     t.text "derniere_version_html"
+    t.text "derniere_version_markdown"
     t.integer "erreurs_consecutives", default: 0
+    t.string "html_hash"
     t.string "nom"
     t.text "notes_correctrices"
     t.string "statut_scraping", default: "actif"
     t.datetime "updated_at", null: false
     t.string "url", null: false
     t.boolean "use_browser", default: true, null: false
+    t.index ["html_hash"], name: "index_scraped_urls_on_html_hash"
     t.index ["url"], name: "index_scraped_urls_on_url", unique: true
   end
 

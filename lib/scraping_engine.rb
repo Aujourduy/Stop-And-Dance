@@ -19,12 +19,18 @@ class ScrapingEngine
       return { success: false, error: result[:error] }
     end
 
+    # Calculate HTML hash for efficient change detection
+    new_html_hash = Digest::SHA256.hexdigest(result[:html])
+
     # Compare with last version
     diff_result = HtmlDiffer.compare(scraped_url.derniere_version_html, result[:html])
 
     if diff_result[:changed]
-      # Store new version
-      scraped_url.update!(derniere_version_html: result[:html])
+      # Store new version with hash
+      scraped_url.update!(
+        derniere_version_html: result[:html],
+        html_hash: new_html_hash
+      )
 
       # Create ChangeLog
       ChangeLog.create!(
@@ -60,6 +66,7 @@ class ScrapingEngine
       # No changes detected
       scraped_url.update!(
         derniere_version_html: result[:html],
+        html_hash: new_html_hash,
         erreurs_consecutives: 0
       )
 

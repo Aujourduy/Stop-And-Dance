@@ -10,6 +10,12 @@ class ClaudeCliIntegration
     # Clean HTML and convert to Markdown for better Claude parsing
     cleaned = HtmlCleaner.clean_and_convert(html)
 
+    # Store Markdown and data_attributes for debugging/audit
+    scraped_url.update(
+      derniere_version_markdown: cleaned[:markdown],
+      data_attributes: cleaned[:data_attributes]
+    )
+
     SCRAPING_LOGGER.info({
       event: "html_cleaned",
       scraped_url_id: scraped_url.id,

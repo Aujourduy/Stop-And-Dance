@@ -2,28 +2,122 @@
   <%= link_to "← Retour", admin_scraped_url_path(@scraped_url), class: "text-terracotta hover:underline" %>
 </div>
 
-<h1 class="text-3xl font-bold mb-6">Preview Scraping</h1>
+<h1 class="text-3xl font-bold mb-6">Preview Scraping - <%= @scraped_url.nom || @scraped_url.url %></h1>
 
 <% if @error %>
   <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-6">
     <strong>Erreur:</strong> <%= @error %>
   </div>
 <% else %>
+  <!-- Stats summary -->
   <div class="bg-white rounded-lg shadow p-6 mb-6">
-    <h2 class="text-xl font-bold mb-4">Résultat du parsing</h2>
-    <% if @parse_result[:error] %>
-      <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
-        <%= @parse_result[:error] %>
+    <h2 class="text-xl font-bold mb-4">Résumé</h2>
+    <div class="grid grid-cols-3 gap-4">
+      <div>
+        <div class="text-sm text-gray-600">HTML brut</div>
+        <div class="text-2xl font-bold"><%= number_to_human_size(@scraped_url.derniere_version_html&.bytesize || 0) %></div>
       </div>
-    <% else %>
-      <div class="prose max-w-none">
-        <pre class="bg-gray-50 p-4 rounded overflow-x-auto"><%= JSON.pretty_generate(@parse_result) %></pre>
+      <div>
+        <div class="text-sm text-gray-600">Markdown</div>
+        <div class="text-2xl font-bold"><%= number_to_human_size(@scraped_url.derniere_version_markdown&.bytesize || 0) %></div>
       </div>
-    <% end %>
+      <div>
+        <div class="text-sm text-gray-600">Réduction</div>
+        <% if @scraped_url.derniere_version_html.present? && @scraped_url.derniere_version_markdown.present? %>
+          <% reduction = ((1 - @scraped_url.derniere_version_markdown.bytesize.to_f / @scraped_url.derniere_version_html.bytesize) * 100).round(1) %>
+          <div class="text-2xl font-bold text-green-600"><%= reduction %>%</div>
+        <% else %>
+          <div class="text-2xl font-bold text-gray-400">—</div>
+        <% end %>
+      </div>
+    </div>
   </div>
 
-  <details class="bg-white rounded-lg shadow p-6">
-    <summary class="font-bold cursor-pointer">HTML brut (cliquer pour voir)</summary>
-    <pre class="mt-4 bg-gray-50 p-4 rounded overflow-x-auto text-xs"><%= @html %></pre>
-  </details>
+  <!-- Tabs -->
+  <div class="bg-white rounded-lg shadow">
+    <!-- Tab headers -->
+    <div class="border-b border-gray-200">
+      <nav class="flex -mb-px">
+        <button onclick="showTab('parsed')" id="tab-parsed" class="tab-button active px-6 py-3 border-b-2 border-terracotta text-terracotta font-medium">
+          Résultat parsing
+        </button>
+        <button onclick="showTab('markdown')" id="tab-markdown" class="tab-button px-6 py-3 border-b-2 border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300">
+          Markdown
+        </button>
+        <button onclick="showTab('data')" id="tab-data" class="tab-button px-6 py-3 border-b-2 border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300">
+          Data attributes
+        </button>
+        <button onclick="showTab('html')" id="tab-html" class="tab-button px-6 py-3 border-b-2 border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300">
+          HTML brut
+        </button>
+      </nav>
+    </div>
+
+    <!-- Tab contents -->
+    <div class="p-6">
+      <!-- Parsed results tab -->
+      <div id="content-parsed" class="tab-content">
+        <% if @parse_result[:error] %>
+          <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+            <%= @parse_result[:error] %>
+          </div>
+        <% else %>
+          <div class="prose max-w-none">
+            <h3 class="text-lg font-bold mb-2">Événements détectés: <%= @parse_result[:events]&.size || 0 %></h3>
+            <pre class="bg-gray-50 p-4 rounded overflow-x-auto text-sm"><%= JSON.pretty_generate(@parse_result) %></pre>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Markdown tab -->
+      <div id="content-markdown" class="tab-content hidden">
+        <% if @scraped_url.derniere_version_markdown.present? %>
+          <pre class="bg-gray-50 p-4 rounded overflow-x-auto text-sm whitespace-pre-wrap"><%= @scraped_url.derniere_version_markdown %></pre>
+        <% else %>
+          <div class="text-gray-500 italic">Aucun Markdown disponible. Lancez un scraping pour générer le Markdown.</div>
+        <% end %>
+      </div>
+
+      <!-- Data attributes tab -->
+      <div id="content-data" class="tab-content hidden">
+        <% if @scraped_url.data_attributes.present? && @scraped_url.data_attributes.any? %>
+          <pre class="bg-gray-50 p-4 rounded overflow-x-auto text-sm"><%= JSON.pretty_generate(@scraped_url.data_attributes) %></pre>
+        <% else %>
+          <div class="text-gray-500 italic">Aucune data-attribute détectée dans le HTML.</div>
+        <% end %>
+      </div>
+
+      <!-- HTML tab -->
+      <div id="content-html" class="tab-content hidden">
+        <% if @html.present? %>
+          <pre class="bg-gray-50 p-4 rounded overflow-x-auto text-xs"><%= @html %></pre>
+        <% else %>
+          <div class="text-gray-500 italic">Aucun HTML disponible.</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
 <% end %>
+
+<script>
+  function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(el => {
+      el.classList.add('hidden');
+    });
+
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-button').forEach(el => {
+      el.classList.remove('active', 'border-terracotta', 'text-terracotta');
+      el.classList.add('border-transparent', 'text-gray-600');
+    });
+
+    // Show selected tab content
+    document.getElementById('content-' + tabName).classList.remove('hidden');
+
+    // Add active class to selected button
+    const activeButton = document.getElementById('tab-' + tabName);
+    activeButton.classList.add('active', 'border-terracotta', 'text-terracotta');
+    activeButton.classList.remove('border-transparent', 'text-gray-600');
+  }
+</script>
