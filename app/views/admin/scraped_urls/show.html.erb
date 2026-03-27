@@ -27,8 +27,40 @@
     </div>
 
     <div>
-      <dt class="font-bold text-gray-700">Dernier scraping</dt>
-      <dd class="text-gray-900"><%= @scraped_url.dernier_scraping_a&.strftime("%d/%m/%Y à %H:%M") || "Jamais" %></dd>
+      <dt class="font-bold text-gray-700">Dernière mise à jour</dt>
+      <dd class="text-gray-900"><%= @scraped_url.updated_at.strftime("%d/%m/%Y à %H:%M") %></dd>
+    </div>
+
+    <div>
+      <dt class="font-bold text-gray-700">Erreurs consécutives</dt>
+      <dd class="text-gray-900">
+        <% if @scraped_url.erreurs_consecutives > 0 %>
+          <span class="px-2 py-1 rounded bg-red-100 text-red-800">⚠️ <%= @scraped_url.erreurs_consecutives %> erreur(s)</span>
+        <% else %>
+          <span class="text-green-600">✓ Aucune erreur</span>
+        <% end %>
+      </dd>
+    </div>
+
+    <div>
+      <dt class="font-bold text-gray-700">Nom</dt>
+      <dd class="text-gray-900"><%= @scraped_url.nom.presence || "—" %></dd>
+    </div>
+
+    <div>
+      <dt class="font-bold text-gray-700">Professeurs associés</dt>
+      <dd class="text-gray-900">
+        <% if @scraped_url.professors.any? %>
+          <%= @scraped_url.professors.map(&:nom).join(", ") %>
+        <% else %>
+          Aucun professeur associé
+        <% end %>
+      </dd>
+    </div>
+
+    <div>
+      <dt class="font-bold text-gray-700">Événements scrapés</dt>
+      <dd class="text-gray-900"><%= @scraped_url.events.count %> événement(s)</dd>
     </div>
 
     <div>
@@ -41,11 +73,15 @@
 <div class="bg-white rounded-lg shadow p-6">
   <h2 class="text-xl font-bold mb-4">Derniers changements détectés</h2>
   <% if @recent_change_logs.any? %>
-    <div class="space-y-2">
+    <div class="space-y-3">
       <% @recent_change_logs.each do |log| %>
-        <div class="border-l-4 border-terracotta pl-4">
-          <div class="text-sm text-gray-600"><%= log.created_at.strftime("%d/%m/%Y %H:%M") %></div>
-          <div class="text-gray-900"><%= log.texte_avant.truncate(100) %> → <%= log.texte_apres.truncate(100) %></div>
+        <div class="border-l-4 border-terracotta pl-4 py-2">
+          <div class="text-sm text-gray-600 mb-1"><%= log.created_at.strftime("%d/%m/%Y à %H:%M") %></div>
+          <div class="text-sm text-gray-700">
+            <%= log.changements_detectes['lines_added'] %> lignes ajoutées,
+            <%= log.changements_detectes['lines_removed'] %> lignes supprimées
+          </div>
+          <%= link_to "Voir le diff →", admin_change_log_path(log), class: "text-sm text-terracotta hover:underline" %>
         </div>
       <% end %>
     </div>
