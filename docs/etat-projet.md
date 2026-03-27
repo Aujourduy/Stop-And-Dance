@@ -269,7 +269,7 @@ bin/rails scraping:test[1]    # Test parsing sans sauvegarder
 - ✅ Brakeman warnings (redirect, XSS) → config/brakeman.ignore créé
 - ✅ Setup synchronisation Gist pour claude.ai → opérationnel
 
-**Session actuelle (2026-03-27) :**
+**Session 2026-03-27 matin :**
 - ✅ Migration complète du projet "3 Graces" vers "Stop & Dance"
   - Module Rails : App → StopAndDance
   - Base de données : threegraces_v2_* → stopanddance_*
@@ -344,6 +344,31 @@ bin/rails scraping:test[1]    # Test parsing sans sauvegarder
     - Médias : photo_url
   - Création vue events/show complète (détails + métadonnées)
   - Tests : 89 tests (0 failures), 8 system tests (0 failures)
+
+**Session 2026-03-27 après-midi :**
+- ✅ Optimisation scraping : HTML→Markdown avant envoi à Claude
+  - Migration : 3 nouvelles colonnes (derniere_version_markdown, data_attributes, html_hash)
+  - HtmlCleaner : extraction data-attributes + conversion Markdown (ReverseMarkdown)
+  - Réduction tokens : 98.7% (419 KB → 5 KB pour site Wix)
+  - ClaudeCliIntegration : stockage markdown + data après conversion
+  - ScrapingEngine : calcul html_hash (SHA256) pour détection changements O(1)
+- ✅ Preview admin amélioré : 6 onglets interactifs
+  - Résultat parsing : events JSON (cache DB instantané, bouton re-parse optionnel)
+  - Markdown view : rendu HTML stylé (redcarpet + prose Tailwind)
+  - Markdown brut : code source markdown
+  - Data attributes : data-* extraits du HTML
+  - HTML view : rendu HTML dans iframe sandbox
+  - HTML brut : code source HTML
+  - Performance : prévisualisation instantanée (cache DB) vs 61s avant
+  - Sécurité : helper render_markdown avec filter_html, safe_links_only
+- ✅ Documentation architecture scraping complète
+  - docs/architecture-scraping.md : 460 lignes, flux détaillé, composants, performance
+  - Tous les composants documentés : ScrapingDispatchJob, ScrapingEngine, HtmlCleaner, etc.
+  - Exemples réels, logs, monitoring, gestion erreurs
+- ✅ Corrections bugs
+  - Helper route : admin_scraped_url_preview_path → preview_admin_scraped_url_path
+  - LoadError reverse_markdown : suppression require redondant
+- ✅ Commits : b41b037, 737bd27, 5783ac8
 
 **Prochaines actions suggérées :**
 - Mise à jour credentials ENV (~/.env-stopanddance)
