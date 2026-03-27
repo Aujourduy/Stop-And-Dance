@@ -13,6 +13,8 @@ module.exports = {
         'beige': '#F5E6D3',            // Secondary color
         'beige-dark': '#E8D4BB',
         'dark-bg': '#1A1A1A',          // Near-black background
+        'moutarde': '#D4A017',         // Jaune moutarde pour Markdown maker
+        'moutarde-dark': '#B8860B',
       },
       fontFamily: {
         'script': ['Georgia', 'serif'],  // Elegant italic for titles/logo

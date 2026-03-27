@@ -41,6 +41,9 @@ Rails.application.routes.draw do
     resources :scraped_urls do
       member do
         post :scrape_now
+        post :fetch_with_httparty
+        post :fetch_with_playwright
+        post :generate_markdown
         get :preview
         get :raw_html
       end

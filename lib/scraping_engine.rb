@@ -8,8 +8,8 @@ class ScrapingEngine
 
     start_time = Time.current
 
-    # Detect appropriate scraper
-    scraper = detect_scraper(scraped_url.url)
+    # Detect appropriate scraper based on use_browser flag
+    scraper = detect_scraper(scraped_url)
 
     # Fetch HTML/data
     result = scraper.fetch(scraped_url.url)
@@ -86,16 +86,14 @@ class ScrapingEngine
   end
 
   # Make detect_scraper public for reuse in admin controllers (Story 9.2)
-  def self.detect_scraper(url)
-    case url
-    when /calendar\.google\.com/i
-      Scrapers::HtmlScraper # All platforms use HtmlScraper in MVP (Story 3.3)
-    when /helloasso\.com/i
-      Scrapers::HtmlScraper
-    when /billetweb\.fr/i
-      Scrapers::HtmlScraper
+  def self.detect_scraper(scraped_url)
+    # Use scraped_url.use_browser to determine scraper
+    # use_browser: true  → Playwright (sites JavaScript: Wix, React, Vue)
+    # use_browser: false → HTTParty (sites statiques, plus rapide)
+    if scraped_url.use_browser
+      Scrapers::PlaywrightScraper
     else
-      Scrapers::HtmlScraper # Default
+      Scrapers::HtmlScraper
     end
   end
 

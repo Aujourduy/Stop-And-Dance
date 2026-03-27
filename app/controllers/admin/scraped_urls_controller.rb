@@ -1,6 +1,6 @@
 class Admin::ScrapedUrlsController < Admin::ApplicationController
   include Pagy::Method
-  before_action :find_scraped_url, only: [ :show, :edit, :update, :destroy, :scrape_now, :preview, :raw_html ]
+  before_action :find_scraped_url, only: [ :show, :edit, :update, :destroy, :scrape_now, :fetch_with_httparty, :fetch_with_playwright, :generate_markdown, :preview, :raw_html ]
 
   def index
     # Pagy syntax: @pagy, @records = pagy(scope, limit: N)
@@ -55,6 +55,61 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
 
     redirect_to admin_scraped_url_path(@scraped_url),
                 notice: "Scraping lancé. Consultez les logs pour voir le résultat."
+  end
+
+  def fetch_with_httparty
+    # Test fetch with HTTParty (fast, no JS execution)
+    result = Scrapers::HtmlScraper.fetch(@scraped_url.url)
+
+    if result[:error]
+      redirect_to preview_admin_scraped_url_path(@scraped_url),
+                  alert: "Erreur HTTParty : #{result[:error]}"
+      return
+    end
+
+    # Save HTML result
+    @scraped_url.update!(derniere_version_html: result[:html])
+
+    redirect_to preview_admin_scraped_url_path(@scraped_url),
+                notice: "HTML téléchargé avec HTTParty (#{result[:html].bytesize} bytes)"
+  end
+
+  def fetch_with_playwright
+    # Test fetch with Playwright (slower, executes JavaScript)
+    result = Scrapers::PlaywrightScraper.fetch(@scraped_url.url)
+
+    if result[:error]
+      redirect_to preview_admin_scraped_url_path(@scraped_url),
+                  alert: "Erreur Playwright : #{result[:error]}"
+      return
+    end
+
+    # Save HTML result
+    @scraped_url.update!(derniere_version_html: result[:html])
+
+    redirect_to preview_admin_scraped_url_path(@scraped_url),
+                notice: "HTML téléchargé avec Playwright (#{result[:html].bytesize} bytes)"
+  end
+
+  def generate_markdown
+    # Convert HTML → Markdown + data-attributes (HtmlCleaner)
+    if @scraped_url.derniere_version_html.blank?
+      redirect_to preview_admin_scraped_url_path(@scraped_url),
+                  alert: "Aucun HTML en cache. Lancez un scraping d'abord."
+      return
+    end
+
+    # Call HtmlCleaner to extract data-attributes and convert to Markdown
+    result = HtmlCleaner.extract_and_convert(@scraped_url.derniere_version_html)
+
+    # Save results
+    @scraped_url.update!(
+      derniere_version_markdown: result[:markdown],
+      data_attributes: result[:data_attributes]
+    )
+
+    redirect_to preview_admin_scraped_url_path(@scraped_url),
+                notice: "Markdown généré avec succès ! (#{result[:markdown].bytesize} bytes)"
   end
 
   def preview
@@ -114,6 +169,6 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
   end
 
   def scraped_url_params
-    params.require(:scraped_url).permit(:url, :nom, :commentaire, :notes_correctrices, :statut_scraping)
+    params.require(:scraped_url).permit(:url, :nom, :commentaire, :notes_correctrices, :statut_scraping, :use_browser)
   end
 end

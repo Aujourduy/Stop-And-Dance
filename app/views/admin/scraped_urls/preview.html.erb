@@ -2,9 +2,48 @@
   <div>
     <%= link_to "← Retour", admin_scraped_url_path(@scraped_url), class: "text-terracotta hover:underline" %>
   </div>
-  <div>
+  <div class="flex gap-3 items-center">
+    <!-- Badge indicateur mode production -->
+    <% if @scraped_url.use_browser %>
+      <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+            title="Mode production : Playwright (browser complet avec JavaScript)">
+        🎭 Playwright
+      </span>
+    <% else %>
+      <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium"
+            title="Mode production : HTTParty (fetch rapide sans JavaScript)">
+        🌐 HTTParty
+      </span>
+    <% end %>
+
+    <!-- Bouton HTTParty -->
+    <%= button_to "🌐 HTTParty", fetch_with_httparty_admin_scraped_url_path(@scraped_url),
+                  method: :post,
+                  class: "bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700",
+                  title: "Fetch rapide sans JavaScript\n\n📋 QUAND L'UTILISER :\n• Sites statiques (HTML/CSS simple)\n• Pas de contenu chargé en JavaScript\n• Pas de React/Vue/Angular\n\n⏱️ DURÉE : ~1-2 secondes\n\n💡 AVANTAGE : Rapide et léger\n\n⚠️ LIMITE : Ne voit pas le contenu JS dynamique",
+                  data: { confirm: "Télécharger le HTML avec HTTParty ?\n\n⚡ Rapide (1-2s)\n❌ N'exécute PAS le JavaScript" },
+                  form: { class: "inline" } %>
+
+    <!-- Bouton Playwright -->
+    <%= button_to "🎭 Playwright", fetch_with_playwright_admin_scraped_url_path(@scraped_url),
+                  method: :post,
+                  class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700",
+                  title: "Lance un vrai browser Chromium headless\n\n📋 QUAND L'UTILISER :\n• Sites Wix, Squarespace, Webflow\n• Applications React/Vue/Angular\n• Contenu chargé en JavaScript\n• Calendriers dynamiques\n• Lazy-loading d'images\n\n⏱️ DURÉE : ~5-10 secondes\n\n💡 AVANTAGE : Voit TOUT le contenu (comme un vrai navigateur)\n\n⚠️ COÛT : Plus lent et consomme plus de ressources",
+                  data: { confirm: "Télécharger le HTML avec Playwright ?\n\n🎭 Lance un vrai browser Chromium\n✅ Exécute le JavaScript\n⏱️ Plus lent (5-10s)" },
+                  form: { class: "inline" } %>
+
+    <!-- Bouton Markdown maker -->
+    <%= button_to "📝 Markdown maker", generate_markdown_admin_scraped_url_path(@scraped_url),
+                  method: :post,
+                  class: "bg-moutarde text-white px-4 py-2 rounded hover:bg-moutarde-dark",
+                  title: "Convertit le HTML en cache → Markdown + data-attributes\n\n📋 FONCTION :\n• Nettoie le HTML (retire scripts, styles, nav)\n• Extrait les data-attributes\n• Convertit en Markdown optimisé\n\n⏱️ DURÉE : Instantané (<1s)\n\n💡 USAGE : Tester la conversion HTML→Markdown sans re-télécharger",
+                  data: { confirm: "Générer le Markdown à partir du HTML en cache ?" },
+                  form: { class: "inline" } %>
+
+    <!-- Bouton Re-parser avec Claude -->
     <%= link_to "🔄 Re-parser avec Claude", preview_admin_scraped_url_path(@scraped_url, force_parse: true),
                 class: "bg-terracotta text-white px-4 py-2 rounded hover:bg-terracotta-dark",
+                title: "Envoie le Markdown à Claude pour extraire les événements\n\n📋 FONCTION :\n• Utilise le Markdown en cache (pas de re-download)\n• Applique les notes correctrices\n• Parse avec Claude CLI\n• Crée/update les Events en base\n\n⏱️ DURÉE : ~30-60 secondes\n\n💡 USAGE : Tester différentes notes correctrices sans re-scraper",
                 data: { confirm: "Re-parser avec Claude prendra ~30-60 secondes. Continuer ?" } %>
   </div>
 </div>

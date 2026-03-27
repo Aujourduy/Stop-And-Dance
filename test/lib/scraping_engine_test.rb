@@ -9,24 +9,28 @@ class ScrapingEngineTest < ActiveSupport::TestCase
     )
   end
 
-  test "detects scraper based on URL pattern - Google Calendar" do
-    scraper = ScrapingEngine.detect_scraper("https://calendar.google.com/calendar/u/0/r")
+  test "detects Playwright scraper when use_browser is true" do
+    scraped_url = ScrapedUrl.create!(url: "https://example.com", use_browser: true)
+    scraper = ScrapingEngine.detect_scraper(scraped_url)
+    assert_equal Scrapers::PlaywrightScraper, scraper
+  end
+
+  test "detects HtmlScraper when use_browser is false" do
+    scraped_url = ScrapedUrl.create!(url: "https://example.com", use_browser: false)
+    scraper = ScrapingEngine.detect_scraper(scraped_url)
     assert_equal Scrapers::HtmlScraper, scraper
   end
 
-  test "detects scraper based on URL pattern - Helloasso" do
-    scraper = ScrapingEngine.detect_scraper("https://www.helloasso.com/associations/example")
+  test "uses HtmlScraper by default for HTTParty-compatible sites" do
+    scraped_url = ScrapedUrl.create!(url: "https://static-site.com", use_browser: false)
+    scraper = ScrapingEngine.detect_scraper(scraped_url)
     assert_equal Scrapers::HtmlScraper, scraper
   end
 
-  test "detects scraper based on URL pattern - Billetweb" do
-    scraper = ScrapingEngine.detect_scraper("https://www.billetweb.fr/example")
-    assert_equal Scrapers::HtmlScraper, scraper
-  end
-
-  test "uses default HtmlScraper for unknown URLs" do
-    scraper = ScrapingEngine.detect_scraper("https://random-website.com")
-    assert_equal Scrapers::HtmlScraper, scraper
+  test "uses PlaywrightScraper for JavaScript-heavy sites" do
+    scraped_url = ScrapedUrl.create!(url: "https://wix-site.com", use_browser: true)
+    scraper = ScrapingEngine.detect_scraper(scraped_url)
+    assert_equal Scrapers::PlaywrightScraper, scraper
   end
 
   test "increments error counter on scraping failure" do

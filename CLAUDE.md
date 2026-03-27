@@ -34,7 +34,35 @@ STOP uniquement si erreur technique bloquante nécessitant intervention humaine.
 
 ## Projet
 Agenda danse exploratoire France. Site read-only, zéro compte utilisateur.
-Rails 8, PostgreSQL, Solid Queue, Tailwind, Turbo, Pagy.
+Rails 8, PostgreSQL, Solid Queue, Tailwind CSS v4, Turbo, Pagy.
+
+### ⚠️ IMPORTANT : Tailwind CSS v4 Configuration
+
+**Ce projet utilise Tailwind CSS v4** qui fonctionne DIFFÉREMMENT de v3 !
+
+**❌ NE FONCTIONNE PLUS :**
+- `tailwind.config.js` pour ajouter des couleurs custom (méthode v3)
+
+**✅ NOUVELLE MÉTHODE v4 :**
+- Ajouter les couleurs dans `app/assets/tailwind/application.css` avec la directive `@theme`
+
+**Exemple :**
+```css
+@theme {
+  --color-ma-couleur: #FF5733;
+  --color-ma-couleur-dark: #CC4629;
+}
+```
+
+**Process complet :**
+1. Éditer `app/assets/tailwind/application.css` → ajouter `--color-xxx` dans `@theme`
+2. Recompiler : `bin/rails tailwindcss:build`
+3. Relancer le serveur Rails
+4. Utiliser dans les vues : `bg-ma-couleur`, `text-ma-couleur`, etc.
+
+**Couleurs déjà disponibles :**
+- Custom : `terracotta`, `beige`, `dark-bg`, `moutarde`
+- Tailwind base : `green-XXX`, `blue-XXX`, `red-XXX`, `gray-XXX` (limitées aux variants utilisés)
 
 ---
 
