@@ -1,9 +1,57 @@
 # État du Projet - Stop & Dance v2
 
-**Dernière mise à jour :** 2026-03-27
+**Dernière mise à jour :** 2026-03-28
 **Branch :** main
-**Dernière commit :** (en cours - migration vers Stop & Dance)
-**Statut :** ✅ **PROJET TERMINÉ - TOUS LES EPICS COMPLÉTÉS + MIGRATION EN COURS**
+**Dernière commit :** 3df9fe6 - Flash messages auto-dismiss + timeout Playwright 10min
+**Statut :** ✅ **PROJET TERMINÉ - Système de test scraping ajouté**
+
+---
+
+## 🎯 Session 2026-03-28 : Système de test scraping
+
+### Nouvelles fonctionnalités implémentées
+
+**1. PlaywrightScraper opérationnel**
+- Nouveau scraper avec Chromium headless pour sites JavaScript
+- Timeout 10 minutes pour pages complexes
+- Scroll automatique pour lazy-loading
+- User-Agent custom : "stopand.dance bot"
+
+**2. Interface admin de test scraping**
+- 4 boutons dans la preview pour tester chaque étape :
+  - 🌐 **HTTParty** (vert) : fetch rapide sans JS (1-2s)
+  - 🎭 **Playwright** (bleu) : browser complet avec JS (10min max)
+  - 📝 **Markdown maker** (jaune moutarde) : conversion HTML→Markdown
+  - 🔄 **Re-parser avec Claude** (terracotta) : parsing Markdown→Events
+- Infobulles détaillées sur chaque bouton (usage, durée, avantages)
+
+**3. Badge indicateur mode production**
+- Visible dans : liste admin, page show, preview
+- Indique le mode selon `use_browser` (HTTParty ou Playwright)
+
+**4. Formulaire edit amélioré**
+- Choix visuel HTTParty vs Playwright avec radio buttons
+- Descriptions détaillées pour chaque mode
+
+**5. Flash messages améliorés**
+- Auto-dismiss après 5 secondes
+- Bouton × pour fermer manuellement
+- Transition en fondu
+
+**6. Documentation Tailwind CSS v4**
+- Section WARNING ajoutée dans CLAUDE.md
+- Explique que `tailwind.config.js` ne fonctionne plus pour les couleurs
+- Méthode correcte : `@theme` dans `app/assets/tailwind/application.css`
+
+### ⚠️ TODO PROCHAINE SESSION
+
+**🧪 TESTER PLAYWRIGHT EN PRODUCTION**
+1. Aller dans `/admin/scraped_urls`
+2. Créer une nouvelle URL avec un site JavaScript (Wix, React, etc.)
+3. Cocher `use_browser: true` dans le formulaire
+4. Cliquer sur "🎭 Playwright" dans la preview
+5. Vérifier que le HTML est bien récupéré (avec contenu JS chargé)
+6. Comparer avec HTTParty pour voir la différence
 
 ---
 
