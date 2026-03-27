@@ -28,6 +28,7 @@ puts "\n👤 Creating professors..."
 
 professors_data = [
   {
+    nom: "Sophie Marchand",
     email: "sophie.marchand@example.com",
     site_web: "https://example.com/sophie-marchand",
     avatar_url: "https://i.pravatar.cc/300?img=1",
@@ -35,6 +36,7 @@ professors_data = [
     scraped_url_indices: [ 0 ]
   },
   {
+    nom: "Jean-Luc Dubois",
     email: "jeanluc.dubois@example.com",
     site_web: "https://example.com/jean-luc-dubois",
     avatar_url: "https://i.pravatar.cc/300?img=2",
@@ -42,6 +44,7 @@ professors_data = [
     scraped_url_indices: [ 1 ]
   },
   {
+    nom: "Marie Fontaine",
     email: "marie.fontaine@example.com",
     site_web: "https://example.com/marie-fontaine",
     avatar_url: "https://i.pravatar.cc/300?img=3",
@@ -49,6 +52,7 @@ professors_data = [
     scraped_url_indices: [ 2 ]
   },
   {
+    nom: "Pierre Lefebvre",
     email: "pierre.lefebvre@example.com",
     site_web: "https://example.com/pierre-lefebvre",
     avatar_url: "https://i.pravatar.cc/300?img=4",
@@ -58,11 +62,14 @@ professors_data = [
 ]
 
 professors = professors_data.map do |data|
-  prof = Professor.find_or_create_by!(email: data[:email]) do |p|
-    p.site_web = data[:site_web]
-    p.avatar_url = data[:avatar_url]
-    p.bio = data[:bio]
-  end
+  prof = Professor.find_or_initialize_by(email: data[:email])
+  prof.assign_attributes(
+    nom: data[:nom],
+    site_web: data[:site_web],
+    avatar_url: data[:avatar_url],
+    bio: data[:bio]
+  )
+  prof.save!
 
   # Associate with scraped URLs
   data[:scraped_url_indices].each do |idx|

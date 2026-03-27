@@ -3,17 +3,17 @@
             class: "block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 mb-4",
             data: { turbo_frame: "event_modal", debug_id: "event-card-#{event.id}" } do %>
 
-  <div class="flex gap-4">
-    <%# Event photo (80x80 square) %>
+  <div class="flex gap-4 items-start">
+    <%# Colonne 1: Avatar carré %>
     <div class="flex-shrink-0">
       <% if event.photo_url.present? %>
         <%= image_tag event.photo_url,
                       alt: event.titre,
-                      class: "w-20 h-20 object-cover rounded",
+                      class: "w-32 h-32 object-cover rounded",
                       loading: "lazy" %>
       <% else %>
         <%# Placeholder if no photo %>
-        <div class="w-20 h-20 bg-terracotta-light rounded flex items-center justify-center text-white text-2xl">
+        <div class="w-32 h-32 bg-terracotta-light rounded flex items-center justify-center text-white text-4xl">
           <%= event.professor.nom&.first&.upcase || "?" %>
         </div>
       <% end %>
@@ -21,17 +21,12 @@
 
     <%# Event details %>
     <div class="flex-grow min-w-0">
-      <%# Time in terracotta bold %>
-      <div class="text-terracotta font-bold text-lg mb-1">
-        <%= l(event.date_debut, format: :time_only) %>
-      </div>
-
-      <%# Tags %>
-      <div class="flex flex-wrap gap-2 mb-2">
+      <%# Ligne 1: Horaire + Pastilles %>
+      <div class="flex items-center gap-2 mb-2">
+        <div class="text-terracotta font-bold text-lg">
+          <%= l(event.date_debut, format: :time_only) %>
+        </div>
         <%= render "shared/tag", text: event.type_event_humanized, variant: event.type_event %>
-        <% if event.gratuit %>
-          <%= render "shared/tag", text: "Gratuit", variant: "gratuit" %>
-        <% end %>
         <% if event.en_ligne %>
           <%= render "shared/tag", text: "En ligne", variant: "en_ligne" %>
         <% end %>
@@ -40,33 +35,36 @@
         <% end %>
       </div>
 
-      <%# Title %>
+      <%# Ligne 2: Titre %>
       <h3 class="font-bold text-lg mb-1 truncate"><%= event.titre %></h3>
 
-      <%# Presenter %>
+      <%# Ligne 3: Animé par %>
       <p class="text-gray-600 text-sm mb-1">
-        Animé par <%= event.professor.nom %>
+        Animé par <%= event.professor&.nom || "" %>
       </p>
 
-      <%# Location %>
-      <p class="text-gray-600 text-sm flex items-center gap-1 mb-1">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-        </svg>
-        <%= event.lieu %>
-      </p>
+      <%# Ligne 4: Localisation (gauche) + Prix (droite) %>
+      <div class="flex items-center justify-between">
+        <%# Localisation à gauche %>
+        <p class="text-gray-600 text-sm flex items-center gap-1">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+          </svg>
+          <%= event.lieu %>
+        </p>
 
-      <%# Price %>
-      <p class="text-gray-900 font-medium">
-        <% if event.gratuit %>
-          <span class="text-green-600">Gratuit</span>
-        <% elsif event.prix_reduit.present? %>
-          <%= number_to_currency(event.prix_normal, unit: "€", format: "%n%u") %>
-          <span class="text-sm text-gray-600">(réduit: <%= number_to_currency(event.prix_reduit, unit: "€", format: "%n%u") %>)</span>
-        <% else %>
-          <%= number_to_currency(event.prix_normal, unit: "€", format: "%n%u") %>
-        <% end %>
-      </p>
+        <%# Prix à droite %>
+        <p class="text-gray-900 font-medium">
+          <% if event.gratuit %>
+            <span class="text-green-600">Gratuit</span>
+          <% elsif event.prix_reduit.present? %>
+            <%= number_to_currency(event.prix_normal, unit: "€", format: "%n%u") %>
+            <span class="text-sm text-gray-600">(réduit: <%= number_to_currency(event.prix_reduit, unit: "€", format: "%n%u") %>)</span>
+          <% else %>
+            <%= number_to_currency(event.prix_normal, unit: "€", format: "%n%u") %>
+          <% end %>
+        </p>
+      </div>
     </div>
   </div>
 <% end %>
