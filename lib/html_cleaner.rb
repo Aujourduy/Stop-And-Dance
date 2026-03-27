@@ -1,5 +1,3 @@
-require 'reverse_markdown'
-
 class HtmlCleaner
   def self.clean_and_convert(html)
     doc = Nokogiri::HTML(html)
