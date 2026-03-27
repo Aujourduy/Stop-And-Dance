@@ -304,6 +304,20 @@ bin/rails scraping:test[1]    # Test parsing sans sauvegarder
   - Puma bind sur 0.0.0.0 (accès réseau Tailscale)
   - Règle CLAUDE.md : toujours lancer avec -b 0.0.0.0 -p 3002
   - Site accessible via http://100.95.124.70:3002
+- ✅ Déduplication professeurs (scraping)
+  - Migration : nom_normalise (unique index) + status (auto/verified) + scraped_urls.nom
+  - Concern Normalizable : normaliser_nom + find_or_create_from_scrape
+  - Validation : nom presence required
+  - Rake task : professors:backfill_nom_normalise
+  - Tests : 17 tests déduplication (89 tests total, 0 failures)
+  - Seeds : 5 profs dont 2 multi-sources (Sophie, Marie au Studio Collectif)
+  - Documentation : docs/scraping-architecture.md complète
+  - Fix : "Marie Dupont" = "marie dupont" = "Stéphane" = "Stephane" (accents strippés)
+- ✅ Documentation utilisateur scraping
+  - Guide complet : docs/guide-scraping.md
+  - Ajouter URL, lancer scraping (test + réel), vérifier résultats
+  - Debugging, notes correctrices, maintenance
+  - Cheatsheet commandes rapides
 
 **Prochaines actions suggérées :**
 - Mise à jour credentials ENV (~/.env-stopanddance)
