@@ -329,10 +329,26 @@ bin/rails scraping:test[1]    # Test parsing sans sauvegarder
   - Sections par audience (admin, dev, PM)
   - Quick start dev + premier scraping
 
+- ✅ Corrections interface admin
+  - Fix login : credentials .env (admin/change_me_in_production) vs doc
+  - Fix ScrapedUrl show : dernier_scraping_a supprimé → updated_at
+  - Fix ChangeLog : texte_avant/apres supprimés → changements_detectes jsonb
+  - Création vue change_logs/show avec diff HTML
+  - Ajout champ commentaire (text) pour ScrapedUrls
+  - Fix formulaire events/edit : TOUS les champs ajoutés (17 champs)
+    - Informations base : titre, description, professor_id, type_event, tags
+    - Dates : date_debut, date_fin
+    - Lieu : lieu, adresse_complete
+    - Tarifs : prix_normal, prix_reduit, gratuit
+    - Format : en_presentiel, en_ligne (hybrid possible)
+    - Médias : photo_url
+  - Création vue events/show complète (détails + métadonnées)
+  - Tests : 89 tests (0 failures), 8 system tests (0 failures)
+
 **Prochaines actions suggérées :**
 - Mise à jour credentials ENV (~/.env-stopanddance)
 - Setup DNS pour stopand.dance
 - Upgrade Ruby 3.3 avant EOL 3.2.10 (31 mars 2026)
 - Tests production sur stopand.dance
 - QA final complet (slash command `/qa`)
-- Documentation utilisateur (guide admin)
+- Tester le scraping sur URLs réelles
