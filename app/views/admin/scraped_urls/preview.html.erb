@@ -53,8 +53,11 @@
         <button onclick="showTab('parsed')" id="tab-parsed" class="tab-button active px-6 py-3 border-b-2 border-terracotta text-terracotta font-medium">
           Résultat parsing
         </button>
+        <button onclick="showTab('markdown-view')" id="tab-markdown-view" class="tab-button px-6 py-3 border-b-2 border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300">
+          Markdown view
+        </button>
         <button onclick="showTab('markdown')" id="tab-markdown" class="tab-button px-6 py-3 border-b-2 border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300">
-          Markdown
+          Markdown brut
         </button>
         <button onclick="showTab('data')" id="tab-data" class="tab-button px-6 py-3 border-b-2 border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300">
           Data attributes
@@ -91,7 +94,18 @@
         <% end %>
       </div>
 
-      <!-- Markdown tab -->
+      <!-- Markdown view tab (rendered) -->
+      <div id="content-markdown-view" class="tab-content hidden">
+        <% if @scraped_url.derniere_version_markdown.present? %>
+          <div class="prose max-w-none bg-white p-6 rounded border border-gray-200">
+            <%= render_markdown(@scraped_url.derniere_version_markdown) %>
+          </div>
+        <% else %>
+          <div class="text-gray-500 italic">Aucun Markdown disponible. Lancez un scraping pour générer le Markdown.</div>
+        <% end %>
+      </div>
+
+      <!-- Markdown brut tab -->
       <div id="content-markdown" class="tab-content hidden">
         <% if @scraped_url.derniere_version_markdown.present? %>
           <pre class="bg-gray-50 p-4 rounded overflow-x-auto text-sm whitespace-pre-wrap"><%= @scraped_url.derniere_version_markdown %></pre>
