@@ -197,6 +197,12 @@ Epic 1 DÉBUT → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → Epic 1 FIN (Do
 - Dev Rails v2 sur port 3002
 - Tests système : Capybara + Playwright local (Chromium)
 
+**IMPORTANT - Serveur Rails :**
+- Toujours lancer avec : `bin/rails server -b 0.0.0.0 -p 3002`
+- Le bind sur 0.0.0.0 est OBLIGATOIRE (serveur headless, accès réseau local)
+- JAMAIS localhost uniquement (sinon inaccessible depuis navigateur)
+- Raison : serveur distant accessible via Tailscale VPN
+
 ### Réseau et déploiement
 - **Tailscale** : VPN mesh privé, serveur accessible via IP 100.x.x.x
 - **Cloudflare** : DNS + proxy HTTPS pour stopand.dance
