@@ -31,13 +31,35 @@
       <%# Flash messages %>
       <% if flash.any? %>
         <% flash.each do |type, message| %>
-          <div class="<%= type == 'alert' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' %> px-4 py-3 rounded mb-4">
+          <div class="<%= type == 'alert' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' %> px-4 py-3 rounded mb-4 flash-message"
+               data-controller="flash"
+               data-flash-type-value="<%= type %>">
             <%= message %>
+            <button type="button"
+                    class="float-right text-2xl leading-none font-semibold opacity-50 hover:opacity-100"
+                    onclick="this.parentElement.remove()">
+              ×
+            </button>
           </div>
         <% end %>
       <% end %>
 
       <%= yield %>
     </main>
+
+    <script>
+      // Auto-dismiss flash messages after 5 seconds
+      document.addEventListener('turbo:load', function() {
+        document.querySelectorAll('.flash-message').forEach(function(flash) {
+          setTimeout(function() {
+            flash.style.transition = 'opacity 0.5s';
+            flash.style.opacity = '0';
+            setTimeout(function() {
+              flash.remove();
+            }, 500);
+          }, 5000);
+        });
+      });
+    </script>
   </body>
 </html>

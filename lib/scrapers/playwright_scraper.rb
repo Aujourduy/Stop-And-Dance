@@ -16,8 +16,8 @@ module Scrapers
           page = context.new_page
 
           begin
-            # Navigate to URL with 60s timeout
-            page.goto(url, waitUntil: "networkidle", timeout: 60_000)
+            # Navigate to URL with 10min timeout for complex pages
+            page.goto(url, waitUntil: "networkidle", timeout: 600_000)
 
             # Wait for JavaScript to fully execute
             page.wait_for_timeout(2000) # 2s additional wait for lazy-loaded content
