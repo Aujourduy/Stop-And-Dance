@@ -369,6 +369,12 @@ bin/rails scraping:test[1]    # Test parsing sans sauvegarder
   - Helper route : admin_scraped_url_preview_path → preview_admin_scraped_url_path
   - LoadError reverse_markdown : suppression require redondant
 - ✅ Commits : b41b037, 737bd27, 5783ac8
+- ✅ Correction preview HTML admin
+  - Bug : méthode raw_html non incluse dans before_action :find_scraped_url
+  - Résultat : iframe HTML view ne chargeait pas (404)
+  - Fix : ajout :raw_html dans la liste des actions du before_action
+  - Tests : 89 tests passent, routes preview + raw_html retournent 200
+  - Commit : cffc7c9
 
 **Prochaines actions suggérées :**
 - Mise à jour credentials ENV (~/.env-stopanddance)
