@@ -6,6 +6,11 @@ class Admin::ChangeLogsController < Admin::ApplicationController
       ChangeLog.includes(:scraped_url).order(created_at: :desc),
       limit: 50
     )
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def show

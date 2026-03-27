@@ -7,6 +7,11 @@ class Admin::EventsController < Admin::ApplicationController
       Event.includes(:professor).order(date_debut: :desc),
       limit: 30
     )
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def show

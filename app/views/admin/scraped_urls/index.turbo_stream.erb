@@ -1,0 +1,44 @@
+<%= turbo_stream.append "admin-scraped-urls-tbody" do %>
+  <% @scraped_urls.each do |url| %>
+    <tr>
+      <td class="px-6 py-4">
+        <%= link_to admin_scraped_url_path(url), class: "text-terracotta hover:underline" do %>
+          <div class="font-medium"><%= url.nom.presence || url.url.truncate(40) %></div>
+          <% if url.nom.present? %>
+            <div class="text-xs text-gray-500"><%= url.url.truncate(50) %></div>
+          <% end %>
+        <% end %>
+      </td>
+      <td class="px-6 py-4 text-sm text-gray-900">
+        <%= url.professors.map(&:nom).join(", ").presence || "—" %>
+      </td>
+      <td class="px-6 py-4">
+        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                     <%= url.statut_scraping == 'actif' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+          <%= url.statut_scraping %>
+        </span>
+      </td>
+      <td class="px-6 py-4 text-sm text-gray-500">
+        <%= url.updated_at.strftime("%d/%m/%Y %H:%M") %>
+      </td>
+      <td class="px-6 py-4 text-right text-sm font-medium space-x-2">
+        <%= link_to "Voir", admin_scraped_url_path(url), class: "text-blue-600 hover:underline" %>
+        <%= link_to "Modifier", edit_admin_scraped_url_path(url), class: "text-blue-600 hover:underline" %>
+        <%= button_to "Scraper", scrape_now_admin_scraped_url_path(url), method: :post, class: "text-green-600 hover:underline inline" %>
+      </td>
+    </tr>
+  <% end %>
+<% end %>
+
+<%# Next page trigger %>
+<%= turbo_stream.append "admin-scraped-urls-list" do %>
+  <% if @pagy.next %>
+    <%= turbo_frame_tag "admin-scraped-urls-page-#{@pagy.next}",
+                        src: admin_scraped_urls_path(page: @pagy.next, format: :turbo_stream),
+                        loading: :lazy do %>
+      <div class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

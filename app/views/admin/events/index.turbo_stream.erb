@@ -1,0 +1,25 @@
+<%= turbo_stream.append "admin-events-tbody" do %>
+  <% @events.each do |event| %>
+    <tr>
+      <td class="px-6 py-4 text-sm"><%= link_to event.titre, admin_event_path(event), class: "text-terracotta hover:underline" %></td>
+      <td class="px-6 py-4 text-sm"><%= event.date_debut.strftime("%d/%m/%Y") %></td>
+      <td class="px-6 py-4 text-sm"><%= event.professor.nom %></td>
+      <td class="px-6 py-4 text-right text-sm">
+        <%= link_to "Modifier", edit_admin_event_path(event), class: "text-blue-600 hover:underline" %>
+      </td>
+    </tr>
+  <% end %>
+<% end %>
+
+<%# Next page trigger %>
+<%= turbo_stream.append "admin-events-list" do %>
+  <% if @pagy.next %>
+    <%= turbo_frame_tag "admin-events-page-#{@pagy.next}",
+                        src: admin_events_path(page: @pagy.next, format: :turbo_stream),
+                        loading: :lazy do %>
+      <div class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

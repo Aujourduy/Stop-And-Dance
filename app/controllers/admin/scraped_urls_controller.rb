@@ -8,6 +8,11 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
       ScrapedUrl.includes(:professors).order(created_at: :desc),
       limit: 20
     )
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def show

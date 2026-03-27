@@ -1,0 +1,29 @@
+<%= turbo_stream.append "admin-change-logs-tbody" do %>
+  <% @change_logs.each do |log| %>
+    <tr>
+      <td class="px-6 py-4 text-sm"><%= log.created_at.strftime("%d/%m/%Y %H:%M") %></td>
+      <td class="px-6 py-4 text-sm">
+        <%= link_to log.scraped_url.url.truncate(40), admin_scraped_url_path(log.scraped_url), class: "text-terracotta hover:underline" %>
+      </td>
+      <td class="px-6 py-4 text-sm text-gray-900">
+        <span class="text-red-600">-<%= log.changements_detectes["lines_removed"] || 0 %></span>
+        /
+        <span class="text-green-600">+<%= log.changements_detectes["lines_added"] || 0 %></span>
+        lignes
+      </td>
+    </tr>
+  <% end %>
+<% end %>
+
+<%# Next page trigger %>
+<%= turbo_stream.append "admin-change-logs-list" do %>
+  <% if @pagy.next %>
+    <%= turbo_frame_tag "admin-change-logs-page-#{@pagy.next}",
+                        src: admin_change_logs_path(page: @pagy.next, format: :turbo_stream),
+                        loading: :lazy do %>
+      <div class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
