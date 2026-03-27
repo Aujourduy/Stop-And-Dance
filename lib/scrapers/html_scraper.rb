@@ -1,6 +1,6 @@
 module Scrapers
   class HtmlScraper
-    USER_AGENT = "3graces.community bot - contact@3graces.community"
+    USER_AGENT = "stopand.dance bot - contact@stopand.dance"
 
     def self.fetch(url)
       # Check robots.txt compliance first (NFR-S1)

@@ -10,7 +10,7 @@
 - **Accents** : Tons terracotta pour boutons CTA, headers sidebar
 
 ### Typographie
-- Titres principaux : Police script/italique élégante (ex: "AU JOUR duy")
+- Titres principaux : Police script/italique élégante (ex: "Stop & Dance")
 - Corps de texte : Sans-serif lisible
 - Labels/tags : Petite taille, fond coloré arrondi
 
@@ -29,7 +29,7 @@
 
 **Desktop & Mobile**
 - Photo pleine largeur de danseurs (fond sombre, noir & blanc ou sépia)
-- Logo "AU JOUR duy" en grand — typographie script blanche
+- Logo "Stop & Dance" en grand — typographie script blanche
 - Texte de présentation en italic blanc (paragraphe court)
 - 6 boutons CTA arrondis en 2 rangées :
   - Rangée 1 : AGENDA (terracotta) · PUBLIES TES ATELIERS (terracotta) · ACTUALITÉS (terracotta)

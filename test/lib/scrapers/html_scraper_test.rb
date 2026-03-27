@@ -17,7 +17,7 @@ class HtmlScraperTest < ActiveSupport::TestCase
   end
 
   test "uses correct user agent" do
-    assert_equal "3graces.community bot - contact@3graces.community",
+    assert_equal "stopand.dance bot - contact@stopand.dance",
                  Scrapers::HtmlScraper::USER_AGENT
   end
 

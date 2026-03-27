@@ -23,7 +23,7 @@ module SeoMetadata
       },
       twitter: {
         card: "summary_large_image",
-        site: "@3graces",
+        site: "@stopanddance",
         title: :title,
         description: :description,
         image: view_context.asset_path("og-default.jpg")

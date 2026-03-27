@@ -1,10 +1,10 @@
 #!/bin/bash
-# Production deployment script for 3 Graces
+# Production deployment script for Stop & Dance
 # Usage: ./scripts/deploy.sh
 
 set -e
 
-echo "=== 3 Graces Production Deployment ==="
+echo "=== Stop & Dance Production Deployment ==="
 echo ""
 
 # Check .env exists

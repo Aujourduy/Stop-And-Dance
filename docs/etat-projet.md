@@ -281,6 +281,16 @@ bin/rails scraping:test[1]    # Test parsing sans sauvegarder
 - ✅ Repo GitHub renommé : 3-Graces → Stop-And-Dance
 - ✅ Dossier projet renommé : ~/3graces-v2 → ~/stop-and-dance
 - ✅ Chemins absolus corrigés dans la documentation
+- ✅ Corrections références "3 Graces" → "Stop & Dance" dans le code
+  - Vues : navbar, mobile_drawer, hero, tailwind_test
+  - Logo Hero : "AU JOUR duy" → "Stop & Dance"
+  - SEO metadata : @3graces → @stopanddance
+  - User-agent scraper : 3graces.community → stopand.dance
+  - Robots.txt : sitemap URL mis à jour
+  - Scripts : backup-db.sh, deploy.sh, Caddyfile
+  - Documentation : ui-reference.md, config.yaml
+  - Tests : html_scraper_test.rb, pages_accessibility_test.rb
+  - Tous les tests passent (71 runs, 0 failures)
 
 **Prochaines actions suggérées :**
 - Mise à jour credentials ENV (~/.env-stopanddance)

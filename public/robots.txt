@@ -3,4 +3,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://3graces.community/sitemap.xml
+Sitemap: https://stopand.dance/sitemap.xml
