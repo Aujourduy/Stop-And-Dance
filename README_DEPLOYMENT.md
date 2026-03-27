@@ -61,10 +61,10 @@ The script will:
 Set up daily backups via cron:
 ```bash
 crontab -e
-# Add: 0 2 * * * /home/dang/3graces-v2/scripts/backup-db.sh
+# Add: 0 2 * * * /home/dang/stop-and-dance/scripts/backup-db.sh
 ```
 
-Backups stored in `/home/dang/backups/3graces-v2/` (30 day retention)
+Backups stored in `/home/dang/backups/stop-and-dance/` (30 day retention)
 
 ### Monitoring
 

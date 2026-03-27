@@ -229,7 +229,7 @@ This document provides the complete epic and story breakdown for 3graces-v2, dec
 
 ### Additional Requirements (from Architecture)
 
-**ARCH-1:** Rails 8.1.2 project already exists at /home/dang/3graces-v2 (no starter template needed)
+**ARCH-1:** Rails 8.1.2 project already exists at /home/dang/stop-and-dance (no starter template needed)
 
 **ARCH-2:** PostgreSQL with timezone forced to Europe/Paris display, UTC storage (config.active_record.default_timezone = :utc)
 

@@ -18,7 +18,7 @@ So that the application has a complete data foundation to build features upon.
 
 **Acceptance Criteria:**
 
-**Given** Rails 8.1.2 project exists at /home/dang/3graces-v2
+**Given** Rails 8.1.2 project exists at /home/dang/stop-and-dance
 **And** PostgreSQL is NOT installed locally (only runs in Docker v1 containers)
 **And** Docker v1 (prod port 3000, dev port 3001) must remain untouched
 **And** Nextcloud occupies ports 80/443
@@ -371,7 +371,7 @@ SCRAPING_LOGGER.info({
 #!/bin/bash
 find ./log -name "*.log" -type f -mtime +90 -delete
 ```
-- Cron: `0 2 * * * /home/dang/3graces-v2/scripts/cleanup_logs.sh`
+- Cron: `0 2 * * * /home/dang/stop-and-dance/scripts/cleanup_logs.sh`
 
 **And** logs use ISO 8601 timestamps with timezone: `2026-03-25T19:30:00+01:00`
 **And** scraping logs are separate from general Rails logs for easier monitoring
@@ -395,7 +395,7 @@ So that I can recover data in case of corruption or accidental deletion.
 **Backup script (`scripts/backup_db.sh`):**
 ```bash
 #!/bin/bash
-BACKUP_DIR="/home/dang/3graces-v2/backups"
+BACKUP_DIR="/home/dang/stop-and-dance/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="${BACKUP_DIR}/threegraces_${TIMESTAMP}.sql"
 
@@ -415,10 +415,10 @@ echo "Backup completed: ${BACKUP_FILE}.gz"
 ```
 
 **Cron job (daily at 3 AM):**
-- Crontab entry: `0 3 * * * /home/dang/3graces-v2/scripts/backup_db.sh >> /home/dang/3graces-v2/log/backup.log 2>&1`
+- Crontab entry: `0 3 * * * /home/dang/stop-and-dance/scripts/backup_db.sh >> /home/dang/stop-and-dance/log/backup.log 2>&1`
 
 **Backup directory:**
-- `/home/dang/3graces-v2/backups/` created
+- `/home/dang/stop-and-dance/backups/` created
 - `.gitignore` includes `backups/*.sql.gz`
 - Permissions: `chmod 700 backups/` (only owner can read)
 
