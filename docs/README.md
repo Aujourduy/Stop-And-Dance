@@ -125,7 +125,7 @@ http://localhost:3002
 # Accès admin
 http://localhost:3002/admin
 # Username: admin
-# Password: changeme
+# Password: change_me_in_production
 ```
 
 ### Premier scraping

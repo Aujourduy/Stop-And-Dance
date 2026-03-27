@@ -36,7 +36,7 @@ L'accès admin est protégé par **HTTP Basic Authentication**.
 
 **Credentials par défaut** :
 - Username : `admin`
-- Password : `changeme`
+- Password : `change_me_in_production`
 
 ⚠️ **IMPORTANT** : Changer le mot de passe en production !
 
@@ -68,7 +68,7 @@ bin/rails restart  # Ou docker restart stopanddance_web
 
 ```bash
 # Curl avec auth
-curl -u admin:changeme http://localhost:3002/admin
+curl -u admin:change_me_in_production http://localhost:3002/admin
 
 # Ou via navigateur
 # → Ouvrir http://localhost:3002/admin
@@ -503,7 +503,7 @@ L'admin ajoute automatiquement :
 # Accès admin
 http://localhost:3002/admin
 # Username: admin
-# Password: changeme (CHANGER EN PROD !)
+# Password: change_me_in_production (CHANGER EN PROD !)
 
 # Changer credentials
 nano ~/.env-stopanddance
