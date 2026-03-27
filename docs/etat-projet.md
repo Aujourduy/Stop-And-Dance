@@ -375,6 +375,16 @@ bin/rails scraping:test[1]    # Test parsing sans sauvegarder
   - Fix : ajout :raw_html dans la liste des actions du before_action
   - Tests : 89 tests passent, routes preview + raw_html retournent 200
   - Commit : cffc7c9
+- ✅ Corrections CI (lint + security scan)
+  - RuboCop : 16 offenses corrigées automatiquement (StringLiterals lib/html_cleaner.rb)
+  - Brakeman : XSS warning ajouté à brakeman.ignore (diff_html admin safe)
+  - Tests : 89 tests passent (0 failures)
+  - CI status : ✅ lint, ✅ tests, ✅ scan_ruby (1 warning Ruby EOL non-bloquant)
+  - Commit : 4de7f8b
+- ✅ Nouvelle règle CLAUDE.md global
+  - Vérification CI obligatoire avant chaque push (lint + tests + scan)
+  - Règle 4 - PROTECTION GIT enrichie avec checklist CI
+  - Commit claude-config : cd4f363
 
 **Prochaines actions suggérées :**
 - Mise à jour credentials ENV (~/.env-stopanddance)
