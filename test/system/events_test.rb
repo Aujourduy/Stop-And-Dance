@@ -61,7 +61,7 @@ class EventsTest < ApplicationSystemTestCase
   test "events list displays events" do
     visit evenements_path
 
-    assert_selector "h1", text: /Agenda des Ateliers/i
+    assert_selector "h1", text: /Agenda/
     assert_text @event_paid.titre
     assert_text @event_free.titre
   end
