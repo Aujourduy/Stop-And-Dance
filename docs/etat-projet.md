@@ -1,9 +1,9 @@
 # État du Projet - Stop & Dance
 
-**Dernière mise à jour :** 2026-03-28
+**Dernière mise à jour :** 2026-03-29
 **Branch :** main
-**Dernière commit :** ddc480e
-**Statut :** ✅ **PROJET COMPLET - Tous les epics terminés**
+**Dernière commit :** 699076d
+**Statut :** ✅ **PROJET COMPLET - Tous les epics terminés + Playwright validé**
 
 ---
 
@@ -456,77 +456,91 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 
 ---
 
-## 🚀 Dernière Session (2026-03-28)
+## 🚀 Dernière Session (2026-03-29)
 
-### Nouvelles fonctionnalités
+### Tests Playwright Complets ✅
 
-**1. PlaywrightScraper opérationnel**
-- Scraper Chromium headless pour sites JavaScript
-- Timeout 10 minutes pour pages complexes
-- Scroll automatique lazy-loading
-- User-Agent custom : "stopand.dance bot"
-- Corrections : paramètres camelCase (`userAgent`, `waitUntil`)
+**Module Playwright 100% opérationnel - Aucune correction nécessaire**
 
-**2. Interface admin test scraping**
-- 4 boutons dans preview pour tester chaque étape :
-  - 🌐 HTTParty (vert) : fetch rapide sans JS (1-2s)
-  - 🎭 Playwright (bleu) : browser complet avec JS (10min max)
-  - 📝 Markdown maker (jaune moutarde) : conversion HTML→Markdown
-  - 🔄 Re-parser avec Claude (terracotta) : parsing Markdown→Events
-- Infobulles détaillées sur chaque bouton (usage, durée, avantages)
+**Tests effectués :**
 
-**3. Badge indicateur mode production**
-- Visible dans : liste admin, page show, preview
-- Indique le mode selon `use_browser` (HTTParty ou Playwright)
-- Badge vert (HTTParty) ou bleu (Playwright)
+1. **Site de test HTML+JS local**
+   - Créé `tmp/test-playwright.html` avec contenu JavaScript (lazy-loading 500ms)
+   - Serveur HTTP Python (port 8888)
+   - ✅ Contenu dynamique JavaScript détecté (Stage Dance Immersion)
+   - ✅ Confirmation exécution JS détectée
+   - Temps : 3-5 secondes
 
-**4. Formulaire edit amélioré**
-- Choix visuel HTTParty vs Playwright avec radio buttons
-- Cases avec bordures colorées selon sélection
-- Descriptions détaillées pour chaque mode
-- Conseil : "Commence avec HTTParty"
+2. **Site Rails local (port 3002)**
+   - URL: `http://localhost:3002/`
+   - ✅ Homepage chargée (13130 chars)
+   - ✅ Titre et contenu détectés
+   - Temps : 4-6 secondes
 
-**5. Flash messages améliorés**
-- Auto-dismiss après 5 secondes
-- Bouton × pour fermer manuellement
-- Transition en fondu (opacity fade-out)
-- Compatible Turbo (écoute `turbo:load`)
+3. **Site Wix externe**
+   - URL: `https://www.wix.com/website-template/view/html/1068`
+   - ✅ Template Wix chargé (4599 chars)
+   - ✅ Contenu Wix détecté
+   - Temps : 8-12 secondes
 
-**6. Documentation Tailwind CSS v4**
-- Section WARNING ajoutée dans CLAUDE.md
-- Explique que `tailwind.config.js` ne fonctionne plus pour les couleurs
-- Méthode correcte : `@theme` dans `app/assets/tailwind/application.css`
-- Couleur moutarde ajoutée : `--color-moutarde: #D4A017`
+4. **Intégration ScrapingEngine**
+   - ✅ Scraping complet avec détection changements
+   - ✅ HTML mis en cache database (2981 chars)
+   - ✅ html_hash calculé (SHA256)
+   - ✅ Contenu JavaScript présent dans cache
 
-### Corrections
+5. **Conversion Markdown**
+   - ✅ HtmlCleaner détecte contenu JavaScript dans Markdown
+   - ✅ Réduction tokens efficace (313 chars)
 
-- HtmlCleaner : méthode correcte `clean_and_convert` (pas `extract_and_convert`)
-- PlaywrightScraper : paramètres camelCase (`userAgent`, `waitUntil` pas snake_case)
-- Tests : 89 runs, 0 failures
+6. **Tests automatisés**
+   - ✅ Tests unitaires : 89 runs, 0 failures
+   - ✅ Tests système : 8 runs, 0 failures
+   - ✅ RuboCop : 0 offenses
+   - ✅ Brakeman : 1 warning (EOL Ruby, non-bloquant)
 
-### Commits session
+**Comparaison HTTParty vs Playwright :**
+- HTTParty : ⚡ 1-2s, ❌ pas de JS, sites statiques uniquement
+- Playwright : 🐢 3-12s, ✅ JS complet, Wix/React/Vue compatible
+
+**Rapport complet :** `tmp/PLAYWRIGHT_TEST_REPORT.md`
+
+### Session précédente (2026-03-28)
+
+**Fonctionnalités implémentées :**
+- PlaywrightScraper opérationnel (timeout 10min, scroll lazy-loading)
+- Interface admin test scraping (4 boutons : HTTParty, Playwright, Markdown, Claude)
+- Badges indicateurs mode (HTTParty/Playwright)
+- Formulaire edit avec choix visuel
+- Flash messages auto-dismiss (5s)
+- Documentation Tailwind CSS v4
+
+**Commits :**
 - `6be714c` - feat: Ajout système de test scraping
 - `2d4ef6c` - fix: Corrections boutons Markdown maker et Playwright
 - `3df9fe6` - feat: Flash messages auto-dismiss + timeout Playwright 10min
 - `ddc480e` - docs: MAJ état projet session 2026-03-28
+- `699076d` - docs: Refonte complète etat-projet.md en synthèse globale
 
 ---
 
 ## ⚠️ TODO Prochaine Session
 
-**🧪 TESTER PLAYWRIGHT EN PRODUCTION**
+**✅ PLAYWRIGHT VALIDÉ - Prêt pour production**
 
-1. Aller dans `/admin/scraped_urls`
-2. Créer une nouvelle URL avec un site JavaScript (Wix, React, etc.)
-3. Cocher `use_browser: true` dans le formulaire
-4. Cliquer sur "🎭 Playwright" dans la preview
-5. Vérifier que le HTML est bien récupéré (avec contenu JS chargé)
-6. Comparer avec HTTParty pour voir la différence
+**Actions production :**
+1. Tester scraping sur 2-3 URLs réelles (Wix/React/Vue) en production
+2. Monitorer logs Solid Queue pour temps d'exécution
+3. Comparer résultats HTTParty vs Playwright côte à côte
+4. Vérifier utilisation mémoire Chromium headless
 
-**Autres actions suggérées :**
+**Maintenance système :**
+- Upgrade Ruby 3.3 avant EOL 3.2.10 (31 mars 2026)
 - Mise à jour credentials ENV (ADMIN_USERNAME, ADMIN_PASSWORD)
 - Setup DNS pour stopand.dance
-- Upgrade Ruby 3.3 avant EOL 3.2.10 (31 mars 2026)
-- Tests production sur stopand.dance
+- Tests complets production sur stopand.dance
+
+**Qualité :**
 - QA final complet (slash command `/qa`)
-- Tester scraping sur URLs réelles
+- Documenter cas d'usage HTTParty vs Playwright avec screenshots
+- Ajouter métriques réelles dans `docs/architecture-scraping.md`
