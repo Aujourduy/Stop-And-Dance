@@ -102,6 +102,21 @@ Scénarios : Homepage (Hero, navbar), liste événements, filtres (Gratuit, date
 
 ---
 
+## Vérification du Scraping
+
+**Protocole complet :** `docs/verification-scraping.md`
+
+Après chaque scraping (nouveau ScrapedUrl, modif code scraping, parsing Claude nouvelle source), vérifier :
+- Comptage événements extraits (≥ 1)
+- Timestamps (HTML, Markdown, Claude) renseignés
+- Cohérence données (dates, prix/gratuit, professor_id)
+- Correspondance site source vs DB (≥ 80%)
+- Affichage site public + admin preview OK
+
+**Commandes rapides et checklist complète dans la doc.**
+
+---
+
 ## Ordre des Epics
 
 Epic 1 DÉBUT → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → Epic 1 FIN (Docker/prod en dernier).
