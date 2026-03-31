@@ -3,16 +3,13 @@
 ## SURCHARGES DU CLAUDE.MD GLOBAL
 
 ### Override Règle 2 — PENDANT L'EXÉCUTION DES STORIES
-Quand Duy a lancé l'exécution des stories ("go", "continue", "enchaîne"),
-ne PAS s'arrêter entre les stories pour proposer des options.
-Enchaîner story suivante → tests → commit → push → story suivante.
+Quand Duy a lancé l'exécution des stories ("go", "continue", "enchaîne"), ne PAS s'arrêter entre les stories pour proposer des options.
+Enchaîner : story suivante → tests → commit → push → story suivante.
 La règle 2 reste active pour toute AUTRE discussion.
 
 ### Override Règle 3 (Démarrage session)
 Ce projet N'UTILISE PAS SUIVI_ENCOURS.md ni SUIVI_ARCHITECTURE.md.
-Au démarrage, lire ce fichier puis le fichier story de l'epic en cours.
-Pour savoir où on en est : `git log --oneline` — le dernier commit
-feat: Story X.X indique la dernière story terminée.
+Au démarrage : lire ce fichier + `git log --oneline` (dernier commit feat: Story X.X = dernière story terminée).
 Stories : `_bmad-output/planning-artifacts/epic-*.md`
 Architecture : `_bmad-output/planning-artifacts/architecture.md`
 Maquette UI : `docs/ui-reference.md` et `docs/ui-reference.jsx`
@@ -25,14 +22,14 @@ La protection git-firewall.sh est désactivée pour ce projet.
 
 ### Mode continu
 Ne PAS s'arrêter entre les epics pour faire un bilan ou résumé.
-Enchaîner : story → tests → commit → push → story suivante →
-jusqu'à ce que toutes les stories de tous les epics soient terminées.
+Enchaîner : story → tests → commit → push → story suivante → jusqu'à fin de tous les epics.
 Un résumé n'est PAS un problème bloquant.
 STOP uniquement si erreur technique bloquante nécessitant intervention humaine.
 
 ---
 
 ## Projet
+
 Agenda danse exploratoire France. Site read-only, zéro compte utilisateur.
 Rails 8, PostgreSQL, Solid Queue, Tailwind CSS v4, Turbo, Pagy.
 
@@ -40,133 +37,62 @@ Rails 8, PostgreSQL, Solid Queue, Tailwind CSS v4, Turbo, Pagy.
 
 **Ce projet utilise Tailwind CSS v4** qui fonctionne DIFFÉREMMENT de v3 !
 
-**❌ NE FONCTIONNE PLUS :**
-- `tailwind.config.js` pour ajouter des couleurs custom (méthode v3)
+❌ `tailwind.config.js` pour ajouter couleurs custom NE FONCTIONNE PLUS (méthode v3)
+✅ Ajouter couleurs dans `app/assets/tailwind/application.css` avec directive `@theme`
 
-**✅ NOUVELLE MÉTHODE v4 :**
-- Ajouter les couleurs dans `app/assets/tailwind/application.css` avec la directive `@theme`
+**Process :** Éditer `app/assets/tailwind/application.css` → ajouter `--color-xxx` dans `@theme` → `bin/rails tailwindcss:build` → relancer serveur → utiliser `bg-xxx` dans vues
 
-**Exemple :**
-```css
-@theme {
-  --color-ma-couleur: #FF5733;
-  --color-ma-couleur-dark: #CC4629;
-}
-```
-
-**Process complet :**
-1. Éditer `app/assets/tailwind/application.css` → ajouter `--color-xxx` dans `@theme`
-2. Recompiler : `bin/rails tailwindcss:build`
-3. Relancer le serveur Rails
-4. Utiliser dans les vues : `bg-ma-couleur`, `text-ma-couleur`, etc.
-
-**Couleurs déjà disponibles :**
-- Custom : `terracotta`, `beige`, `dark-bg`, `moutarde`
-- Tailwind base : `green-XXX`, `blue-XXX`, `red-XXX`, `gray-XXX` (limitées aux variants utilisés)
+**Couleurs disponibles :** terracotta, beige, dark-bg, moutarde (custom) + green/blue/red/gray-XXX (variants utilisés)
 
 ---
 
 ## Définition de "Story terminée"
+
 Une story est terminée UNIQUEMENT quand :
 1. Code écrit selon acceptance criteria
 2. Tests écrits ET passent (`rails test`)
 3. Tests système passent (`rails test:system`)
 4. Routes impactées testées avec curl (status 200)
-5. Si la story modifie du code existant, les tests impactés 
-   (unitaires + système) sont mis à jour pour refléter les changements
-6. Les tests existants qui échouent après une modif DOIVENT être 
-   corrigés avant commit, JAMAIS supprimés
+5. Si modif code existant → tests impactés (unitaires + système) mis à jour
+6. Tests qui échouent après modif → CORRIGER avant commit, JAMAIS supprimer
 7. Commit + push
-Si tests ou curl échouent, corriger avant de passer à la suite.
+
+Si tests ou curl échouent → corriger avant de passer à la suite.
+
 ---
 
 ## Audit QA — Après le dernier Epic de chaque session
 
-Jouer le rôle de QA Engineer. Audit complet de l'application :
+Jouer le rôle de QA Engineer. Audit complet via slash command `/qa` ou manuel.
 
-### 1. TESTS
-Lancer `rails test` — TOUT doit passer. Zéro failure, zéro error.
+**8 sections :** Tests unitaires, tests système, routes (curl), liens (link_to), modèles (associations), vues (partials), conventions CLAUDE.md, tests UX.
 
-### 2. ROUTES
-Lancer le serveur sur port 3002, curl TOUTES les routes, vérifier status 200 :
+**Spécificités projet :**
 
-**Routes publiques :**
-- GET /
-- GET /evenements
-- GET /evenements/:slug (premier event des seeds)
-- GET /professeurs/:id (premier prof des seeds)
-- GET /professeurs/:id/stats
-- GET /professeurs/:id/redirect_to_site (vérifie redirect 303)
-- GET /a-propos
-- GET /contact
-- GET /proposants
-- GET /sitemap.xml
+**Routes à tester (curl sur port 3002) :**
+- Publiques : /, /evenements, /evenements/:slug, /professeurs/:id, /professeurs/:id/stats, /professeurs/:id/redirect_to_site, /a-propos, /contact, /proposants, /sitemap.xml
+- Admin (HTTP Basic Auth) : /admin, /admin/scraped_urls (index, new, show, edit, preview), /admin/events (index, show, edit), /admin/change_logs (index, show)
 
-**Routes admin (avec auth HTTP Basic) :**
-- GET /admin
-- GET /admin/scraped_urls
-- GET /admin/scraped_urls/new
-- GET /admin/scraped_urls/:id
-- GET /admin/scraped_urls/:id/edit
-- GET /admin/scraped_urls/:id/preview
-- GET /admin/events
-- GET /admin/events/:id
-- GET /admin/events/:id/edit
-- GET /admin/change_logs
-- GET /admin/change_logs/:id
-
-### 3. LIENS
-Vérifier que tous les `link_to` dans les vues pointent vers des routes
-qui existent. Grep les helpers de route utilisés dans `app/views/` et
-croiser avec `rails routes`.
-
-### 4. MODÈLES
-Vérifier que les associations (belongs_to, has_many, has_many :through)
-sont cohérentes :
-- Pas de données orphelines dans les seeds
-- Event.professor n'est JAMAIS nil pour les events affichés
-- Chaque belongs_to optionnel est protégé dans les vues (&. ou if)
-
-### 5. VUES
-Vérifier que chaque partial appelé avec `render` :
-- Existe au bon chemin
-- Reçoit les bonnes variables locales
-- Ne plante pas sur des données nil (professor, scraped_url, etc.)
-
-### 6. CONVENTIONS CLAUDE.MD
-Grep et vérifier dans tout le code :
-- Pagy utilisé partout, PAS Kaminari (JAMAIS `.page().per()`)
-- `Time.current` dans les scopes, PAS `Date.current`
-- `increment_counter` pour compteurs, PAS `increment!`
+**Conventions spécifiques à vérifier :**
+- Pagy utilisé partout (JAMAIS `.page().per()` Kaminari)
+- `Time.current` dans scopes (JAMAIS `Date.current`)
+- `increment_counter` pour compteurs (JAMAIS `increment!`)
 - Timezone : `config.active_record.default_timezone = :utc`
 - Routes publiques en français (/evenements, /professeurs)
 
-### 7. RAPPORT
-Pour chaque bug trouvé : corriger, tester, commit, push.
-Faire un rapport final listant tout ce qui a été corrigé.
+**Tests système UX :**
+Capybara + Playwright local (PAS Selenium), port 3002.
+Scénarios : Homepage (Hero, navbar), liste événements, filtres (Gratuit, date), modal, newsletter, infinite scroll, admin (HTTP Basic).
 
-### 8. TESTS SYSTÈME (UX)
-Utiliser Capybara + Playwright local (PAS Selenium, PAS container Docker Playwright v1).
-Driver: `capybara-playwright-driver`, browser: Chromium headless, port 3002.
-Config: `test/application_system_test_case.rb`
+**Process :** Pour chaque bug → corriger, tester, commit + push → rapport final `tmp/QA_AUDIT_[DATE].md`
 
-Écrire des tests système pour les interactions utilisateur :
-- Homepage : charge OK, affiche Hero, navbar
-- Liste événements : affiche des events
-- Filtres : cocher "Gratuit" → seuls events gratuits affichés
-- Filtres : entrer date → filtrage OK
-- Modal : cliquer event → modal s'ouvre
-- Newsletter : remplir email → flash message succès
-- Infinite scroll : scroll → batch suivant chargé
-- Admin : login HTTP Basic → accès admin OK
-
-Lancer avec `rails test:system` — tout doit passer.
+**Détails complets :** `~/.claude/commands/qa.md`
 
 ---
 
 ## Conventions à respecter PARTOUT
 
-- **Timezone** : UTC en base, Europe/Paris à l'affichage. JAMAIS stocker en local.
+- **Timezone** : UTC en base, Europe/Paris affichage. JAMAIS stocker en local.
 - **Pagination** : Pagy (`@pagy, @records = pagy(scope)`). JAMAIS `.page().per()`.
 - **Compteurs** : `Professor.increment_counter(:x, id)`. JAMAIS `increment!`.
 - **Scopes temps** : `Time.current` dans Event.futurs. JAMAIS `Date.current`.
@@ -177,65 +103,44 @@ Lancer avec `rails test:system` — tout doit passer.
 ---
 
 ## Ordre des Epics
+
 Epic 1 DÉBUT → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → Epic 1 FIN (Docker/prod en dernier).
 
 ---
 
 ## Mise à jour état projet — AVANT chaque commit significatif
 
-**IMPORTANT** : Mettre à jour `docs/etat-projet.md` + sync Gist **AVANT chaque commit significatif** (pas typos, mais features/corrections/stories).
+**IMPORTANT** : MAJ `docs/etat-projet.md` + sync Gist AVANT commit significatif (features/corrections/stories, PAS typos).
 
-**Pourquoi ?**
-- Si session interrompue, état cohérent dans Gist
-- claude.ai voit toujours l'état réel du projet
-- Trace historique précise dans git
+**Pourquoi ?** Session interrompue = état cohérent dans Gist → claude.ai voit état réel → trace précise dans git.
 
-**Process AVANT chaque commit significatif :**
+**Process :**
+1. MAJ `docs/etat-projet.md` : date, epics/stories terminés, epic en cours, fonctionnalités, problèmes, prochaines étapes
+2. Lancer `bin/sync-gist.sh` (sync vers Gist GitHub secret, credentials ~/.env-stopanddance)
+3. Commit avec docs/etat-projet.md inclus
 
-1. **Mettre à jour** `docs/etat-projet.md` :
-   - Date de dernière mise à jour
-   - Epics/stories terminés
-   - Epic en cours + prochaine story
-   - Fonctionnalités implémentées
-   - Problèmes résolus/connus
-   - Prochaines étapes
-
-2. **Lancer** `bin/sync-gist.sh`
-   - Synchronise vers Gist GitHub (secret)
-   - claude.ai peut lire l'état (repo privé inaccessible)
-   - Credentials : ~/.env-stopanddance (GIST_ID, GIST_TOKEN)
-
-3. **Commit** avec docs/etat-projet.md inclus
-
-**Exemples de commits significatifs :**
-- ✅ Story terminée (feat: Story X.X)
-- ✅ Epic terminé (feat: Epic X)
-- ✅ Correction bug majeur (fix: problème bloquant)
-- ✅ Refactor important (refactor: architecture)
-- ❌ Fix typo (docs: correction typo) → pas besoin de maj état
+**Commits significatifs :** Story terminée, Epic terminé, bug majeur, refactor important (PAS typos).
 
 ---
 
 ## Contexte serveur
 
-### Infrastructure locale
-- PostgreSQL local (user dang, peer auth, pas de mot de passe)
-- Docker v1 tourne en parallèle — NE PAS TOUCHER
+**Infrastructure locale :**
+- PostgreSQL local (user dang, peer auth)
+- Docker v1 en parallèle — NE PAS TOUCHER
 - Ports occupés : 3000, 3001, 80, 443
-- Dev Rails v2 sur port 3002
+- Dev Rails v2 : port 3002
 - Tests système : Capybara + Playwright local (Chromium)
 
 **IMPORTANT - Serveur Rails :**
-- Toujours lancer avec : `bin/rails server -b 0.0.0.0 -p 3002`
-- Le bind sur 0.0.0.0 est OBLIGATOIRE (serveur headless, accès réseau local)
-- JAMAIS localhost uniquement (sinon inaccessible depuis navigateur)
-- Raison : serveur distant accessible via Tailscale VPN
+`bin/rails server -b 0.0.0.0 -p 3002`
+Bind 0.0.0.0 OBLIGATOIRE (serveur headless, accès réseau local via Tailscale VPN).
+JAMAIS localhost uniquement (inaccessible depuis navigateur).
 
-### Réseau et déploiement
-- **Tailscale** : VPN mesh privé, serveur accessible via IP 100.x.x.x
-- **Cloudflare** : DNS + proxy HTTPS pour stopand.dance
-- **HTTPS** : Géré par Cloudflare uniquement, PAS par Caddy/Let's Encrypt
-- **Admin** : Peut être restreint au réseau Tailscale (accès VPN uniquement)
+**Réseau/déploiement :**
+- Tailscale : VPN mesh privé (IP 100.x.x.x)
+- Cloudflare : DNS + proxy HTTPS (stopand.dance)
+- HTTPS : géré par Cloudflare uniquement (PAS Caddy/Let's Encrypt)
+- Admin : restreint VPN Tailscale (optionnel)
 
-### Aide
-Si bloqué : WebSearch ou WebFetch pour consulter la documentation.
+**Aide :** WebSearch ou WebFetch si bloqué.

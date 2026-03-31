@@ -458,6 +458,27 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 
 ## 🚀 Dernière Session (2026-03-31)
 
+### Refactorisation CLAUDE.md Projet (-39%) ✅
+
+**Compression réalisée :**
+- 240 lignes → 146 lignes (-39%)
+- 1300 mots → 857 mots (-34%)
+- ~1950 tokens → ~1285 tokens (-34%)
+- Économie : ~665 tokens
+
+**Optimisations sans perte :**
+- Externalisé audit QA détaillé vers `~/.claude/commands/qa.md` (référence)
+- Condensé section Tailwind CSS v4 (avertissement + process 1 ligne)
+- Synthétisé mise à jour état projet (33 → 10 lignes)
+- Factorié conventions redondantes (2 sections → 1)
+- Optimisé contexte serveur (23 → 13 lignes)
+
+**Règles critiques préservées :**
+- Overrides règles 2, 3, 4, 8 (mode autonome)
+- Définition "Story terminée" complète
+- Avertissement Tailwind CSS v4
+- Conventions critiques (Pagy, Time.current, port 3002, bind 0.0.0.0)
+
 ### Gestion Warning Brakeman EOL Ruby ✅
 
 **Action effectuée :**
