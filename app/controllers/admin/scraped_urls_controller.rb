@@ -68,10 +68,12 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
     end
 
     # Save HTML result with timestamp
-    @scraped_url.update!(
+    # Always update timestamp even if HTML unchanged
+    @scraped_url.assign_attributes(
       derniere_version_html: result[:html],
       derniere_version_html_at: Time.current
     )
+    @scraped_url.save!(touch: false)
 
     redirect_to preview_admin_scraped_url_path(@scraped_url),
                 notice: "HTML téléchargé avec HTTParty (#{result[:html].bytesize} bytes)"
@@ -88,10 +90,12 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
     end
 
     # Save HTML result with timestamp
-    @scraped_url.update!(
+    # Always update timestamp even if HTML unchanged
+    @scraped_url.assign_attributes(
       derniere_version_html: result[:html],
       derniere_version_html_at: Time.current
     )
+    @scraped_url.save!(touch: false)
 
     redirect_to preview_admin_scraped_url_path(@scraped_url),
                 notice: "HTML téléchargé avec Playwright (#{result[:html].bytesize} bytes)"
@@ -109,11 +113,13 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
     result = HtmlCleaner.clean_and_convert(@scraped_url.derniere_version_html)
 
     # Save results with timestamp
-    @scraped_url.update!(
+    # Always update timestamp even if Markdown unchanged
+    @scraped_url.assign_attributes(
       derniere_version_markdown: result[:markdown],
       data_attributes: result[:data_attributes],
       derniere_version_markdown_at: Time.current
     )
+    @scraped_url.save!(touch: false)
 
     redirect_to preview_admin_scraped_url_path(@scraped_url),
                 notice: "Markdown généré avec succès ! (#{result[:markdown].bytesize} bytes)"
