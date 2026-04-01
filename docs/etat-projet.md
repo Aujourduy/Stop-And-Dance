@@ -1,8 +1,8 @@
 # État du Projet - Stop & Dance
 
-**Dernière mise à jour :** 2026-03-31
+**Dernière mise à jour :** 2026-04-01
 **Branch :** main
-**Dernière commit :** 530dd55
+**Dernière commit :** fd8a174
 **Statut :** ✅ **PROJET COMPLET - Tous les epics terminés + Playwright validé**
 
 ---
@@ -107,9 +107,11 @@
 - Mode headless : --dangerously-skip-permissions
 
 **Déduplication Professeurs**
-- Migration : nom_normalise (unique index) + status (auto/verified)
+- Migration : champ prenom + nom_normalise (prenom + nom, unique index) + status (auto/reviewed)
 - Normalisation : strip, downcase, unaccent, 1 space
-- find_or_create_from_scrape : dédup automatique
+- Auto-création : Claude extrait professor_nom par event → find_or_create avec status="auto"
+- Recherche 3 niveaux : ScrapedUrl.professors → global → create new
+- Admin review : alerte dashboard + /admin/professors pour vérifier/compléter + bouton "Marquer vérifié"
 - Seeds : 5 profs dont 2 multi-sources (Sophie, Marie au Studio Collectif)
 
 ### Interface Admin
@@ -138,6 +140,14 @@
 - HTML view : rendu dans iframe sandbox
 - HTML brut : code source HTML
 - Performance : prévisualisation instantanée (cache DB)
+
+**CRUD Professeurs** (`/admin/professors`)
+- Liste avec filtres : Tous / À vérifier (auto)
+- Alerte dashboard si professeurs status="auto" non vérifiés
+- Badges : 🤖 Auto (jaune) / ✅ Vérifié (vert)
+- Edit : prenom, nom, email, site_web, avatar_url, bio
+- Bouton "Marquer comme vérifié" (auto → reviewed)
+- UI cohérente avec conventions admin (Tailwind classes standards)
 
 **Autres Fonctionnalités Admin**
 - Scraping manuel (bouton "Scraper maintenant")
@@ -193,9 +203,10 @@
 
 **Professor** (professeurs)
 - Relations : has_many :events, has_many :scraped_urls
-- Champs : nom, nom_normalise (unique), bio, photo_url, site_url, status (auto/verified)
-- Compteurs : nombre_vues, nombre_clics_site
-- Concern : Normalizable (normaliser_nom, find_or_create_from_scrape)
+- Champs : prenom, nom, nom_normalise (prenom + nom, unique), bio, email, site_web, avatar_url, status (auto/reviewed)
+- Compteurs : consultations_count, clics_sortants_count
+- Concern : Normalizable (normaliser_nom avec prenom + nom)
+- Auto-création : status="auto" quand détecté par Claude, admin review requis
 
 **ScrapedUrl** (sources scraping)
 - Relations : has_many :events, has_many :change_logs, has_many :professors
@@ -245,6 +256,8 @@
 - `POST /admin/scraped_urls/:id/generate_markdown` : test conversion Markdown
 - `GET /admin/scraped_urls/:id/preview` : preview scraping (6 onglets)
 - `GET /admin/scraped_urls/:id/raw_html` : HTML brut (iframe)
+- `/admin/professors` : index (filtres), edit, update
+- `POST /admin/professors/:id/mark_reviewed` : marquer vérifié (auto → reviewed)
 - `GET /admin/change_logs` : historique changements
 - `GET /admin/events` : liste événements
 - `PATCH /admin/events/:id` : édition événement
@@ -279,7 +292,8 @@
 - `parse_and_generate(scraped_url, html, notes_correctrices)` : parsing Claude
 - Construit prompt : markdown + data + consignes + notes
 - Appelle Claude CLI (timeout 120s)
-- Parse JSON events
+- Parse JSON events avec professor_nom par event
+- Schema : titre, professor_nom, description, date_debut, date_fin, lieu, prix, etc.
 
 **app/jobs/scraping_dispatch_job.rb**
 - Cron 24h (Solid Queue)
@@ -292,7 +306,8 @@
 **app/jobs/event_update_job.rb**
 - Convertit HTML → Markdown (HtmlCleaner)
 - Parse avec Claude CLI (ClaudeCliIntegration)
-- Crée/update Events en base
+- `find_or_create_professor(scraped_url, professor_nom)` : recherche 3 niveaux + auto-création
+- Crée/update Events en base avec association professor correcte
 
 ### Conventions Projet
 
@@ -456,48 +471,100 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 
 ---
 
-## 🚀 Dernière Session (2026-03-31)
+**Documentation vérification**
+- `docs/verification-scraping.md` : protocole complet vérification résultats scraping (8 sections, 14 checkpoints)
 
-### Refactorisation CLAUDE.md Projet (-39%) ✅
+---
 
-**Compression réalisée :**
-- 240 lignes → 146 lignes (-39%)
-- 1300 mots → 857 mots (-34%)
-- ~1950 tokens → ~1285 tokens (-34%)
-- Économie : ~665 tokens
+## 🚀 Dernière Session (2026-04-01)
 
-**Optimisations sans perte :**
-- Externalisé audit QA détaillé vers `~/.claude/commands/qa.md` (référence)
-- Condensé section Tailwind CSS v4 (avertissement + process 1 ligne)
-- Synthétisé mise à jour état projet (33 → 10 lignes)
-- Factorié conventions redondantes (2 sections → 1)
-- Optimisé contexte serveur (23 → 13 lignes)
+### 1. Fix Timestamps Preview Admin ✅
 
-**Règles critiques préservées :**
-- Overrides règles 2, 3, 4, 8 (mode autonome)
-- Définition "Story terminée" complète
-- Avertissement Tailwind CSS v4
-- Conventions critiques (Pagy, Time.current, port 3002, bind 0.0.0.0)
+**Problème résolu :**
+- Timestamps (derniere_version_html_at, markdown_at, claude_at) non mis à jour après boutons test
+- Cause : Rails optimisation skip update si contenu identique
+- Solution : `assign_attributes` + `save!(touch: false)` dans fetch_with_httparty, fetch_with_playwright, generate_markdown
 
-### Gestion Warning Brakeman EOL Ruby ✅
+**Fichiers modifiés :**
+- `app/controllers/admin/scraped_urls_controller.rb` (3 actions)
+- `app/views/admin/scraped_urls/preview.html.erb` (ajout affichage timestamps)
 
-**Action effectuée :**
-- Warning Brakeman "Ruby 3.2.10 EOL" ajouté à `.brakeman.ignore`
-- Note documentée : upgrade Ruby 3.4 planifié pour session future
-- Justification : projet reste sécurisé, EOL = pas de nouveaux correctifs mais code actuel sans vulnérabilités connues
+### 2. Documentation Vérification Scraping ✅
 
-**Résultat :**
-- ✅ Brakeman : 0 warnings (3 ignored)
-- ✅ Tests : 89 runs, 0 failures
-- ✅ RuboCop : 0 offenses
-- ✅ CI prêt pour production
+**Création :**
+- `docs/verification-scraping.md` : protocole 8 sections, 14 checkpoints
+- Sections : Base, Cohérence, Comparaison HTML→DB, Affichage public/admin, Avancé, Troubleshooting, Résumé
+- Commandes copy-paste SQL et Rails console
+- Référencé dans `CLAUDE.md` projet
 
-**Décision pragmatique :**
-- Option D choisie : ignorer temporairement le warning EOL Ruby
-- Upgrade Ruby 3.4 reporté à session future (dispo limitée, prioriser features)
-- Projet 100% fonctionnel et sécurisé
+### 3. Ajout Champ Prenom Professors ✅
 
-### Session précédente (2026-03-29)
+**Migration :**
+- Nouveau champ `prenom` (string, nullable)
+- Split données existantes : dernier mot = nom, reste = prenom
+- Concern Normalizable : `nom_normalise = normaliser(prenom + nom)`
+
+**Fichiers modifiés :**
+- Migration `db/migrate/20260331212835_add_prenom_to_professors.rb`
+- `app/models/concerns/normalizable.rb` (logique prenom + nom)
+
+### 4. Auto-Création Professeurs Multi-Profs ✅
+
+**Feature complète :**
+- Claude extrait `professor_nom` par événement (ajout champ JSON schema)
+- `EventUpdateJob.find_or_create_professor` : recherche 3 niveaux
+  1. ScrapedUrl.professors (professeurs déjà associés)
+  2. Global (Professor.find_by nom_normalise)
+  3. Create new avec status="auto", bio auto-générée
+- Split automatique prenom/nom (dernier mot = nom, reste = prenom)
+- Logging SCRAPING_LOGGER pour toutes créations/associations
+
+**Fichiers modifiés :**
+- `lib/claude_cli_integration.rb` (schema JSON + professor_nom)
+- `app/jobs/event_update_job.rb` (méthode find_or_create_professor)
+
+### 5. Interface Admin Review Professeurs ✅
+
+**CRUD Professeurs créé :**
+- Route `/admin/professors` : index (liste), edit, update, mark_reviewed
+- Index : filtres Tous / À vérifier (auto), badges 🤖 Auto / ✅ Vérifié
+- Alerte dashboard (URLs admin) si professeurs status="auto" non vérifiés
+- Edit : prenom, nom, email, site_web, avatar_url, bio
+- Bouton "Marquer comme vérifié" (auto → reviewed)
+- UI harmonisée avec conventions admin (Tailwind classes standards)
+
+**Fichiers créés :**
+- `app/controllers/admin/professors_controller.rb` (index, edit, update, mark_reviewed)
+- `app/views/admin/professors/index.html.erb`
+- `app/views/admin/professors/edit.html.erb`
+
+**Fichiers modifiés :**
+- `config/routes.rb` (routes professors)
+- `app/controllers/admin/scraped_urls_controller.rb` (alerte dashboard)
+- `app/views/admin/scraped_urls/index.html.erb` (alerte yellow box)
+- `app/views/layouts/admin.html.erb` (lien navigation "Professeurs")
+
+**Commits session :**
+- `f681991` Fix: Force timestamp update même si HTML/Markdown inchangé
+- `c0e6751` Docs: Ajout protocole vérification scraping complet
+- `6a756df` Feat: Ajout champ prenom aux professors avec split prenom/nom
+- `03be341` Feat: Auto-création professors multi-profs + admin review
+- `fd8a174` Refactor: Harmonise UI page /admin/professors/edit avec conventions admin
+
+---
+
+## ⚠️ TODO Prochaine Session
+
+**Fonctionnalités suggérées :**
+- Tester scraping complet avec auto-création professeurs (ScrapedUrl avec nouveaux profs)
+- Vérifier workflow admin review (alerte → liste filtered → edit → mark reviewed)
+- Optionnel : Upgrade Ruby 3.4 (EOL Ruby 3.2 = 31 mars 2026)
+
+---
+
+## 📝 Sessions Précédentes (Archives)
+
+### Session 2026-03-31 - Timestamps + Documentation ✅
 
 #### Correction Critique Playwright ✅
 
