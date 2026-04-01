@@ -1,89 +1,80 @@
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-900">Éditer le professeur</h1>
-    <%= link_to "← Retour à la liste", admin_professors_path, class: "text-blue-600 hover:text-blue-900 text-sm mt-2 inline-block" %>
+<h1 class="text-3xl font-bold mb-6">Éditer le professeur</h1>
+
+<% if @professor.status == "auto" %>
+  <div class="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded">
+    ⚠️ <strong>Professeur créé automatiquement</strong> - Vérifiez et complétez les informations
   </div>
+<% end %>
 
-  <% if @professor.status == "auto" %>
-    <div class="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-      <div class="flex items-center">
-        <span class="text-yellow-800 font-medium">⚠️ Professeur créé automatiquement - Vérifiez et complétez les informations</span>
-      </div>
-    </div>
-  <% end %>
-
-  <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
-    <%= form_with model: @professor, url: admin_professor_path(@professor), method: :patch, local: true, class: "space-y-6" do |form| %>
-      <% if @professor.errors.any? %>
-        <div class="bg-red-50 border border-red-200 rounded p-4">
-          <h3 class="text-red-800 font-medium">Erreurs :</h3>
-          <ul class="mt-2 list-disc list-inside text-red-700 text-sm">
-            <% @professor.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <%= form.label :prenom, "Prénom", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= form.text_field :prenom, class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
-        </div>
-
-        <div>
-          <%= form.label :nom, "Nom de famille *", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= form.text_field :nom, class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", required: true %>
-        </div>
-      </div>
-
-      <div>
-        <%= form.label :email, "Email", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= form.email_field :email, class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", placeholder: "contact@example.com" %>
-      </div>
-
-      <div>
-        <%= form.label :site_web, "Site web", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= form.url_field :site_web, class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", placeholder: "https://..." %>
-      </div>
-
-      <div>
-        <%= form.label :avatar_url, "URL Avatar (photo)", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= form.url_field :avatar_url, class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", placeholder: "https://..." %>
-        <% if @professor.avatar_url.present? %>
-          <div class="mt-2">
-            <img src="<%= @professor.avatar_url %>" alt="Avatar" class="w-20 h-20 rounded-full object-cover">
-          </div>
-        <% end %>
-      </div>
-
-      <div>
-        <%= form.label :bio, "Biographie", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= form.text_area :bio, rows: 4, class: "w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", placeholder: "Décrivez le parcours et les spécialités du professeur..." %>
-      </div>
-
-      <div class="bg-gray-50 p-4 rounded">
-        <h3 class="text-sm font-medium text-gray-700 mb-2">Informations système</h3>
-        <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
-          <div><strong>ID:</strong> <%= @professor.id %></div>
-          <div><strong>Nom normalisé:</strong> <%= @professor.nom_normalise %></div>
-          <div><strong>Status:</strong> <%= @professor.status %></div>
-          <div><strong>Événements:</strong> <%= @professor.events.count %></div>
-          <div><strong>Consultations:</strong> <%= @professor.consultations_count %></div>
-          <div><strong>Clics sortants:</strong> <%= @professor.clics_sortants_count %></div>
-        </div>
-      </div>
-
-      <div class="flex justify-between items-center pt-4 border-t">
-        <div class="space-x-2">
-          <%= form.submit "Enregistrer les modifications", class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
-          <%= link_to "Annuler", admin_professors_path, class: "bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300" %>
-        </div>
-
-        <% if @professor.status == "auto" %>
-          <%= button_to "✅ Marquer comme vérifié", mark_reviewed_admin_professor_path(@professor), method: :post, class: "bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" %>
-        <% end %>
+<div class="bg-white rounded-lg shadow p-6">
+  <%= form_with model: @professor, url: admin_professor_path(@professor), method: :patch, local: true, class: "space-y-6" do |form| %>
+    <% if @professor.errors.any? %>
+      <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+        <ul class="list-disc list-inside">
+          <% @professor.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
       </div>
     <% end %>
-  </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= form.label :prenom, "Prénom", class: "block font-bold mb-2" %>
+        <%= form.text_field :prenom, class: "w-full px-3 py-2 border rounded", placeholder: "Ex: Sophie" %>
+      </div>
+
+      <div>
+        <%= form.label :nom, "Nom de famille *", class: "block font-bold mb-2" %>
+        <%= form.text_field :nom, class: "w-full px-3 py-2 border rounded", placeholder: "Ex: Marchand", required: true %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :email, "Email", class: "block font-bold mb-2" %>
+      <%= form.email_field :email, class: "w-full px-3 py-2 border rounded", placeholder: "contact@example.com" %>
+    </div>
+
+    <div>
+      <%= form.label :site_web, "Site web", class: "block font-bold mb-2" %>
+      <%= form.url_field :site_web, class: "w-full px-3 py-2 border rounded", placeholder: "https://..." %>
+    </div>
+
+    <div>
+      <%= form.label :avatar_url, "URL Avatar (photo)", class: "block font-bold mb-2" %>
+      <%= form.url_field :avatar_url, class: "w-full px-3 py-2 border rounded", placeholder: "https://..." %>
+      <% if @professor.avatar_url.present? %>
+        <div class="mt-2">
+          <img src="<%= @professor.avatar_url %>" alt="Avatar" class="w-20 h-20 rounded-full object-cover">
+        </div>
+      <% end %>
+    </div>
+
+    <div>
+      <%= form.label :bio, "Biographie", class: "block font-bold mb-2" %>
+      <%= form.text_area :bio, rows: 4, class: "w-full px-3 py-2 border rounded", placeholder: "Décrivez le parcours et les spécialités du professeur..." %>
+      <p class="text-sm text-gray-600 mt-1">Cette biographie sera visible sur la page publique du professeur.</p>
+    </div>
+
+    <div class="bg-gray-50 p-4 rounded">
+      <h3 class="font-bold mb-2">Informations système</h3>
+      <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
+        <div><strong>ID:</strong> <%= @professor.id %></div>
+        <div><strong>Nom normalisé:</strong> <%= @professor.nom_normalise %></div>
+        <div><strong>Status:</strong> <%= @professor.status %></div>
+        <div><strong>Événements:</strong> <%= @professor.events.count %></div>
+        <div><strong>Consultations:</strong> <%= @professor.consultations_count %></div>
+        <div><strong>Clics sortants:</strong> <%= @professor.clics_sortants_count %></div>
+      </div>
+    </div>
+
+    <div class="flex gap-4">
+      <%= form.submit "Enregistrer", class: "bg-terracotta text-white px-6 py-2 rounded hover:bg-terracotta-dark cursor-pointer" %>
+      <%= link_to "Annuler", admin_professors_path, class: "bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600" %>
+
+      <% if @professor.status == "auto" %>
+        <%= button_to "✅ Marquer comme vérifié", mark_reviewed_admin_professor_path(@professor), method: :post, class: "bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 ml-auto" %>
+      <% end %>
+    </div>
+  <% end %>
 </div>
