@@ -1,8 +1,8 @@
 # État du Projet - Stop & Dance
 
-**Dernière mise à jour :** 2026-04-01
+**Dernière mise à jour :** 2026-04-05
 **Branch :** main
-**Dernière commit :** fd8a174
+**Dernière commit :** 3f290a1
 **Statut :** ✅ **PROJET COMPLET - Tous les epics terminés + Playwright validé**
 
 ---
@@ -476,9 +476,43 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 
 ---
 
-## 🚀 Dernière Session (2026-04-01)
+## 🚀 Dernière Session (2026-04-05)
 
-### 1. Fix Timestamps Preview Admin ✅
+### Tentative configuration Remote Control ❌
+
+**Objectif :** Configurer Claude Code Remote Control pour piloter le serveur depuis mobile/navigateur.
+
+**Diagnostic effectué :**
+- Auth OAuth claude.ai ✅, plan Max ✅, API connectivity ✅
+- Pas de variables d'env parasites, pas de blocage firewall/Tailscale
+- Version 2.1.92 (>2.1.51 requis) ✅
+
+**Problème identifié :**
+- Token OAuth actuel a scopes `["user:inference","user:profile"]` — il manque `user:sessions:claude_code`
+- Erreur : `OAuth token does not meet scope requirement user:sessions:claude_code`
+- `claude auth login` en headless SSH ne propose pas de prompt pour coller le code OAuth
+- Tentative d'échange manuel du code OAuth via PKCE → rate limité par Cloudflare après plusieurs essais
+
+**Fichiers non commités (travail en cours scraping) :**
+- `app/jobs/scraping_job.rb` (modifié)
+- `config/initializers/solid_queue.rb` (modifié)
+- `config/recurring.yml` (modifié)
+- `lib/tasks/scraping_report.rake` (nouveau)
+
+**TODO pour résoudre Remote Control :**
+1. Attendre fin rate limit (~1h) puis relancer `claude auth login` depuis terminal séparé (pas depuis Claude Code)
+2. Ou : installer Claude Code sur machine locale avec navigateur → `claude auth login` → copier `~/.claude/.credentials.json` vers serveur
+3. Ou : `unset DISPLAY && claude auth logout && claude auth login` (forcer mode texte)
+
+---
+
+## 📝 Session 2026-04-01
+
+### 1. Import Masse + Filtres Admin ScrapedUrls ✅
+
+**Commit :** `3f290a1` feat: Import masse + filtres/tri admin scraped_urls
+
+### 2. Fix Timestamps Preview Admin ✅
 
 **Problème résolu :**
 - Timestamps (derniere_version_html_at, markdown_at, claude_at) non mis à jour après boutons test
@@ -555,10 +589,16 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 
 ## ⚠️ TODO Prochaine Session
 
-**Fonctionnalités suggérées :**
-- Tester scraping complet avec auto-création professeurs (ScrapedUrl avec nouveaux profs)
-- Vérifier workflow admin review (alerte → liste filtered → edit → mark reviewed)
-- Optionnel : Upgrade Ruby 3.4 (EOL Ruby 3.2 = 31 mars 2026)
+**Priorité 1 — Remote Control :**
+- Résoudre scope OAuth `user:sessions:claude_code` (voir solutions ci-dessus)
+
+**Priorité 2 — Fichiers non commités :**
+- Examiner et commiter les modifications scraping en cours (scraping_job, solid_queue, recurring.yml, scraping_report.rake)
+
+**Autres :**
+- Tester scraping complet avec auto-création professeurs
+- Vérifier workflow admin review
+- Optionnel : Upgrade Ruby 3.4
 
 ---
 
