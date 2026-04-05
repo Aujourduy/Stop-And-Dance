@@ -34,6 +34,7 @@ module StopAndDance
     # in config/environments, which are processed later.
     #
     config.time_zone = "Europe/Paris"
+    config.i18n.default_locale = :fr
     config.active_record.default_timezone = :utc
     # config.eager_load_paths << Rails.root.join("extras")
 

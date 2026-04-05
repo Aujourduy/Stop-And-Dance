@@ -87,3 +87,5 @@ group :development do
 end
 
 gem "tailwindcss-rails", "~> 4.4"
+
+gem "rails-i18n", "~> 8.1"

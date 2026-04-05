@@ -29,5 +29,5 @@ en:
     attributes:
       event:
         type_events:
-          atelier: "Workshop"
+          atelier: "Atelier"
           stage: "Stage"

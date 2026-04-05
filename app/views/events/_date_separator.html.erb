@@ -1,7 +1,7 @@
 <%# locals: date %>
 <div class="flex items-center gap-4 my-6 first:mt-0">
   <hr class="flex-grow border-gray-300">
-  <time datetime="<%= date.iso8601 %>" class="text-gray-600 italic text-lg whitespace-nowrap">
+  <time datetime="<%= date.iso8601 %>" class="text-gray-600 italic text-lg whitespace-nowrap capitalize">
     <%= l(date, format: :long) %>
   </time>
   <hr class="flex-grow border-gray-300">
