@@ -1,4 +1,4 @@
-<div class="container mx-auto px-4 py-8" data-controller="mobile-filters">
+<div class="container mx-auto px-0 lg:px-4 py-8" data-controller="mobile-filters">
   <%# Mobile filter button (hidden on desktop) %>
   <button data-action="click->mobile-filters#open"
           class="lg:hidden fixed bottom-4 right-4 bg-terracotta text-white px-6 py-3 rounded-full shadow-lg z-40 flex items-center gap-2">
@@ -23,7 +23,7 @@
     <%# Main column: Event list (70% on desktop) %>
     <div>
       <%= turbo_frame_tag "events-list", data: { controller: "infinite-scroll" } do %>
-        <h1 class="text-3xl font-script italic mb-8">
+        <h1 class="text-3xl font-script italic mb-8 px-4 lg:px-0">
           <%= @filtered ? "Agenda filtré" : "Agenda complet" %> : Ateliers (<%= @atelier_count %>) et Stages (<%= @stage_count %>)
         </h1>
 

@@ -1,6 +1,6 @@
 <%# locals: event %>
 <%= link_to evenement_path(event.slug),
-            class: "block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 mb-4",
+            class: "block bg-white rounded-none lg:rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 mb-2 lg:mb-4",
             data: { turbo_frame: "event_modal", debug_id: "event-card-#{event.id}" } do %>
 
   <div class="flex gap-4 items-start">
@@ -58,8 +58,7 @@
           <% if event.gratuit %>
             <span class="text-green-600">Gratuit</span>
           <% elsif event.prix_reduit.present? %>
-            <%= number_to_currency(event.prix_normal, unit: "€", format: "%n%u") %>
-            <span class="text-sm text-gray-600">(réduit: <%= number_to_currency(event.prix_reduit, unit: "€", format: "%n%u") %>)</span>
+            <%= number_to_currency(event.prix_normal, unit: "€", format: "%n%u") %>/<%= number_to_currency(event.prix_reduit, unit: "€", format: "%n%u") %>
           <% else %>
             <%= number_to_currency(event.prix_normal, unit: "€", format: "%n%u") %>
           <% end %>
