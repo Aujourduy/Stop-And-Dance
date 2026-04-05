@@ -9,10 +9,11 @@ class EventsController < ApplicationController
                 params[:en_ligne].present? ||
                 params[:en_presentiel].present? ||
                 params[:gratuit].present? ||
-                params[:lieu].present?
+                params[:lieu].present? ||
+                params[:q].present?
 
     # Apply filters to base scope
-    scope = apply_filters(Event.futurs.includes(:professor))
+    scope = apply_filters(Event.futurs.joins(:professor))
 
     # Calculate counts for ateliers and stages (based on filtered scope)
     @atelier_count = scope.where(type_event: :atelier).count
@@ -88,12 +89,24 @@ class EventsController < ApplicationController
       scope = scope.where("lieu ILIKE ?", lieu_query)
     end
 
+    # Full-text search (AND logic: all words must match across event fields + professor name)
+    if params[:q].present?
+      words = params[:q].strip.split(/\s+/)
+      words.each do |word|
+        pattern = "%#{word}%"
+        scope = scope.where(
+          "events.titre ILIKE :p OR events.description ILIKE :p OR events.lieu ILIKE :p OR events.adresse_complete ILIKE :p OR events.tags::text ILIKE :p OR professors.nom ILIKE :p",
+          p: pattern
+        )
+      end
+    end
+
     scope
   end
 
   def cache_key_for_filters
     # MD5 hash of filter params to ensure unique cache keys
-    filter_params = params.slice(:date_debut, :atelier, :stage, :en_ligne, :en_presentiel, :gratuit, :lieu)
+    filter_params = params.slice(:date_debut, :atelier, :stage, :en_ligne, :en_presentiel, :gratuit, :lieu, :q)
     Digest::MD5.hexdigest(filter_params.to_json)
   end
 end

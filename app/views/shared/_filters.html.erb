@@ -22,6 +22,16 @@
                 },
                 class: "space-y-6" do |f| %>
 
+    <%# Search field %>
+    <div>
+      <h3 class="font-medium mb-3">Recherche</h3>
+      <%= f.text_field :q,
+                       value: params[:q],
+                       class: "w-full rounded border-gray-300 focus:border-terracotta focus:ring-terracotta",
+                       placeholder: "Ex: marc rennes",
+                       data: { action: "change->auto-submit#submit" } %>
+    </div>
+
     <%# Type & Format filters (2-column grid) %>
     <div>
       <h3 class="font-medium mb-3">Type et format</h3>
