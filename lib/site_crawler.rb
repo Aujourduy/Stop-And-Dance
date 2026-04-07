@@ -64,8 +64,9 @@ class SiteCrawler
   private
 
   def crawl_page(url, depth)
-    scraper = @scraped_url.use_browser ? Scrapers::PlaywrightScraper : Scrapers::HtmlScraper
-    result = scraper.fetch(url)
+    # Always use HTTParty for crawling (fast, sufficient for classification)
+    # Playwright is only needed for final scraping of classified "yes" pages
+    result = Scrapers::HtmlScraper.fetch(url)
 
     if result[:error]
       page = @site_crawl.crawled_pages.create!(
