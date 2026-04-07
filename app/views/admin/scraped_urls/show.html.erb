@@ -1,143 +1,125 @@
 <div class="mb-6">
-  <%= link_to "← Retour", admin_scraped_urls_path, class: "text-terracotta hover:underline" %>
+  <%= link_to "← Retour", admin_scraped_urls_path, class: "link link-primary" %>
 </div>
 
-<div class="bg-white rounded-lg shadow p-6 mb-6">
-  <div class="flex justify-between items-start mb-4">
-    <h1 class="text-2xl font-bold">Détails URL</h1>
-    <div class="space-x-2">
-      <%= link_to "Modifier", edit_admin_scraped_url_path(@scraped_url), class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
-      <%= button_to "Scraper maintenant", scrape_now_admin_scraped_url_path(@scraped_url), method: :post, class: "bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" %>
-      <%= link_to "Preview", preview_admin_scraped_url_path(@scraped_url), class: "bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700" %>
-    </div>
-  </div>
-
-  <%# Crawler site %>
-  <div class="mt-4 p-4 bg-purple-50 rounded-lg">
-    <h3 class="font-bold text-purple-800 mb-2">Crawler le site</h3>
-    <%= form_with url: crawl_site_admin_scraped_url_path(@scraped_url), method: :post, local: true, class: "flex flex-wrap gap-2 items-end" do |f| %>
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Modèle LLM</label>
-        <%= f.select :llm_model,
-                     options_for_select([
-                       ["Défaut: #{Setting.instance.openrouter_default_model}", ""],
-                       ["Llama 3.3 70B (free)", "meta-llama/llama-3.3-70b-instruct:free"],
-                       ["Gemini 2.0 Flash (free)", "google/gemini-2.0-flash-exp:free"],
-                       ["DeepSeek Chat (free)", "deepseek/deepseek-chat:free"]
-                     ]),
-                     {}, class: "border rounded px-2 py-1 text-sm" %>
+<div class="card bg-base-100 shadow-sm mb-6">
+  <div class="card-body">
+    <div class="flex flex-wrap justify-between items-start gap-2 mb-4">
+      <h1 class="card-title text-2xl">Détails URL</h1>
+      <div class="flex flex-wrap gap-2">
+        <%= link_to "Modifier", edit_admin_scraped_url_path(@scraped_url), class: "btn btn-info btn-sm" %>
+        <%= button_to "Scraper maintenant", scrape_now_admin_scraped_url_path(@scraped_url), method: :post, class: "btn btn-success btn-sm" %>
+        <%= link_to "Preview", preview_admin_scraped_url_path(@scraped_url), class: "btn btn-ghost btn-sm" %>
       </div>
-      <%= f.submit "Crawler le site",
-                   class: "bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 cursor-pointer",
-                   data: { confirm: "Lancer le crawl complet du site ? (profondeur max 5, max 100 pages)" } %>
-    <% end %>
-    <% if @scraped_url.site_crawls.any? %>
-      <p class="text-sm text-gray-600 mt-2">
-        Dernier crawl : <%= @scraped_url.site_crawls.recent.first.statut %>
-        (<%= @scraped_url.site_crawls.recent.first.pages_found %> pages)
-        — <%= link_to "Voir les crawls", admin_site_crawl_path(@scraped_url.site_crawls.recent.first), class: "text-purple-600 hover:underline" %>
-      </p>
-    <% end %>
-  </div>
-
-  <dl class="space-y-3">
-    <div>
-      <dt class="font-bold text-gray-700">URL</dt>
-      <%# brakeman:disable LinkToHref - URL validated to be HTTP/HTTPS only via model validation %>
-      <dd class="text-gray-900"><%= link_to @scraped_url.url, @scraped_url.url, target: "_blank", class: "text-blue-600 hover:underline" %></dd>
     </div>
 
-    <div>
-      <dt class="font-bold text-gray-700">Statut</dt>
-      <dd><span class="px-2 py-1 rounded <%= @scraped_url.statut_scraping == 'actif' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
-        <%= @scraped_url.statut_scraping %>
-      </span></dd>
-    </div>
-
-    <div>
-      <dt class="font-bold text-gray-700">Mode scraping (production)</dt>
-      <dd>
-        <% if @scraped_url.use_browser %>
-          <span class="px-2 py-1 rounded bg-blue-100 text-blue-800"
-                title="Lance un browser Chromium headless pour exécuter le JavaScript (sites Wix, React, Vue)">
-            🎭 Playwright
-          </span>
-          <span class="text-sm text-gray-500 ml-2">Browser complet avec JS (~5-10s)</span>
-        <% else %>
-          <span class="px-2 py-1 rounded bg-green-100 text-green-800"
-                title="Fetch HTTP simple sans JavaScript (sites statiques)">
-            🌐 HTTParty
-          </span>
-          <span class="text-sm text-gray-500 ml-2">Fetch rapide sans JS (~1-2s)</span>
-        <% end %>
-      </dd>
-    </div>
-
-    <div>
-      <dt class="font-bold text-gray-700">Dernière mise à jour</dt>
-      <dd class="text-gray-900"><%= @scraped_url.updated_at.strftime("%d/%m/%Y à %H:%M") %></dd>
-    </div>
-
-    <div>
-      <dt class="font-bold text-gray-700">Erreurs consécutives</dt>
-      <dd class="text-gray-900">
-        <% if @scraped_url.erreurs_consecutives > 0 %>
-          <span class="px-2 py-1 rounded bg-red-100 text-red-800">⚠️ <%= @scraped_url.erreurs_consecutives %> erreur(s)</span>
-        <% else %>
-          <span class="text-green-600">✓ Aucune erreur</span>
-        <% end %>
-      </dd>
-    </div>
-
-    <div>
-      <dt class="font-bold text-gray-700">Nom</dt>
-      <dd class="text-gray-900"><%= @scraped_url.nom.presence || "—" %></dd>
-    </div>
-
-    <div>
-      <dt class="font-bold text-gray-700">Professeurs associés</dt>
-      <dd class="text-gray-900">
-        <% if @scraped_url.professors.any? %>
-          <%= @scraped_url.professors.map(&:nom).join(", ") %>
-        <% else %>
-          Aucun professeur associé
-        <% end %>
-      </dd>
-    </div>
-
-    <div>
-      <dt class="font-bold text-gray-700">Événements scrapés</dt>
-      <dd class="text-gray-900"><%= @scraped_url.events.count %> événement(s)</dd>
-    </div>
-
-    <div>
-      <dt class="font-bold text-gray-700">Commentaire</dt>
-      <dd class="text-gray-900 whitespace-pre-wrap"><%= @scraped_url.commentaire.presence || "—" %></dd>
-    </div>
-
-    <div>
-      <dt class="font-bold text-gray-700">Notes correctrices</dt>
-      <dd class="text-gray-900 whitespace-pre-wrap"><%= @scraped_url.notes_correctrices.presence || "Aucune note" %></dd>
-    </div>
-  </dl>
-</div>
-
-<div class="bg-white rounded-lg shadow p-6">
-  <h2 class="text-xl font-bold mb-4">Derniers changements détectés</h2>
-  <% if @recent_change_logs.any? %>
-    <div class="space-y-3">
-      <% @recent_change_logs.each do |log| %>
-        <div class="border-l-4 border-terracotta pl-4 py-2">
-          <div class="text-sm text-gray-600 mb-1"><%= log.created_at.strftime("%d/%m/%Y à %H:%M") %></div>
-          <div class="text-sm text-gray-700">
-            <%= log.changements_detectes['lines_added'] %> lignes ajoutées,
-            <%= log.changements_detectes['lines_removed'] %> lignes supprimées
-          </div>
-          <%= link_to "Voir le diff →", admin_change_log_path(log), class: "text-sm text-terracotta hover:underline" %>
+    <%# Crawler site %>
+    <div class="bg-secondary/10 rounded-box p-4 mb-6">
+      <h3 class="font-bold mb-2">Crawler le site</h3>
+      <%= form_with url: crawl_site_admin_scraped_url_path(@scraped_url), method: :post, local: true, class: "flex flex-wrap gap-2 items-end" do |f| %>
+        <div>
+          <label class="label text-sm">Modèle LLM</label>
+          <%= f.select :llm_model,
+                       options_for_select([
+                         ["Défaut: #{Setting.instance.openrouter_default_model}", ""],
+                         ["Gemma 3n 4B (free)", "google/gemma-3n-e4b-it:free"],
+                         ["Gemma 3 12B (free)", "google/gemma-3-12b-it:free"],
+                         ["Gemma 3 27B (free)", "google/gemma-3-27b-it:free"],
+                         ["Llama 3.3 70B (free)", "meta-llama/llama-3.3-70b-instruct:free"]
+                       ]),
+                       {}, class: "select select-bordered select-sm" %>
         </div>
+        <%= f.submit "Crawler le site",
+                     class: "btn btn-secondary btn-sm",
+                     data: { confirm: "Lancer le crawl complet du site ? (profondeur max 5, max 100 pages)" } %>
+      <% end %>
+      <% if @scraped_url.site_crawls.any? %>
+        <p class="text-sm opacity-60 mt-2">
+          Dernier crawl : <%= @scraped_url.site_crawls.recent.first.statut %>
+          (<%= @scraped_url.site_crawls.recent.first.pages_found %> pages)
+          — <%= link_to "Voir les crawls", admin_site_crawl_path(@scraped_url.site_crawls.recent.first), class: "link link-secondary" %>
+        </p>
       <% end %>
     </div>
-  <% else %>
-    <p class="text-gray-500">Aucun changement détecté</p>
-  <% end %>
+
+    <dl class="space-y-3">
+      <div>
+        <dt class="font-bold">URL</dt>
+        <%# brakeman:disable LinkToHref - URL validated to be HTTP/HTTPS only via model validation %>
+        <dd><%= link_to @scraped_url.url, @scraped_url.url, target: "_blank", class: "link link-primary" %></dd>
+      </div>
+      <div>
+        <dt class="font-bold">Statut</dt>
+        <dd><span class="badge <%= @scraped_url.statut_scraping == 'actif' ? 'badge-success' : 'badge-ghost' %>"><%= @scraped_url.statut_scraping %></span></dd>
+      </div>
+      <div>
+        <dt class="font-bold">Mode scraping</dt>
+        <dd>
+          <% if @scraped_url.use_browser %>
+            <span class="badge badge-info">Playwright</span>
+            <span class="text-sm opacity-60 ml-2">Browser complet avec JS (~5-10s)</span>
+          <% else %>
+            <span class="badge badge-success">HTTParty</span>
+            <span class="text-sm opacity-60 ml-2">Fetch rapide sans JS (~1-2s)</span>
+          <% end %>
+        </dd>
+      </div>
+      <div>
+        <dt class="font-bold">Dernière mise à jour</dt>
+        <dd><%= @scraped_url.updated_at.strftime("%d/%m/%Y à %H:%M") %></dd>
+      </div>
+      <div>
+        <dt class="font-bold">Erreurs consécutives</dt>
+        <dd>
+          <% if @scraped_url.erreurs_consecutives > 0 %>
+            <span class="badge badge-error"><%=  @scraped_url.erreurs_consecutives %> erreur(s)</span>
+          <% else %>
+            <span class="text-success">Aucune erreur</span>
+          <% end %>
+        </dd>
+      </div>
+      <div>
+        <dt class="font-bold">Nom</dt>
+        <dd><%= @scraped_url.nom.presence || "—" %></dd>
+      </div>
+      <div>
+        <dt class="font-bold">Professeurs associés</dt>
+        <dd><%= @scraped_url.professors.any? ? @scraped_url.professors.map(&:nom).join(", ") : "Aucun professeur associé" %></dd>
+      </div>
+      <div>
+        <dt class="font-bold">Événements scrapés</dt>
+        <dd><%= @scraped_url.events.count %> événement(s)</dd>
+      </div>
+      <div>
+        <dt class="font-bold">Commentaire</dt>
+        <dd class="whitespace-pre-wrap"><%= @scraped_url.commentaire.presence || "—" %></dd>
+      </div>
+      <div>
+        <dt class="font-bold">Notes correctrices</dt>
+        <dd class="whitespace-pre-wrap"><%= @scraped_url.notes_correctrices.presence || "Aucune note" %></dd>
+      </div>
+    </dl>
+  </div>
+</div>
+
+<div class="card bg-base-100 shadow-sm">
+  <div class="card-body">
+    <h2 class="card-title">Derniers changements détectés</h2>
+    <% if @recent_change_logs.any? %>
+      <div class="space-y-3">
+        <% @recent_change_logs.each do |log| %>
+          <div class="border-l-4 border-primary pl-4 py-2">
+            <div class="text-sm opacity-60 mb-1"><%= log.created_at.strftime("%d/%m/%Y à %H:%M") %></div>
+            <div class="text-sm">
+              <%= log.changements_detectes['lines_added'] %> lignes ajoutées,
+              <%= log.changements_detectes['lines_removed'] %> lignes supprimées
+            </div>
+            <%= link_to "Voir le diff →", admin_change_log_path(log), class: "link link-primary text-sm" %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="opacity-50">Aucun changement détecté</p>
+    <% end %>
+  </div>
 </div>

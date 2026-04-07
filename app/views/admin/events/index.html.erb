@@ -1,90 +1,63 @@
 <h1 class="text-3xl font-bold mb-6">Événements</h1>
 
-<!-- Filters -->
-<div class="bg-white rounded-lg shadow p-4 mb-6">
-  <%= form_with url: admin_events_path, method: :get, class: "grid grid-cols-1 md:grid-cols-3 gap-4" do |f| %>
-    <div>
-      <%= f.label :professor_id, "Professeur", class: "block font-bold mb-2" %>
-      <%= f.select :professor_id,
-                   options_from_collection_for_select(@professors, :id, :nom, params[:professor_id]),
-                   { include_blank: "Tous les professeurs" },
-                   class: "w-full px-3 py-2 border rounded" %>
-    </div>
-
-    <div>
-      <%= f.label :titre, "Recherche dans le titre", class: "block font-bold mb-2" %>
-      <%= f.text_field :titre,
-                       value: params[:titre],
-                       placeholder: "Ex: Stage Paris",
-                       class: "w-full px-3 py-2 border rounded" %>
-    </div>
-
-    <div class="flex items-end gap-2">
-      <%= f.submit "Filtrer", class: "bg-terracotta text-white px-4 py-2 rounded hover:bg-terracotta-dark cursor-pointer" %>
-      <%= link_to "Réinitialiser", admin_events_path, class: "bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" %>
-    </div>
-
-    <%= f.hidden_field :sort, value: params[:sort] %>
-  <% end %>
+<div class="card bg-base-100 shadow-sm mb-6">
+  <div class="card-body p-4">
+    <%= form_with url: admin_events_path, method: :get, class: "grid grid-cols-1 md:grid-cols-3 gap-4" do |f| %>
+      <div>
+        <%= f.label :professor_id, "Professeur", class: "label font-bold" %>
+        <%= f.select :professor_id,
+                     options_from_collection_for_select(@professors, :id, :nom, params[:professor_id]),
+                     { include_blank: "Tous les professeurs" },
+                     class: "select select-bordered w-full" %>
+      </div>
+      <div>
+        <%= f.label :titre, "Recherche titre", class: "label font-bold" %>
+        <%= f.text_field :titre, value: params[:titre], placeholder: "Ex: Stage Paris", class: "input input-bordered w-full" %>
+      </div>
+      <div class="flex items-end gap-2">
+        <%= f.submit "Filtrer", class: "btn btn-primary btn-sm" %>
+        <%= link_to "Réinitialiser", admin_events_path, class: "btn btn-ghost btn-sm" %>
+      </div>
+      <%= f.hidden_field :sort, value: params[:sort] %>
+    <% end %>
+  </div>
 </div>
 
 <% if @filtered || @sorted %>
-  <p class="mb-4 text-gray-600">
-    <%= @events.count %> événement(s) trouvé(s)
-    <% if @filtered || @sorted %>
-      - <strong>Pagination désactivée</strong>
-    <% end %>
-  </p>
+  <p class="mb-4 opacity-60"><%= @events.count %> événement(s) trouvé(s)</p>
 <% end %>
 
 <%= turbo_frame_tag "admin-events-list", data: (@pagy.present? ? { controller: "infinite-scroll" } : {}) do %>
-  <div class="bg-white rounded-lg shadow overflow-hidden">
-    <table class="min-w-full">
-      <thead class="bg-gray-50">
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
         <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-            <%= link_to admin_events_path(sort: (params[:sort] == "titre_asc" ? "titre_desc" : "titre_asc"), professor_id: params[:professor_id], titre: params[:titre]), class: "flex items-center gap-1 hover:text-terracotta" do %>
-              Titre
-              <% if params[:sort] == "titre_asc" %>
-                <span>↑</span>
-              <% elsif params[:sort] == "titre_desc" %>
-                <span>↓</span>
-              <% end %>
+          <th>
+            <%= link_to admin_events_path(sort: (params[:sort] == "titre_asc" ? "titre_desc" : "titre_asc"), professor_id: params[:professor_id], titre: params[:titre]), class: "link link-hover" do %>
+              Titre <%= "↑" if params[:sort] == "titre_asc" %><%= "↓" if params[:sort] == "titre_desc" %>
             <% end %>
           </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-            <%= link_to admin_events_path(sort: (params[:sort] == "date_asc" ? "date_desc" : "date_asc"), professor_id: params[:professor_id], titre: params[:titre]), class: "flex items-center gap-1 hover:text-terracotta" do %>
-              Date
-              <% if params[:sort] == "date_asc" %>
-                <span>↑</span>
-              <% elsif params[:sort] == "date_desc" %>
-                <span>↓</span>
-              <% else %>
-                <span class="text-terracotta">↓</span>
-              <% end %>
+          <th>
+            <%= link_to admin_events_path(sort: (params[:sort] == "date_asc" ? "date_desc" : "date_asc"), professor_id: params[:professor_id], titre: params[:titre]), class: "link link-hover" do %>
+              Date <%= "↑" if params[:sort] == "date_asc" %><%= "↓" if params[:sort] == "date_desc" %>
             <% end %>
           </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-            <%= link_to admin_events_path(sort: (params[:sort] == "professor_asc" ? "professor_desc" : "professor_asc"), professor_id: params[:professor_id], titre: params[:titre]), class: "flex items-center gap-1 hover:text-terracotta" do %>
-              Professeur
-              <% if params[:sort] == "professor_asc" %>
-                <span>↑</span>
-              <% elsif params[:sort] == "professor_desc" %>
-                <span>↓</span>
-              <% end %>
+          <th>
+            <%= link_to admin_events_path(sort: (params[:sort] == "professor_asc" ? "professor_desc" : "professor_asc"), professor_id: params[:professor_id], titre: params[:titre]), class: "link link-hover" do %>
+              Professeur <%= "↑" if params[:sort] == "professor_asc" %><%= "↓" if params[:sort] == "professor_desc" %>
             <% end %>
           </th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+          <th class="text-right">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-200" id="admin-events-tbody">
+      <tbody>
         <% @events.each do |event| %>
-          <tr>
-            <td class="px-6 py-4 text-sm"><%= link_to event.titre, admin_event_path(event), class: "text-terracotta hover:underline", data: { turbo_frame: "_top" } %></td>
-            <td class="px-6 py-4 text-sm"><%= event.date_debut.strftime("%d/%m/%Y") %></td>
-            <td class="px-6 py-4 text-sm"><%= event.professor.nom %></td>
-            <td class="px-6 py-4 text-right text-sm">
-              <%= link_to "Modifier", edit_admin_event_path(event), class: "text-blue-600 hover:underline", data: { turbo_frame: "_top" } %>
+          <tr class="hover">
+            <td><%= link_to event.titre, admin_event_path(event), class: "link link-primary", data: { turbo_frame: "_top" } %></td>
+            <td class="text-sm"><%= event.date_debut.strftime("%d/%m/%Y") %></td>
+            <td class="text-sm"><%= event.professor.nom %></td>
+            <td class="text-right">
+              <%= link_to "Modifier", edit_admin_event_path(event), class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
             </td>
           </tr>
         <% end %>
@@ -92,15 +65,13 @@
     </table>
   </div>
 
-  <%# Infinite scroll trigger (only if pagination is active) %>
   <% if @pagy&.next %>
     <%= turbo_frame_tag "admin-events-page-#{@pagy.next}",
                         src: admin_events_path(page: @pagy.next, format: :turbo_stream, sort: params[:sort], professor_id: params[:professor_id], titre: params[:titre]),
                         loading: :lazy do %>
       <div class="text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+        <span class="loading loading-spinner loading-md text-primary"></span>
       </div>
     <% end %>
   <% end %>
 <% end %>
-

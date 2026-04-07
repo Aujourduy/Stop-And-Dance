@@ -1,6 +1,6 @@
 <%= form_with model: [:admin, scraped_url], class: "space-y-6" do |f| %>
   <% if scraped_url.errors.any? %>
-    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+    <div role="alert" class="alert alert-error">
       <ul class="list-disc list-inside">
         <% scraped_url.errors.full_messages.each do |message| %>
           <li><%= message %></li>
@@ -10,88 +10,67 @@
   <% end %>
 
   <div>
-    <%= f.label :url, "URL", class: "block font-bold mb-2" %>
-    <%= f.url_field :url, class: "w-full px-3 py-2 border rounded", placeholder: "https://example.com/agenda", required: true %>
+    <%= f.label :url, "URL", class: "label font-bold" %>
+    <%= f.url_field :url, class: "input input-bordered w-full", placeholder: "https://example.com/agenda", required: true %>
   </div>
 
   <div>
-    <%= f.label :nom, "Nom (label descriptif)", class: "block font-bold mb-2" %>
-    <%= f.text_field :nom, class: "w-full px-3 py-2 border rounded", placeholder: "Ex: Agenda Danse Contact Paris" %>
-    <p class="text-sm text-gray-600 mt-1">Nom lisible pour identifier facilement cette source dans l'admin.</p>
+    <%= f.label :nom, "Nom (label descriptif)", class: "label font-bold" %>
+    <%= f.text_field :nom, class: "input input-bordered w-full", placeholder: "Ex: Agenda Danse Contact Paris" %>
+    <p class="text-sm opacity-60 mt-1">Nom lisible pour identifier facilement cette source dans l'admin.</p>
   </div>
 
   <div>
-    <%= f.label :statut_scraping, "Statut", class: "block font-bold mb-2" %>
+    <%= f.label :statut_scraping, "Statut", class: "label font-bold" %>
     <%= f.select :statut_scraping,
                  [['Actif', 'actif'], ['Pause', 'pause'], ['Erreur', 'erreur']],
                  {},
-                 class: "w-full px-3 py-2 border rounded" %>
+                 class: "select select-bordered w-full" %>
   </div>
 
   <div>
-    <%= f.label :use_browser, "Mode scraping (production)", class: "block font-bold mb-2" %>
+    <%= f.label :use_browser, "Mode scraping (production)", class: "label font-bold" %>
     <div class="space-y-3">
-      <!-- Option HTTParty -->
-      <label class="flex items-start p-4 border-2 rounded cursor-pointer <%= scraped_url.use_browser == false ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300' %>">
-        <%= f.radio_button :use_browser, false, class: "mt-1 mr-3" %>
-        <div class="flex-1">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-lg">🌐</span>
-            <span class="font-bold">HTTParty</span>
-            <span class="px-2 py-0.5 rounded text-xs bg-green-100 text-green-800">Rapide</span>
+      <label class="card card-bordered cursor-pointer p-4 <%= scraped_url.use_browser == false ? 'border-success bg-success/10' : '' %>">
+        <div class="flex items-start gap-3">
+          <%= f.radio_button :use_browser, false, class: "radio radio-success mt-1" %>
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold">HTTParty</span>
+              <span class="badge badge-success badge-sm">Rapide</span>
+            </div>
+            <p class="text-sm opacity-70">Fetch HTTP simple sans JavaScript (1-2 secondes)</p>
           </div>
-          <p class="text-sm text-gray-700 mb-1">Fetch HTTP simple sans JavaScript (1-2 secondes)</p>
-          <p class="text-xs text-gray-600">
-            ✅ Sites statiques HTML/CSS<br>
-            ✅ Rapide et léger<br>
-            ❌ Ne voit pas le contenu chargé en JavaScript
-          </p>
         </div>
       </label>
 
-      <!-- Option Playwright -->
-      <label class="flex items-start p-4 border-2 rounded cursor-pointer <%= scraped_url.use_browser == true ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300' %>">
-        <%= f.radio_button :use_browser, true, class: "mt-1 mr-3" %>
-        <div class="flex-1">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-lg">🎭</span>
-            <span class="font-bold">Playwright</span>
-            <span class="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800">Complet</span>
+      <label class="card card-bordered cursor-pointer p-4 <%= scraped_url.use_browser == true ? 'border-info bg-info/10' : '' %>">
+        <div class="flex items-start gap-3">
+          <%= f.radio_button :use_browser, true, class: "radio radio-info mt-1" %>
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold">Playwright</span>
+              <span class="badge badge-info badge-sm">Complet</span>
+            </div>
+            <p class="text-sm opacity-70">Browser Chromium headless avec JavaScript (5-10 secondes)</p>
           </div>
-          <p class="text-sm text-gray-700 mb-1">Lance un browser Chromium headless avec JavaScript (5-10 secondes)</p>
-          <p class="text-xs text-gray-600">
-            ✅ Sites Wix, Squarespace, React, Vue<br>
-            ✅ Voit TOUT le contenu (comme un vrai navigateur)<br>
-            ⚠️ Plus lent et consomme plus de ressources
-          </p>
         </div>
       </label>
     </div>
-    <p class="text-sm text-gray-600 mt-2">
-      💡 <strong>Conseil :</strong> Commence avec HTTParty. Passe à Playwright uniquement si le contenu est chargé en JavaScript.
-    </p>
   </div>
 
   <div>
-    <%= f.label :commentaire, "Commentaire (notes personnelles)", class: "block font-bold mb-2" %>
-    <%= f.text_area :commentaire,
-                    class: "w-full px-3 py-2 border rounded",
-                    rows: 4,
-                    placeholder: "Notes personnelles sur cette source..." %>
-    <p class="text-sm text-gray-600 mt-1">Tes notes personnelles (non utilisées par le scraping).</p>
+    <%= f.label :commentaire, "Commentaire (notes personnelles)", class: "label font-bold" %>
+    <%= f.text_area :commentaire, class: "textarea textarea-bordered w-full", rows: 4, placeholder: "Notes personnelles..." %>
   </div>
 
   <div>
-    <%= f.label :notes_correctrices, "Notes correctrices (pour Claude)", class: "block font-bold mb-2" %>
-    <%= f.text_area :notes_correctrices,
-                    class: "w-full px-3 py-2 border rounded font-mono",
-                    rows: 10,
-                    placeholder: "Instructions pour corriger les erreurs de parsing..." %>
-    <p class="text-sm text-gray-600 mt-1">Ces notes sont envoyées à Claude CLI pour corriger les erreurs de parsing.</p>
+    <%= f.label :notes_correctrices, "Notes correctrices (pour Claude)", class: "label font-bold" %>
+    <%= f.text_area :notes_correctrices, class: "textarea textarea-bordered w-full font-mono", rows: 10, placeholder: "Instructions pour corriger les erreurs de parsing..." %>
   </div>
 
   <div class="flex gap-4">
-    <%= f.submit "Enregistrer", class: "bg-terracotta text-white px-6 py-2 rounded hover:bg-terracotta-dark cursor-pointer" %>
-    <%= link_to "Annuler", @scraped_url.persisted? ? admin_scraped_url_path(@scraped_url) : admin_scraped_urls_path, class: "bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600" %>
+    <%= f.submit "Enregistrer", class: "btn btn-primary" %>
+    <%= link_to "Annuler", @scraped_url.persisted? ? admin_scraped_url_path(@scraped_url) : admin_scraped_urls_path, class: "btn btn-ghost" %>
   </div>
 <% end %>

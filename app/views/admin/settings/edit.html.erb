@@ -1,35 +1,38 @@
 <h1 class="text-3xl font-bold mb-6">Paramètres globaux</h1>
 
-<div class="bg-white rounded-lg shadow p-6">
-  <%= form_with model: @setting, url: admin_settings_path, method: :patch, class: "space-y-6" do |f| %>
-    <div>
-      <%= f.label :claude_global_instructions, "Consignes globales pour Claude (toutes les URLs)", class: "block font-bold mb-2" %>
-      <%= f.text_area :claude_global_instructions,
-                      class: "w-full px-3 py-2 border rounded font-mono",
-                      rows: 15,
-                      placeholder: "Exemple:\n- Toujours extraire les dates au format ISO 8601\n- Si le prix n'est pas mentionné, mettre null\n- Détecter automatiquement les événements gratuits..." %>
-      <p class="text-sm text-gray-600 mt-2">
-        Ces consignes sont envoyées à Claude pour <strong>toutes les URLs scrapées</strong>.<br>
-        Les "Notes correctrices" spécifiques à chaque URL sont ajoutées en plus de ces consignes globales.
-      </p>
-    </div>
+<div class="card bg-base-100 shadow-sm">
+  <div class="card-body">
+    <%= form_with model: @setting, url: admin_settings_path, method: :patch, class: "space-y-6" do |f| %>
+      <div>
+        <%= f.label :claude_global_instructions, "Consignes globales pour Claude (toutes les URLs)", class: "label font-bold" %>
+        <%= f.text_area :claude_global_instructions,
+                        class: "textarea textarea-bordered w-full font-mono",
+                        rows: 15,
+                        placeholder: "Exemple:\n- Toujours extraire les dates au format ISO 8601\n- Si le prix n'est pas mentionné, mettre null" %>
+        <p class="text-sm opacity-60 mt-2">
+          Ces consignes sont envoyées à Claude pour <strong>toutes les URLs scrapées</strong>.<br>
+          Les "Notes correctrices" spécifiques à chaque URL sont ajoutées en plus.
+        </p>
+      </div>
 
-    <div>
-      <%= f.label :openrouter_default_model, "Modèle OpenRouter par défaut (crawler site)", class: "block font-bold mb-2" %>
-      <%= f.select :openrouter_default_model, options_for_select([
-        ["Llama 3.3 70B (free)", "meta-llama/llama-3.3-70b-instruct:free"],
-        ["Gemini 2.0 Flash (free)", "google/gemini-2.0-flash-exp:free"],
-        ["DeepSeek Chat (free)", "deepseek/deepseek-chat:free"]
-      ], @setting.openrouter_default_model), {}, class: "w-full px-3 py-2 border rounded" %>
-      <p class="text-sm text-gray-600 mt-2">
-        Modèle utilisé par défaut pour classifier les pages lors du crawl de site.<br>
-        Peut être overridé au moment du lancement de chaque crawl.
-      </p>
-    </div>
+      <div>
+        <%= f.label :openrouter_default_model, "Modèle OpenRouter par défaut (crawler site)", class: "label font-bold" %>
+        <%= f.select :openrouter_default_model, options_for_select([
+          ["Gemma 3n 4B (free)", "google/gemma-3n-e4b-it:free"],
+          ["Gemma 3 12B (free)", "google/gemma-3-12b-it:free"],
+          ["Gemma 3 27B (free)", "google/gemma-3-27b-it:free"],
+          ["Llama 3.3 70B (free)", "meta-llama/llama-3.3-70b-instruct:free"]
+        ], @setting.openrouter_default_model), {}, class: "select select-bordered w-full" %>
+        <p class="text-sm opacity-60 mt-2">
+          Modèle utilisé par défaut pour classifier les pages lors du crawl de site.<br>
+          Peut être overridé au moment du lancement de chaque crawl.
+        </p>
+      </div>
 
-    <div class="flex gap-4">
-      <%= f.submit "Enregistrer", class: "bg-terracotta text-white px-6 py-2 rounded hover:bg-terracotta-dark cursor-pointer" %>
-      <%= link_to "Retour", admin_root_path, class: "bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600" %>
-    </div>
-  <% end %>
+      <div class="flex gap-4">
+        <%= f.submit "Enregistrer", class: "btn btn-primary" %>
+        <%= link_to "Retour", admin_root_path, class: "btn btn-ghost" %>
+      </div>
+    <% end %>
+  </div>
 </div>

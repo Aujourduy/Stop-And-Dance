@@ -1,26 +1,26 @@
 <h1 class="text-3xl font-bold mb-6">Logs de Changements</h1>
 
 <%= turbo_frame_tag "admin-change-logs-list", data: { controller: "infinite-scroll" } do %>
-  <div class="bg-white rounded-lg shadow overflow-hidden">
-    <table class="min-w-full">
-      <thead class="bg-gray-50">
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
         <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">URL</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Changement</th>
+          <th>Date</th>
+          <th>URL</th>
+          <th>Changement</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-200" id="admin-change-logs-tbody">
+      <tbody>
         <% @change_logs.each do |log| %>
-          <tr>
-            <td class="px-6 py-4 text-sm"><%= log.created_at.strftime("%d/%m/%Y %H:%M") %></td>
-            <td class="px-6 py-4 text-sm">
-              <%= link_to log.scraped_url.url.truncate(40), admin_scraped_url_path(log.scraped_url), class: "text-terracotta hover:underline", data: { turbo_frame: "_top" } %>
+          <tr class="hover">
+            <td class="text-sm"><%= log.created_at.strftime("%d/%m/%Y %H:%M") %></td>
+            <td class="text-sm">
+              <%= link_to log.scraped_url.url.truncate(40), admin_scraped_url_path(log.scraped_url), class: "link link-primary", data: { turbo_frame: "_top" } %>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-900">
-              <span class="text-red-600">-<%= log.changements_detectes["lines_removed"] || 0 %></span>
+            <td class="text-sm">
+              <span class="text-error">-<%= log.changements_detectes["lines_removed"] || 0 %></span>
               /
-              <span class="text-green-600">+<%= log.changements_detectes["lines_added"] || 0 %></span>
+              <span class="text-success">+<%= log.changements_detectes["lines_added"] || 0 %></span>
               lignes
             </td>
           </tr>
@@ -29,15 +29,13 @@
     </table>
   </div>
 
-  <%# Infinite scroll trigger %>
   <% if @pagy.next %>
     <%= turbo_frame_tag "admin-change-logs-page-#{@pagy.next}",
                         src: admin_change_logs_path(page: @pagy.next, format: :turbo_stream),
                         loading: :lazy do %>
       <div class="text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+        <span class="loading loading-spinner loading-md text-primary"></span>
       </div>
     <% end %>
   <% end %>
 <% end %>
-

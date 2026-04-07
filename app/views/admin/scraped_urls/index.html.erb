@@ -1,123 +1,100 @@
 <div class="flex justify-between items-center mb-6">
   <h1 class="text-3xl font-bold">URLs Scrapées</h1>
-  <%= link_to "Nouvelle URL", new_admin_scraped_url_path, class: "bg-terracotta text-white px-4 py-2 rounded hover:bg-terracotta-dark" %>
+  <%= link_to "Nouvelle URL", new_admin_scraped_url_path, class: "btn btn-primary" %>
 </div>
 
 <%# Filtres %>
-<div class="mb-6 bg-white rounded-lg shadow p-4">
-  <%= form_with url: admin_scraped_urls_path, method: :get, class: "flex gap-4 items-end", data: { turbo_frame: "_top" } do |f| %>
-    <div class="flex-1">
-      <%= f.label :source_filter, "Filtrer sources", class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= f.text_field :source_filter,
-                       value: params[:source_filter],
-                       placeholder: "marc silvestre (plusieurs mots = ET)",
-                       class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-terracotta focus:border-terracotta" %>
-    </div>
-    <div class="flex-1">
-      <%= f.label :professor_filter, "Filtrer professeurs", class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= f.text_field :professor_filter,
-                       value: params[:professor_filter],
-                       placeholder: "marie dupont (plusieurs mots = ET)",
-                       class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-terracotta focus:border-terracotta" %>
-    </div>
-    <%= f.hidden_field :sort, value: params[:sort] %>
-    <%= f.hidden_field :direction, value: params[:direction] %>
-    <div class="flex gap-2">
-      <%= f.submit "Filtrer", class: "bg-terracotta text-white px-4 py-2 rounded hover:bg-terracotta-dark" %>
-      <%= link_to "Réinitialiser", admin_scraped_urls_path, class: "bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300" %>
-    </div>
-  <% end %>
+<div class="card bg-base-100 shadow-sm mb-6">
+  <div class="card-body p-4">
+    <%= form_with url: admin_scraped_urls_path, method: :get, class: "flex flex-wrap gap-4 items-end", data: { turbo_frame: "_top" } do |f| %>
+      <div class="flex-1 min-w-48">
+        <%= f.label :source_filter, "Filtrer sources", class: "label" %>
+        <%= f.text_field :source_filter,
+                         value: params[:source_filter],
+                         placeholder: "marc silvestre (ET)",
+                         class: "input input-bordered input-sm w-full" %>
+      </div>
+      <div class="flex-1 min-w-48">
+        <%= f.label :professor_filter, "Filtrer professeurs", class: "label" %>
+        <%= f.text_field :professor_filter,
+                         value: params[:professor_filter],
+                         placeholder: "marie dupont (ET)",
+                         class: "input input-bordered input-sm w-full" %>
+      </div>
+      <%= f.hidden_field :sort, value: params[:sort] %>
+      <%= f.hidden_field :direction, value: params[:direction] %>
+      <div class="flex gap-2">
+        <%= f.submit "Filtrer", class: "btn btn-primary btn-sm" %>
+        <%= link_to "Réinitialiser", admin_scraped_urls_path, class: "btn btn-ghost btn-sm" %>
+      </div>
+    <% end %>
+  </div>
 </div>
 
 <% if @pending_professors_count > 0 %>
-  <div class="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
-    <div class="flex items-center">
-      <div class="flex-shrink-0">
-        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-        </svg>
-      </div>
-      <div class="ml-3">
-        <p class="text-sm text-yellow-700">
-          <strong><%= @pending_professors_count %> professeur(s)</strong> créé(s) automatiquement en attente de vérification.
-          <%= link_to "Vérifier maintenant →", admin_professors_path(status: "auto"), class: "font-medium underline hover:text-yellow-900" %>
-        </p>
-      </div>
-    </div>
+  <div role="alert" class="alert alert-warning mb-6">
+    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+    </svg>
+    <span>
+      <strong><%= @pending_professors_count %> professeur(s)</strong> créé(s) automatiquement en attente de vérification.
+      <%= link_to "Vérifier maintenant →", admin_professors_path(status: "auto"), class: "link" %>
+    </span>
   </div>
 <% end %>
 
 <%= turbo_frame_tag "admin-scraped-urls-list", data: { controller: "infinite-scroll" } do %>
-  <div class="bg-white rounded-lg shadow overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
         <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-            <%= link_to admin_scraped_urls_path(sort: "nom", direction: (params[:sort] == "nom" && params[:direction] == "asc" ? "desc" : "asc"), source_filter: params[:source_filter], professor_filter: params[:professor_filter]), class: "hover:text-terracotta" do %>
-              Source
-              <% if params[:sort] == "nom" %>
-                <%= params[:direction] == "asc" ? "▲" : "▼" %>
-              <% else %>
-                <span class="text-gray-300">▼</span>
-              <% end %>
+          <th>
+            <%= link_to admin_scraped_urls_path(sort: "nom", direction: (params[:sort] == "nom" && params[:direction] == "asc" ? "desc" : "asc"), source_filter: params[:source_filter], professor_filter: params[:professor_filter]), class: "link link-hover" do %>
+              Source <%= params[:sort] == "nom" ? (params[:direction] == "asc" ? "▲" : "▼") : "" %>
             <% end %>
           </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-            <%= link_to admin_scraped_urls_path(sort: "professors", direction: (params[:sort] == "professors" && params[:direction] == "asc" ? "desc" : "asc"), source_filter: params[:source_filter], professor_filter: params[:professor_filter]), class: "hover:text-terracotta" do %>
-              Professeur(s)
-              <% if params[:sort] == "professors" %>
-                <%= params[:direction] == "asc" ? "▲" : "▼" %>
-              <% else %>
-                <span class="text-gray-300">▼</span>
-              <% end %>
+          <th>
+            <%= link_to admin_scraped_urls_path(sort: "professors", direction: (params[:sort] == "professors" && params[:direction] == "asc" ? "desc" : "asc"), source_filter: params[:source_filter], professor_filter: params[:professor_filter]), class: "link link-hover" do %>
+              Professeur(s) <%= params[:sort] == "professors" ? (params[:direction] == "asc" ? "▲" : "▼") : "" %>
             <% end %>
           </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mode</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dernière maj</th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+          <th>Mode</th>
+          <th>Statut</th>
+          <th>Dernière maj</th>
+          <th class="text-right">Actions</th>
         </tr>
       </thead>
-      <tbody class="bg-white divide-y divide-gray-200" id="admin-scraped-urls-tbody">
+      <tbody>
         <% @scraped_urls.each do |url| %>
-          <tr>
-            <td class="px-6 py-4">
-              <%= link_to admin_scraped_url_path(url), class: "text-terracotta hover:underline", data: { turbo_frame: "_top" } do %>
+          <tr class="hover">
+            <td>
+              <%= link_to admin_scraped_url_path(url), class: "link link-primary", data: { turbo_frame: "_top" } do %>
                 <div class="font-medium"><%= url.nom.presence || url.url.truncate(40) %></div>
                 <% if url.nom.present? %>
-                  <div class="text-xs text-gray-500"><%= url.url.truncate(50) %></div>
+                  <div class="text-xs opacity-50"><%= url.url.truncate(50) %></div>
                 <% end %>
               <% end %>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-900">
+            <td class="text-sm">
               <%= url.professors.map { |p| "#{p.prenom} #{p.nom}" }.join(", ").presence || "—" %>
             </td>
-            <td class="px-6 py-4">
+            <td>
               <% if url.use_browser %>
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
-                      title="Playwright : Lance un browser pour exécuter le JavaScript">
-                  🎭 Playwright
-                </span>
+                <span class="badge badge-info badge-sm">Playwright</span>
               <% else %>
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                      title="HTTParty : Fetch HTTP rapide sans JavaScript">
-                  🌐 HTTParty
-                </span>
+                <span class="badge badge-success badge-sm">HTTParty</span>
               <% end %>
             </td>
-            <td class="px-6 py-4">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                           <%= url.statut_scraping == 'actif' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
+            <td>
+              <span class="badge badge-sm <%= url.statut_scraping == 'actif' ? 'badge-success' : 'badge-ghost' %>">
                 <%= url.statut_scraping %>
               </span>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-500">
-              <%= url.updated_at.strftime("%d/%m/%Y %H:%M") %>
-            </td>
-            <td class="px-6 py-4 text-right text-sm font-medium space-x-2">
-              <%= link_to "Voir", admin_scraped_url_path(url), class: "text-blue-600 hover:underline", data: { turbo_frame: "_top" } %>
-              <%= link_to "Modifier", edit_admin_scraped_url_path(url), class: "text-blue-600 hover:underline", data: { turbo_frame: "_top" } %>
-              <%= button_to "Scraper", scrape_now_admin_scraped_url_path(url), method: :post, class: "text-green-600 hover:underline inline", data: { turbo_frame: "_top" } %>
+            <td class="text-sm opacity-60"><%= url.updated_at.strftime("%d/%m/%Y %H:%M") %></td>
+            <td class="text-right space-x-1">
+              <%= link_to "Voir", admin_scraped_url_path(url), class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
+              <%= link_to "Modifier", edit_admin_scraped_url_path(url), class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
+              <%= button_to "Scraper", scrape_now_admin_scraped_url_path(url), method: :post, class: "btn btn-success btn-xs", data: { turbo_frame: "_top" } %>
             </td>
           </tr>
         <% end %>
@@ -125,15 +102,13 @@
     </table>
   </div>
 
-  <%# Infinite scroll trigger %>
   <% if @pagy.next %>
     <%= turbo_frame_tag "admin-scraped-urls-page-#{@pagy.next}",
                         src: admin_scraped_urls_path(page: @pagy.next, format: :turbo_stream),
                         loading: :lazy do %>
       <div class="text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+        <span class="loading loading-spinner loading-md text-primary"></span>
       </div>
     <% end %>
   <% end %>
 <% end %>
-
