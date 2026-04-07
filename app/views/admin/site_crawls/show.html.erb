@@ -1,0 +1,102 @@
+<div class="mb-6">
+  <%= link_to "← Retour aux crawls", admin_site_crawls_path, class: "text-terracotta hover:underline" %>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+  <h1 class="text-2xl font-bold mb-4">Crawl #<%= @site_crawl.id %></h1>
+
+  <dl class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+    <div>
+      <dt class="text-sm text-gray-500">URL source</dt>
+      <dd class="font-medium"><%= @site_crawl.scraped_url.nom.presence || truncate(@site_crawl.scraped_url.url, length: 40) %></dd>
+    </div>
+    <div>
+      <dt class="text-sm text-gray-500">Statut</dt>
+      <dd>
+        <span class="px-2 py-1 rounded text-xs font-medium
+          <%= case @site_crawl.statut
+              when 'completed' then 'bg-green-100 text-green-800'
+              when 'running' then 'bg-blue-100 text-blue-800'
+              when 'failed' then 'bg-red-100 text-red-800'
+              else 'bg-gray-100 text-gray-800'
+              end %>">
+          <%= @site_crawl.statut %>
+        </span>
+      </dd>
+    </div>
+    <div>
+      <dt class="text-sm text-gray-500">Modèle LLM</dt>
+      <dd class="font-medium"><%= @site_crawl.llm_model_used %></dd>
+    </div>
+    <div>
+      <dt class="text-sm text-gray-500">Durée</dt>
+      <dd class="font-medium">
+        <% if @site_crawl.started_at && @site_crawl.finished_at %>
+          <%= distance_of_time_in_words(@site_crawl.started_at, @site_crawl.finished_at) %>
+        <% else %>
+          —
+        <% end %>
+      </dd>
+    </div>
+    <div>
+      <dt class="text-sm text-gray-500">Pages trouvées</dt>
+      <dd class="text-2xl font-bold"><%= @site_crawl.pages_found %></dd>
+    </div>
+    <div>
+      <dt class="text-sm text-gray-500">Classées OUI</dt>
+      <dd class="text-2xl font-bold text-green-600"><%= @site_crawl.pages_classified_yes %></dd>
+    </div>
+    <div>
+      <dt class="text-sm text-gray-500">Classées NON</dt>
+      <dd class="text-2xl font-bold text-red-600"><%= @site_crawl.pages_classified_no %></dd>
+    </div>
+    <div>
+      <dt class="text-sm text-gray-500">Date</dt>
+      <dd class="font-medium"><%= @site_crawl.created_at.strftime("%d/%m/%Y %H:%M") %></dd>
+    </div>
+  </dl>
+
+  <% if @site_crawl.error_message.present? %>
+    <div class="bg-red-50 border border-red-200 rounded p-3 mt-4">
+      <p class="text-red-800 text-sm"><strong>Erreur :</strong> <%= @site_crawl.error_message %></p>
+    </div>
+  <% end %>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-x-auto">
+  <h2 class="text-xl font-bold p-6 pb-2">Pages crawlées</h2>
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Verdict</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Depth</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">URL</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">HTTP</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Erreur</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <% @crawled_pages.each do |page| %>
+        <tr>
+          <td class="px-6 py-4 text-lg">
+            <% case page.llm_verdict %>
+            <% when true %>
+              <span title="Contient un atelier/stage">✅</span>
+            <% when false %>
+              <span title="Pas d'atelier/stage">❌</span>
+            <% else %>
+              <span title="Non classé ou erreur">⚠️</span>
+            <% end %>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-500"><%= page.depth %></td>
+          <td class="px-6 py-4 text-sm">
+            <%= link_to truncate(page.url, length: 60), page.url, target: "_blank", class: "text-blue-600 hover:underline" %>
+          </td>
+          <td class="px-6 py-4 text-sm"><%= page.http_status %></td>
+          <td class="px-6 py-4 text-sm text-red-600"><%= truncate(page.error_message.to_s, length: 50) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+

@@ -16,6 +16,6 @@ class Admin::SettingsController < Admin::ApplicationController
   private
 
   def setting_params
-    params.require(:setting).permit(:claude_global_instructions)
+    params.require(:setting).permit(:claude_global_instructions, :openrouter_default_model)
   end
 end

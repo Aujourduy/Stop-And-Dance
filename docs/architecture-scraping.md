@@ -414,15 +414,120 @@ Events détectés: 13
 Temps total: ~50s
 ```
 
+## Crawler de sites (branche exploration-site-prof)
+
+### Vue d'ensemble
+
+Le crawler permet de découvrir automatiquement les pages d'ateliers/stages sur le site d'un professeur, à partir d'une seule URL racine. Un LLM gratuit (via OpenRouter) classifie chaque page trouvée.
+
+### Flux crawl
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ Admin clique "Crawler le site" sur /admin/scraped_urls/:id         │
+│ → SiteCrawlJob.perform_later(scraped_url_id, llm_model:)          │
+└─────────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ SiteCrawler.new(scraped_url, llm_model:).crawl!                    │
+│                                                                     │
+│  1. Créer SiteCrawl (statut: running)                              │
+│  2. BFS récursif (queue + visited Set):                            │
+│     │                                                               │
+│     ├─> Fetch page (HTTParty par défaut)                           │
+│     │   └─> Si JS-only détecté → fallback Playwright              │
+│     │       (texte visible < 500 chars OU <noscript> JavaScript)   │
+│     │                                                               │
+│     ├─> HTML → Markdown (HtmlCleaner)                              │
+│     │                                                               │
+│     ├─> OpenRouter LLM → "oui" ou "non"                           │
+│     │   (contient un atelier/stage avec date ?)                    │
+│     │   └─> Retry 3x avec backoff 15/30/45s sur HTTP 429          │
+│     │                                                               │
+│     ├─> Créer CrawledPage (url, depth, hash, verdict)             │
+│     │                                                               │
+│     └─> Extraire liens même domaine → ajouter à queue             │
+│                                                                     │
+│  3. Pour chaque page "oui" :                                       │
+│     ├─> Créer ScrapedUrl auto (si URL pas déjà en base)           │
+│     ├─> Hériter use_browser du parent                              │
+│     └─> Hériter professors du parent (ProfessorScrapedUrl)        │
+│                                                                     │
+│  4. Finaliser SiteCrawl (statut: completed, stats)                │
+│                                                                     │
+│  Limites : profondeur max 5, max 100 pages, même domaine          │
+│  Rate limit : sleep 3s entre appels LLM                            │
+└─────────────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ SiteCrawlDispatchJob (recurring, 4am)                              │
+│                                                                     │
+│  Pour chaque ScrapedUrl avec auto_recrawl=true :                   │
+│  ├─> Fetch page racine, calculer hash                              │
+│  ├─> Comparer avec hash du dernier crawl                           │
+│  └─> Si différent → enqueue SiteCrawlJob                          │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Composants
+
+#### SiteCrawler (lib/site_crawler.rb)
+- Algorithme BFS (Breadth-First Search)
+- HTTParty par défaut, fallback Playwright si JS-only
+- Détection JS-only : texte visible < 500 chars OU `<noscript>` contient "javascript"
+- Extraction liens via Nokogiri (`a[href]`), normalisation URI, filtrage même domaine
+
+#### OpenRouterClassifier (lib/open_router_classifier.rb)
+- API OpenRouter (`/api/v1/chat/completions`)
+- Prompt en français : "contient un atelier/stage avec date ? oui/non"
+- Markdown tronqué à 10 000 chars
+- Retry 3x avec backoff (15/30/45s) sur HTTP 429
+- Modèle configurable (défaut : `google/gemma-3n-e4b-it:free`)
+
+#### Models
+- **SiteCrawl** : un crawl = une exécution (belongs_to :scraped_url, has_many :crawled_pages)
+- **CrawledPage** : une page découverte (url, depth, content_hash, llm_verdict, http_status)
+
+#### Jobs
+- **SiteCrawlJob** : exécution async, retry 3x exponentiel, queue :scraping
+- **SiteCrawlDispatchJob** : recurring 4am, vérifie hash racine pour auto-recrawl
+
+### Admin UI Crawler
+- Bouton "Crawler le site" sur `/admin/scraped_urls/:id` (dropdown modèle LLM)
+- `/admin/site_crawls` : liste des crawls (statut, pages, oui/non, modèle)
+- `/admin/site_crawls/:id` : détail pages crawlées (verdict ✅/❌/⚠️)
+- `/admin/settings/edit` : modèle OpenRouter par défaut
+
+### Performance réelle
+
+| Site | Type | Pages | OUI | NON | Durée |
+|------|------|-------|-----|-----|-------|
+| Silvestre (Wix) | HTTParty | 12 | 6 | 6 | ~30s |
+| Wilberforce (Wix) | HTTParty | 25 | 14 | 11 | ~4 min |
+
+### Configuration
+
+**Variables d'environnement :**
+```bash
+OPENROUTER_API_KEY=sk-or-v1-xxx    # Clé API OpenRouter
+OPENROUTER_TIMEOUT=30               # Timeout appel LLM (secondes)
+OPENROUTER_RATE_LIMIT_SLEEP=3       # Pause entre appels LLM
+```
+
+**Admin Settings :** `Setting.instance.openrouter_default_model` (dropdown dans /admin/settings)
+
+---
+
 ## Architecture future (TODO)
 
 ### Améliorations prévues
 - [ ] AlertEmailJob pour erreurs 3+ consécutives
 - [ ] Dashboard admin avec graphiques scraping
-- [ ] API webhook pour notifications temps réel
-- [ ] Cache intelligent (skip scraping si HTML identique)
+- [ ] Cache LLM crawler (même URL + même hash → réutiliser verdict)
+- [ ] Détection changement fine (hash par page, pas seulement racine)
 - [ ] Support iCal/Google Calendar direct
-- [ ] Multi-language support (anglais, espagnol)
 
 ## Diagramme de classes
 
@@ -430,8 +535,18 @@ Temps total: ~50s
 ScrapedUrl
 ├── has_many :events
 ├── has_many :change_logs
-├── has_many :professors (through scraped_url_professors)
-└── has_one :scraping_config (future)
+├── has_many :professors (through professor_scraped_urls)
+├── has_many :site_crawls
+├── belongs_to :source_site_crawl (optional, pour auto-créées)
+└── auto_recrawl (boolean)
+
+SiteCrawl
+├── belongs_to :scraped_url
+├── has_many :crawled_pages
+└── has_many :auto_created_scraped_urls (ScrapedUrl)
+
+CrawledPage
+└── belongs_to :site_crawl
 
 Event
 ├── belongs_to :scraped_url
@@ -440,10 +555,14 @@ Event
 
 Professor
 ├── has_many :events
-└── has_and_belongs_to_many :scraped_urls
+└── has_many :scraped_urls (through professor_scraped_urls)
 
 ChangeLog
 └── belongs_to :scraped_url
+
+Setting (singleton)
+├── claude_global_instructions
+└── openrouter_default_model
 ```
 
 ## Ressources
@@ -455,6 +574,6 @@ ChangeLog
 
 ---
 
-**Dernière mise à jour:** 2026-03-27
-**Version:** 1.0
+**Dernière mise à jour:** 2026-04-07
+**Version:** 2.0 (ajout crawler site + OpenRouter)
 **Mainteneur:** Stop & Dance Team

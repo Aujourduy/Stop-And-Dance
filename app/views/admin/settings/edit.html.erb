@@ -14,6 +14,19 @@
       </p>
     </div>
 
+    <div>
+      <%= f.label :openrouter_default_model, "Modèle OpenRouter par défaut (crawler site)", class: "block font-bold mb-2" %>
+      <%= f.select :openrouter_default_model, options_for_select([
+        ["Llama 3.3 70B (free)", "meta-llama/llama-3.3-70b-instruct:free"],
+        ["Gemini 2.0 Flash (free)", "google/gemini-2.0-flash-exp:free"],
+        ["DeepSeek Chat (free)", "deepseek/deepseek-chat:free"]
+      ], @setting.openrouter_default_model), {}, class: "w-full px-3 py-2 border rounded" %>
+      <p class="text-sm text-gray-600 mt-2">
+        Modèle utilisé par défaut pour classifier les pages lors du crawl de site.<br>
+        Peut être overridé au moment du lancement de chaque crawl.
+      </p>
+    </div>
+
     <div class="flex gap-4">
       <%= f.submit "Enregistrer", class: "bg-terracotta text-white px-6 py-2 rounded hover:bg-terracotta-dark cursor-pointer" %>
       <%= link_to "Retour", admin_root_path, class: "bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600" %>

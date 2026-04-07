@@ -1,9 +1,9 @@
 # État du Projet - Stop & Dance
 
-**Dernière mise à jour :** 2026-04-05
-**Branch :** main
-**Dernière commit :** 3f290a1
-**Statut :** ✅ **PROJET COMPLET - Tous les epics terminés + Playwright validé**
+**Dernière mise à jour :** 2026-04-07
+**Branch :** main + exploration-site-prof (feature branch)
+**Dernier commit main :** c34f15e
+**Statut :** ✅ **PROJET COMPLET - Tous les epics terminés** + Feature branch "exploration site prof" en cours
 
 ---
 
@@ -34,6 +34,7 @@
 **Homepage & Navigation**
 - Hero responsive avec titre animé
 - Navigation desktop/mobile avec burger menu
+- Lien Admin dans menu burger mobile
 - Design system terracotta/beige (Tailwind CSS v4)
 - Accessibilité WCAG 2.1 AA
 - Mode debug design (Ctrl+Shift+D)
@@ -42,16 +43,22 @@
 - Affichage chronologique (futurs uniquement)
 - Infinite scroll avec Pagy
 - Cartes événements : avatar prof 128×128px + 4 lignes info
+- Cartes pleine largeur sur mobile (bord à bord)
 - Compteurs dynamiques dans le titre (ateliers/stages)
 - Modal détails événement (Turbo Frame)
+- Jours en français capitalisés (Dimanche 5 Avril 2026)
+- Vignettes : "Atelier" (pas Workshop), "Présentiel" (pas En présentiel)
+- Prix réduit compact : 20,00€/16,00€
 
 **Filtres Multi-Critères**
+- **Recherche full-text** : champ texte multi-mots (opérateur AND), cherche dans titre, description, lieu, adresse, tags, nom professeur
 - Date (date picker)
 - Type (atelier/stage)
 - Format (en ligne/présentiel)
 - Prix (gratuit/payant)
+- Lieu (texte)
 - Reset filtres
-- Auto-submit en temps réel
+- Auto-submit en temps réel (debounce 400ms pour recherche texte)
 - Panneau mobile slide depuis droite
 
 **Profils Professeurs**
@@ -172,7 +179,7 @@
 **Frontend**
 - Turbo (navigation, frames, streams)
 - Tailwind CSS v4 (config via @theme dans CSS, PAS tailwind.config.js)
-- Pas de Stimulus pour MVP
+- Stimulus (auto-submit formulaire filtres)
 - JavaScript vanilla pour interactions simples
 
 **Scraping**
@@ -236,7 +243,7 @@
 
 **Publiques (français)**
 - `GET /` : homepage
-- `GET /evenements` : liste événements
+- `GET /evenements` : liste événements (avec recherche full-text `?q=`)
 - `GET /evenements/:slug` : modal détails (Turbo Frame)
 - `GET /professeurs/:id` : profil professeur
 - `GET /professeurs/:id/stats` : stats publiques
@@ -315,6 +322,10 @@
 - Stockage : UTC en base
 - Affichage : Europe/Paris (config.time_zone)
 
+**Localisation**
+- Locale par défaut : `fr` (gem rails-i18n)
+- Jours/mois en français, capitalisés dans date separators
+
 **Pagination**
 - Pagy partout (JAMAIS `.page().per()` Kaminari)
 - Syntaxe : `@pagy, @records = pagy(scope, limit: N)`
@@ -345,6 +356,9 @@
 
 **Routes publiques**
 - Français : /evenements, /professeurs (PAS /events, /teachers)
+
+**Mobile**
+- Viewport : `user-scalable=no` (zoom désactivé pour éviter scroll horizontal)
 
 ---
 
@@ -386,6 +400,7 @@
 - Filtres type (atelier/stage)
 - Filtres format (en ligne/présentiel)
 - Filtres prix (gratuit/payant)
+- Recherche full-text multi-mots (AND)
 - Reset filtres
 - Auto-submit temps réel
 
@@ -469,248 +484,119 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 **Documentation centrale**
 - `docs/README.md` : navigation toutes les docs, quick start
 
----
-
 **Documentation vérification**
 - `docs/verification-scraping.md` : protocole complet vérification résultats scraping (8 sections, 14 checkpoints)
 
 ---
 
-## 🚀 Dernière Session (2026-04-05)
+## 🚀 Dernière Session (2026-04-05 → 2026-04-06)
 
-### Tentative configuration Remote Control ❌
+### Corrections Mobile (main) ✅
 
-**Objectif :** Configurer Claude Code Remote Control pour piloter le serveur depuis mobile/navigateur.
+**Commits :**
+- `b538c1e` fix: Empêcher le scroll horizontal sur mobile (overflow-x hidden)
+- `82b967a` fix: Corriger débordement horizontal des tags sur mobile (events) — flex-wrap sur vignettes
+- `76ffba9` fix: Bloquer zoom mobile pour empêcher scroll horizontal — viewport `user-scalable=no` (cause réelle du problème)
+- `99b6eb3` feat: Champ recherche full-text multi-mots (AND) dans filtres agenda — recherche titre/description/lieu/adresse/tags/professeur
+- `a6540f0` feat: Vignettes Atelier/Présentiel + jours en français capitalisés — gem rails-i18n, locale fr par défaut
+- `7462abd` fix: Cartes événements pleine largeur sur mobile + prix réduit compact — rounded-none sur mobile, format 20,00€/16,00€
+- `c34f15e` feat: Lien Admin dans menu burger mobile
 
-**Diagnostic effectué :**
-- Auth OAuth claude.ai ✅, plan Max ✅, API connectivity ✅
-- Pas de variables d'env parasites, pas de blocage firewall/Tailscale
-- Version 2.1.92 (>2.1.51 requis) ✅
+**Problèmes résolus :**
+- Scroll horizontal mobile : causé par le zoom (pinch), corrigé par `user-scalable=no` dans viewport meta
+- Tags qui débordaient : ajout `flex-wrap` sur la ligne des pastilles
+- Vignettes en anglais : Workshop → Atelier (locale en corrigée), locale par défaut passée à `fr`
+- JS auto-submit ne fonctionnait pas pour le champ recherche : le fichier JS réellement servi était dans `app/assets/javascripts/` (pas `app/javascript/`), ancien contenu sans méthode `submit()`. Corrigé en ajoutant listener `input` avec debounce directement dans le fichier servi.
 
-**Problème identifié :**
-- Token OAuth actuel a scopes `["user:inference","user:profile"]` — il manque `user:sessions:claude_code`
-- Erreur : `OAuth token does not meet scope requirement user:sessions:claude_code`
-- `claude auth login` en headless SSH ne propose pas de prompt pour coller le code OAuth
-- Tentative d'échange manuel du code OAuth via PKCE → rate limité par Cloudflare après plusieurs essais
+**Leçon apprise (mémorisée) :** Toujours vérifier visuellement avec screenshots Playwright (mobile + desktop) AVANT de dire à Duy de tester. Règle 2d du CLAUDE.md.
 
-**Fichiers non commités (travail en cours scraping) :**
-- `app/jobs/scraping_job.rb` (modifié)
-- `config/initializers/solid_queue.rb` (modifié)
-- `config/recurring.yml` (modifié)
-- `lib/tasks/scraping_report.rake` (nouveau)
+### Feature Branch : Exploration Site Prof (en cours)
 
-**TODO pour résoudre Remote Control :**
-1. Attendre fin rate limit (~1h) puis relancer `claude auth login` depuis terminal séparé (pas depuis Claude Code)
-2. Ou : installer Claude Code sur machine locale avec navigateur → `claude auth login` → copier `~/.claude/.credentials.json` vers serveur
-3. Ou : `unset DISPLAY && claude auth logout && claude auth login` (forcer mode texte)
+**Branche :** `exploration-site-prof` (créée depuis `c34f15e`)
 
----
+**Tech-spec BMAD créée :** `_bmad-output/implementation-artifacts/tech-spec-wip.md`
+- Status : `review` (étapes 1-3 complétées, étape 4 review en attente)
+- Gist pour audit claude.ai : https://gist.github.com/Aujourduy/a50be0d59e19801597527c22eb1de7ee
 
-## 📝 Session 2026-04-01
+**Fonctionnalité prévue :**
+- Crawler récursif de sites de profs (à partir d'une URL racine)
+- Détection des pages ateliers/stages via LLM gratuit (OpenRouter)
+- Classification binaire oui/non (pas d'extraction)
+- Création automatique de ScrapedUrl pour pages classées "oui"
+- Re-crawl automatique si page racine modifiée
+- Config modèle LLM : global dans admin settings + override par scan
+- Limites : profondeur max 5, max 100 pages, même domaine
 
-### 1. Import Masse + Filtres Admin ScrapedUrls ✅
+**Spec complète :** 35 tâches en 8 phases, 20 critères d'acceptation Given/When/Then
 
-**Commit :** `3f290a1` feat: Import masse + filtres/tri admin scraped_urls
+### Implémentation Crawler (2026-04-06 → 2026-04-07) ✅
 
-### 2. Fix Timestamps Preview Admin ✅
+**Commits branche `exploration-site-prof` :**
+- `db9c0e8` feat: Crawler site prof avec détection LLM via OpenRouter (implémentation complète)
+- `50e3e2b` fix: Retry 3x avec backoff sur rate limit 429 OpenRouter
+- `9d198fa` fix: Crawler utilise HTTParty (rapide) au lieu de Playwright
+- `0d143f6` feat: Fallback Playwright automatique pour pages JS-only
 
-**Problème résolu :**
-- Timestamps (derniere_version_html_at, markdown_at, claude_at) non mis à jour après boutons test
-- Cause : Rails optimisation skip update si contenu identique
-- Solution : `assign_attributes` + `save!(touch: false)` dans fetch_with_httparty, fetch_with_playwright, generate_markdown
+**Tests réels :**
+- Silvestre (Wix) : 12 pages crawlées, 6 OUI, ~30s ✅
+- Wilberforce (Wix) : 25 pages crawlées, 14 OUI, ~4 min ✅
 
-**Fichiers modifiés :**
-- `app/controllers/admin/scraped_urls_controller.rb` (3 actions)
-- `app/views/admin/scraped_urls/preview.html.erb` (ajout affichage timestamps)
+**Problèmes résolus :**
+- Rate limit OpenRouter sur modèles gratuits → retry 3x avec backoff 15/30/45s
+- Playwright trop lent/crash sur crawl multi-pages Wix → HTTParty par défaut pour crawler
+- Pages JS-only (contenu vide côté serveur) → détection automatique (texte visible < 500 chars OU `<noscript>` JavaScript) + fallback Playwright
 
-### 2. Documentation Vérification Scraping ✅
-
-**Création :**
-- `docs/verification-scraping.md` : protocole 8 sections, 14 checkpoints
-- Sections : Base, Cohérence, Comparaison HTML→DB, Affichage public/admin, Avancé, Troubleshooting, Résumé
-- Commandes copy-paste SQL et Rails console
-- Référencé dans `CLAUDE.md` projet
-
-### 3. Ajout Champ Prenom Professors ✅
-
-**Migration :**
-- Nouveau champ `prenom` (string, nullable)
-- Split données existantes : dernier mot = nom, reste = prenom
-- Concern Normalizable : `nom_normalise = normaliser(prenom + nom)`
-
-**Fichiers modifiés :**
-- Migration `db/migrate/20260331212835_add_prenom_to_professors.rb`
-- `app/models/concerns/normalizable.rb` (logique prenom + nom)
-
-### 4. Auto-Création Professeurs Multi-Profs ✅
-
-**Feature complète :**
-- Claude extrait `professor_nom` par événement (ajout champ JSON schema)
-- `EventUpdateJob.find_or_create_professor` : recherche 3 niveaux
-  1. ScrapedUrl.professors (professeurs déjà associés)
-  2. Global (Professor.find_by nom_normalise)
-  3. Create new avec status="auto", bio auto-générée
-- Split automatique prenom/nom (dernier mot = nom, reste = prenom)
-- Logging SCRAPING_LOGGER pour toutes créations/associations
-
-**Fichiers modifiés :**
-- `lib/claude_cli_integration.rb` (schema JSON + professor_nom)
-- `app/jobs/event_update_job.rb` (méthode find_or_create_professor)
-
-### 5. Interface Admin Review Professeurs ✅
-
-**CRUD Professeurs créé :**
-- Route `/admin/professors` : index (liste), edit, update, mark_reviewed
-- Index : filtres Tous / À vérifier (auto), badges 🤖 Auto / ✅ Vérifié
-- Alerte dashboard (URLs admin) si professeurs status="auto" non vérifiés
-- Edit : prenom, nom, email, site_web, avatar_url, bio
-- Bouton "Marquer comme vérifié" (auto → reviewed)
-- UI harmonisée avec conventions admin (Tailwind classes standards)
-
-**Fichiers créés :**
-- `app/controllers/admin/professors_controller.rb` (index, edit, update, mark_reviewed)
-- `app/views/admin/professors/index.html.erb`
-- `app/views/admin/professors/edit.html.erb`
-
-**Fichiers modifiés :**
-- `config/routes.rb` (routes professors)
-- `app/controllers/admin/scraped_urls_controller.rb` (alerte dashboard)
-- `app/views/admin/scraped_urls/index.html.erb` (alerte yellow box)
-- `app/views/layouts/admin.html.erb` (lien navigation "Professeurs")
-
-**Commits session :**
-- `f681991` Fix: Force timestamp update même si HTML/Markdown inchangé
-- `c0e6751` Docs: Ajout protocole vérification scraping complet
-- `6a756df` Feat: Ajout champ prenom aux professors avec split prenom/nom
-- `03be341` Feat: Auto-création professors multi-profs + admin review
-- `fd8a174` Refactor: Harmonise UI page /admin/professors/edit avec conventions admin
+**Documentation mise à jour :**
+- `docs/architecture-scraping.md` v2.0 (section crawler + diagramme classes)
+- `docs/guide-admin.md` v2.0 (section 7 crawler + routes)
+- `docs/etat-projet.md`
 
 ---
 
 ## ⚠️ TODO Prochaine Session
 
-**Priorité 1 — Remote Control :**
-- Résoudre scope OAuth `user:sessions:claude_code` (voir solutions ci-dessus)
+**Priorité 1 — Merger branche crawler :**
+- Review code final sur `exploration-site-prof`
+- Merger dans main si OK
+- Tester en production
 
-**Priorité 2 — Fichiers non commités :**
-- Examiner et commiter les modifications scraping en cours (scraping_job, solid_queue, recurring.yml, scraping_report.rake)
+**Priorité 2 — Améliorations crawler :**
+- Nettoyer les faux positifs (articles de blog classés "oui")
+- Tester avec d'autres sites de profs
+- Ajouter checkbox `auto_recrawl` dans le formulaire admin ScrapedUrl
 
-**Autres :**
-- Tester scraping complet avec auto-création professeurs
-- Vérifier workflow admin review
+**Priorité 3 — Maintenance :**
 - Optionnel : Upgrade Ruby 3.4
 
 ---
 
 ## 📝 Sessions Précédentes (Archives)
 
-### Session 2026-03-31 - Timestamps + Documentation ✅
+### Session 2026-04-05 — Remote Control ❌
 
-#### Correction Critique Playwright ✅
+**Objectif :** Configurer Claude Code Remote Control pour piloter le serveur depuis mobile/navigateur.
 
-**Problème identifié et corrigé :**
-- `waitUntil: "networkidle"` timeout 10min sur sites Wix (Marc Silvestre)
-- Cause : scripts analytics/tracking Wix font requêtes infinies, jamais "idle"
-- Solution : `waitUntil: "domcontentloaded"` + wait 5s pour JS rendering
+**Problème identifié :**
+- Token OAuth actuel a scopes `["user:inference","user:profile"]` — il manque `user:sessions:claude_code`
+- `claude auth login` en headless SSH ne propose pas de prompt pour coller le code OAuth
 
-**Changements PlaywrightScraper :**
-- `networkidle` → `domcontentloaded`
-- Timeout : 10min → 2min
-- Wait initial : 2s → 5s (meilleur rendu JS)
-- Wait après scroll : 1s → 2s
+**Résolu dans la session suivante :** Remote Control fonctionne, utilisé pour toutes les corrections mobile.
 
-### Tests Playwright Complets ✅
-
-**Tests effectués :**
-
-1. **Site de test HTML+JS local**
-   - Créé `tmp/test-playwright.html` avec contenu JavaScript (lazy-loading 500ms)
-   - Serveur HTTP Python (port 8888)
-   - ✅ Contenu dynamique JavaScript détecté (Stage Dance Immersion)
-   - ✅ Confirmation exécution JS détectée
-   - Temps : 3-5 secondes
-
-2. **Site Rails local (port 3002)**
-   - URL: `http://localhost:3002/`
-   - ✅ Homepage chargée (13130 chars)
-   - ✅ Titre et contenu détectés
-   - Temps : 4-6 secondes
-
-3. **Site Wix externe**
-   - URL: `https://www.wix.com/website-template/view/html/1068`
-   - ✅ Template Wix chargé (4599 chars)
-   - ✅ Contenu Wix détecté
-   - Temps : 8-12 secondes
-
-3b. **Site Wix réel - Marc Silvestre** ⭐
-   - URL: `https://www.marcsilvestre.com/agenda-cours-stages-1`
-   - ✅ HTML complet : 419 KB
-   - ✅ Markdown : 5.2 KB (98.8% réduction)
-   - ✅ Mots-clés détectés : agenda, stage, cours, VAGUES, Micadanses
-   - ✅ Scraping complet : 40.7s (8s fetch + conversion)
-   - ❌ AVANT : timeout 10min avec networkidle
-   - ✅ APRÈS : 8s avec domcontentloaded
-
-4. **Intégration ScrapingEngine**
-   - ✅ Scraping complet avec détection changements
-   - ✅ HTML mis en cache database (2981 chars)
-   - ✅ html_hash calculé (SHA256)
-   - ✅ Contenu JavaScript présent dans cache
-
-5. **Conversion Markdown**
-   - ✅ HtmlCleaner détecte contenu JavaScript dans Markdown
-   - ✅ Réduction tokens efficace (313 chars)
-
-6. **Tests automatisés**
-   - ✅ Tests unitaires : 89 runs, 0 failures
-   - ✅ Tests système : 8 runs, 0 failures
-   - ✅ RuboCop : 0 offenses
-   - ✅ Brakeman : 1 warning (EOL Ruby, non-bloquant)
-
-**Comparaison HTTParty vs Playwright :**
-- HTTParty : ⚡ 1-2s, ❌ pas de JS, sites statiques uniquement
-- Playwright : 🐢 8-40s, ✅ JS complet, Wix/React/Vue compatible
-- Playwright optimisé : `domcontentloaded` au lieu de `networkidle` (75x plus rapide sur Wix)
-
-**Rapport complet :** `tmp/PLAYWRIGHT_TEST_REPORT.md`
-
-### Session précédente (2026-03-28)
-
-**Fonctionnalités implémentées :**
-- PlaywrightScraper opérationnel (timeout 10min, scroll lazy-loading)
-- Interface admin test scraping (4 boutons : HTTParty, Playwright, Markdown, Claude)
-- Badges indicateurs mode (HTTParty/Playwright)
-- Formulaire edit avec choix visuel
-- Flash messages auto-dismiss (5s)
-- Documentation Tailwind CSS v4
+### Session 2026-04-01 — Import Masse + Admin ✅
 
 **Commits :**
-- `6be714c` - feat: Ajout système de test scraping
-- `2d4ef6c` - fix: Corrections boutons Markdown maker et Playwright
-- `3df9fe6` - feat: Flash messages auto-dismiss + timeout Playwright 10min
-- `ddc480e` - docs: MAJ état projet session 2026-03-28
-- `699076d` - docs: Refonte complète etat-projet.md en synthèse globale
+- `3f290a1` feat: Import masse + filtres/tri admin scraped_urls
+- `f681991` fix: Force timestamp update même si HTML/Markdown inchangé
+- `c0e6751` docs: Ajout protocole vérification scraping complet
+- `6a756df` feat: Ajout champ prenom aux professors avec split prenom/nom
+- `03be341` feat: Auto-création professors multi-profs + admin review
+- `fd8a174` refactor: Harmonise UI page /admin/professors/edit avec conventions admin
 
----
+### Session 2026-03-31 — Playwright ✅
 
-## ⚠️ TODO Prochaine Session
+**Correction critique :** `waitUntil: "networkidle"` → `"domcontentloaded"` (75x plus rapide sur Wix)
+**Tests complets :** 89 tests unitaires + 8 tests système, 0 failures
 
-**✅ PLAYWRIGHT VALIDÉ - Prêt pour production**
+### Session 2026-03-28 — Interface Admin Scraping ✅
 
-**Actions production :**
-1. Tester scraping sur 2-3 URLs réelles (Wix/React/Vue) en production
-2. Monitorer logs Solid Queue pour temps d'exécution
-3. Comparer résultats HTTParty vs Playwright côte à côte
-4. Vérifier utilisation mémoire Chromium headless
-
-**Maintenance système :**
-- ~~Upgrade Ruby 3.3 avant EOL 3.2.10 (31 mars 2026)~~ → reporté (warning ignoré dans Brakeman)
-- Upgrade Ruby 3.4 planifié pour session future (quand temps disponible)
-- Mise à jour credentials ENV (ADMIN_USERNAME, ADMIN_PASSWORD)
-- Setup DNS pour stopand.dance
-- Tests complets production sur stopand.dance
-
-**Qualité :**
-- QA final complet (slash command `/qa`)
-- Documenter cas d'usage HTTParty vs Playwright avec screenshots
-- Ajouter métriques réelles dans `docs/architecture-scraping.md`
+**Fonctionnalités :** PlaywrightScraper, 4 boutons test, badges mode, flash auto-dismiss

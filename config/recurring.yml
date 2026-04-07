@@ -19,3 +19,9 @@ production:
     class: ScrapingDispatchJob
     schedule: every day at 3am
     queue: scraping
+
+  # Site crawl auto-dispatch (re-crawl if root page changed)
+  site_crawl_dispatch:
+    class: SiteCrawlDispatchJob
+    schedule: every day at 4am
+    queue: scraping

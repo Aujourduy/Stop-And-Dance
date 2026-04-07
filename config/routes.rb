@@ -41,6 +41,7 @@ Rails.application.routes.draw do
     resources :scraped_urls do
       member do
         post :scrape_now
+        post :crawl_site
         post :fetch_with_httparty
         post :fetch_with_playwright
         post :generate_markdown
@@ -48,6 +49,7 @@ Rails.application.routes.draw do
         get :raw_html
       end
     end
+    resources :site_crawls, only: [ :index, :show ]
     resources :change_logs, only: [ :index, :show ]
     resources :events, only: [ :index, :show, :edit, :update ]
     resources :professors, only: [ :index, :edit, :update ] do

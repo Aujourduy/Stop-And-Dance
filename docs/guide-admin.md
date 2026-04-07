@@ -12,7 +12,8 @@ Interface d'administration pour gérer les sources de scraping, les événements
 4. [Consultation des ChangeLogs](#4-consultation-des-changelogs)
 5. [Gestion des Events](#5-gestion-des-events)
 6. [Actions rapides](#6-actions-rapides)
-7. [Sécurité](#7-sécurité)
+7. [Crawler de sites](#7-crawler-de-sites)
+8. [Sécurité](#8-sécurité)
 
 ---
 
@@ -321,7 +322,65 @@ SolidQueue::FailedExecution.last(5)
 
 ---
 
-## 7. Sécurité
+## 7. Crawler de sites
+
+### Principe
+
+Le crawler explore le site d'un professeur à partir d'une URL racine, et détecte automatiquement les pages contenant des ateliers/stages grâce à un LLM gratuit (OpenRouter). Les pages détectées sont automatiquement ajoutées comme nouvelles sources de scraping.
+
+### Lancer un crawl
+
+1. Aller sur `/admin/scraped_urls/:id` (page détails d'une URL)
+2. Section **"Crawler le site"** (violet)
+3. Choisir le modèle LLM (optionnel, défaut = celui des paramètres)
+4. Cliquer **"Crawler le site"**
+5. Le crawl s'exécute en arrière-plan
+
+### Consulter les résultats
+
+**URL** : `/admin/site_crawls`
+
+- Liste des crawls avec statut (pending/running/completed/failed)
+- Nombre de pages trouvées
+- Oui / Non (pages classées par le LLM)
+- Modèle LLM utilisé
+
+**Détail d'un crawl** : `/admin/site_crawls/:id`
+
+- Table de toutes les pages crawlées
+- Verdict : ✅ (atelier détecté), ❌ (pas d'atelier), ⚠️ (erreur)
+- Profondeur, URL, statut HTTP
+
+### Auto-recrawl
+
+Pour activer le re-crawl automatique quotidien :
+1. Éditer la ScrapedUrl (`/admin/scraped_urls/:id/edit`)
+2. Cocher **"Auto-recrawl"**
+3. Le `SiteCrawlDispatchJob` (4h du matin) vérifiera si la page racine a changé
+4. Si oui → re-crawl complet automatique
+
+### Configurer le modèle LLM
+
+**URL** : `/admin/settings/edit`
+
+Champ **"Modèle OpenRouter par défaut"** : choisir parmi les modèles gratuits disponibles.
+
+Modèles testés :
+- `google/gemma-3n-e4b-it:free` — rapide, bon pour classification
+- `google/gemma-3-12b-it:free` — plus précis, parfois rate-limité
+- `google/gemma-3-27b-it:free` — meilleur, souvent rate-limité
+
+### Limites
+
+- **Max 100 pages** par crawl
+- **Profondeur max 5** niveaux de liens
+- **Même domaine** uniquement (pas de liens externes)
+- **Rate limit** : les modèles gratuits OpenRouter limitent ~20 req/min
+- **Pages JS-only** : fallback automatique Playwright (plus lent)
+
+---
+
+## 8. Sécurité
 
 ### A. Changer les credentials admin
 
@@ -458,6 +517,9 @@ L'admin ajoute automatiquement :
 | `/admin/scraped_urls/:id/edit` | Éditer URL |
 | `/admin/scraped_urls/:id/preview` | Prévisualiser HTML |
 | `/admin/scraped_urls/:id/scrape_now` | Scraper maintenant (POST) |
+| `/admin/scraped_urls/:id/crawl_site` | Crawler le site (POST) |
+| `/admin/site_crawls` | Liste des crawls |
+| `/admin/site_crawls/:id` | Détail d'un crawl (pages trouvées) |
 | `/admin/change_logs` | Liste ChangeLogs |
 | `/admin/change_logs/:id` | Détails ChangeLog (diff HTML) |
 | `/admin/events` | Liste Events |
@@ -525,5 +587,5 @@ tail -f log/development.log | grep scraping
 
 ---
 
-**Dernière mise à jour** : 2026-03-27
-**Version** : 1.0
+**Dernière mise à jour** : 2026-04-07
+**Version** : 2.0 (ajout crawler site)

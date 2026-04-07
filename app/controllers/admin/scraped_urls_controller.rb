@@ -1,6 +1,6 @@
 class Admin::ScrapedUrlsController < Admin::ApplicationController
   include Pagy::Method
-  before_action :find_scraped_url, only: [ :show, :edit, :update, :destroy, :scrape_now, :fetch_with_httparty, :fetch_with_playwright, :generate_markdown, :preview, :raw_html ]
+  before_action :find_scraped_url, only: [ :show, :edit, :update, :destroy, :scrape_now, :crawl_site, :fetch_with_httparty, :fetch_with_playwright, :generate_markdown, :preview, :raw_html ]
 
   def index
     # Build base scope
@@ -94,6 +94,12 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
   def destroy
     @scraped_url.destroy
     redirect_to admin_scraped_urls_path, notice: "URL supprimée."
+  end
+
+  def crawl_site
+    llm_model = params[:llm_model].presence || Setting.instance.openrouter_default_model
+    SiteCrawlJob.perform_later(@scraped_url.id, llm_model: llm_model)
+    redirect_to admin_scraped_url_path(@scraped_url), notice: "Crawl du site lancé (modèle: #{llm_model})"
   end
 
   def scrape_now
@@ -232,6 +238,6 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
   end
 
   def scraped_url_params
-    params.require(:scraped_url).permit(:url, :nom, :commentaire, :notes_correctrices, :statut_scraping, :use_browser)
+    params.require(:scraped_url).permit(:url, :nom, :commentaire, :notes_correctrices, :statut_scraping, :use_browser, :auto_recrawl)
   end
 end
