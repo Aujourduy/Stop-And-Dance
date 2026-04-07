@@ -63,9 +63,10 @@ class SiteCrawler
 
   private
 
+  MIN_VISIBLE_TEXT = 500
+
   def crawl_page(url, depth)
-    # Always use HTTParty for crawling (fast, sufficient for classification)
-    # Playwright is only needed for final scraping of classified "yes" pages
+    # Try HTTParty first (fast), fallback to Playwright if JS-only content detected
     result = Scrapers::HtmlScraper.fetch(url)
 
     if result[:error]
@@ -77,6 +78,14 @@ class SiteCrawler
     end
 
     html = result[:html]
+
+    # Detect JS-only pages: if visible text < threshold, retry with Playwright
+    if js_only_content?(html)
+      SCRAPING_LOGGER.info({ event: "js_only_detected", url: url, fallback: "playwright" }.to_json)
+      pw_result = Scrapers::PlaywrightScraper.fetch(url)
+      html = pw_result[:html] if pw_result[:html].present? && !pw_result[:error]
+    end
+
     content_hash = Digest::SHA256.hexdigest(html)
     cleaned = HtmlCleaner.clean_and_convert(html)
     classification = OpenRouterClassifier.classify(markdown: cleaned[:markdown], model: @llm_model)
@@ -114,6 +123,19 @@ class SiteCrawler
     end
 
     links.uniq
+  end
+
+  def js_only_content?(html)
+    doc = Nokogiri::HTML(html)
+
+    # Check noscript tag for "enable javascript" message
+    noscript = doc.css("noscript").text.downcase
+    return true if noscript.match?(/javascript|enable|activer/)
+
+    # Check visible text length
+    doc.css("script, style, noscript, meta, link, svg").remove
+    visible_text = doc.text.gsub(/\s+/, " ").strip
+    visible_text.length < MIN_VISIBLE_TEXT
   end
 
   def same_domain?(url)
