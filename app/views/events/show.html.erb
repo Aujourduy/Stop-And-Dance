@@ -5,79 +5,58 @@
        data-action="click->modal#close">
 
     <%# Modal panel %>
-    <div data-debug-id="event-modal" class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+    <div data-debug-id="event-modal" class="card bg-base-100 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
          data-modal-target="panel"
          data-action="click->modal#stopPropagation">
 
       <%# Close button %>
       <%= link_to evenements_path,
-                  class: "absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl",
+                  class: "btn btn-ghost btn-sm absolute top-4 right-4 text-2xl",
                   data: { turbo_frame: "_top" } do %>
         &times;
       <% end %>
 
-      <%# Content %>
-      <div class="p-6">
-        <%# Tags row %>
+      <div class="card-body">
+        <%# Badges %>
         <div class="flex flex-wrap gap-2 mb-4">
-          <%# brakeman:disable RenderInline - type_event_humanized returns safe I18n text from enum %>
-          <%= render "shared/tag", text: @event.type_event_humanized, variant: @event.type_event %>
+          <span class="badge badge-primary"><%= @event.type_event_humanized %></span>
           <% if @event.gratuit %>
-            <%= render "shared/tag", text: "Gratuit", variant: "gratuit" %>
+            <span class="badge badge-success">Gratuit</span>
           <% end %>
           <% if @event.en_ligne %>
-            <%= render "shared/tag", text: "En ligne", variant: "en_ligne" %>
+            <span class="badge badge-info">En ligne</span>
           <% end %>
           <% if @event.en_presentiel %>
-            <%= render "shared/tag", text: "Présentiel", variant: "en_presentiel" %>
+            <span class="badge badge-outline">Présentiel</span>
           <% end %>
         </div>
 
-        <%# Photo carousel (if multiple photos in future) %>
+        <%# Photo %>
         <% if @event.photo_url.present? %>
-          <div class="mb-4">
-            <%= image_tag @event.photo_url, alt: @event.titre, class: "w-full h-64 object-cover rounded" %>
-          </div>
+          <figure class="mb-4">
+            <%= image_tag @event.photo_url, alt: @event.titre, class: "w-full h-64 object-cover rounded-box" %>
+          </figure>
         <% end %>
 
         <%# Title %>
-        <h2 class="font-script italic text-3xl mb-4"><%= @event.titre %></h2>
+        <h2 class="card-title font-script italic text-3xl mb-4"><%= @event.titre %></h2>
 
         <%# Info block %>
         <div class="space-y-3 mb-6">
+          <div><span class="font-medium">Animé par :</span> <%= @event.professor.nom %></div>
+          <div><span class="font-medium">Début :</span> <%= l(@event.date_debut, format: :long) %></div>
+          <div><span class="font-medium">Fin :</span> <%= l(@event.date_fin, format: :long) %></div>
+          <div><span class="font-medium">Durée :</span> <%= @event.duree_minutes %> minutes</div>
           <div>
-            <span class="font-medium">Animé par :</span>
-            <%= @event.professor.nom %>
+            <span class="font-medium">Lieu :</span> <%= @event.lieu %><br>
+            <span class="text-sm opacity-60"><%= @event.adresse_complete %></span>
           </div>
-
-          <div>
-            <span class="font-medium">Début :</span>
-            <%= l(@event.date_debut, format: :long) %>
-          </div>
-
-          <div>
-            <span class="font-medium">Fin :</span>
-            <%= l(@event.date_fin, format: :long) %>
-          </div>
-
-          <div>
-            <span class="font-medium">Durée :</span>
-            <%= @event.duree_minutes %> minutes
-          </div>
-
-          <div>
-            <span class="font-medium">Lieu :</span>
-            <%= @event.lieu %><br>
-            <span class="text-sm text-gray-600"><%= @event.adresse_complete %></span>
-          </div>
-
           <div>
             <span class="font-medium">Tarif :</span>
             <% if @event.gratuit %>
-              <span class="text-green-600 font-medium">Gratuit</span>
+              <span class="text-success font-medium">Gratuit</span>
             <% elsif @event.prix_reduit.present? %>
-              <%= number_to_currency(@event.prix_normal, unit: "€", format: "%n%u") %>
-              (réduit: <%= number_to_currency(@event.prix_reduit, unit: "€", format: "%n%u") %>)
+              <%= number_to_currency(@event.prix_normal, unit: "€", format: "%n%u") %>/<%= number_to_currency(@event.prix_reduit, unit: "€", format: "%n%u") %>
             <% else %>
               <%= number_to_currency(@event.prix_normal, unit: "€", format: "%n%u") %>
             <% end %>
@@ -89,28 +68,26 @@
                           @event.professor.site_web,
                           target: "_blank",
                           rel: "noopener noreferrer",
-                          class: "inline-block bg-terracotta text-white px-4 py-2 rounded hover:bg-terracotta-dark transition-colors" %>
+                          class: "btn btn-primary btn-sm" %>
             </div>
           <% end %>
         </div>
 
-        <%# Description section %>
-        <div class="border-t pt-4">
-          <h3 class="text-terracotta font-bold text-xl mb-3">Description</h3>
-          <div class="prose max-w-none">
-            <%= simple_format(@event.description) %>
-          </div>
+        <%# Description %>
+        <div class="divider"></div>
+        <h3 class="text-primary font-bold text-xl mb-3">Description</h3>
+        <div class="prose max-w-none">
+          <%= simple_format(@event.description) %>
         </div>
 
-        <%# Tags list if any %>
+        <%# Tags %>
         <% if @event.tags.present? %>
-          <div class="border-t pt-4 mt-4">
-            <h3 class="text-terracotta font-bold text-xl mb-3">Pratiques</h3>
-            <div class="flex flex-wrap gap-2">
-              <% @event.tags.each do |tag| %>
-                <%= render "shared/tag", text: tag, variant: "default" %>
-              <% end %>
-            </div>
+          <div class="divider"></div>
+          <h3 class="text-primary font-bold text-xl mb-3">Pratiques</h3>
+          <div class="flex flex-wrap gap-2">
+            <% @event.tags.each do |tag| %>
+              <span class="badge badge-outline"><%= tag %></span>
+            <% end %>
           </div>
         <% end %>
       </div>

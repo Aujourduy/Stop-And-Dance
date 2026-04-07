@@ -1,28 +1,16 @@
-<footer class="bg-dark-bg text-white py-12 mt-12">
-  <div class="container mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <%# Newsletter in footer %>
-      <div>
-        <%= render 'shared/newsletter_signup' %>
-      </div>
-
-      <%# Other footer content (links, etc.) %>
-      <div>
-        <h3 class="font-script italic text-xl mb-4">Navigation</h3>
-        <ul class="space-y-2">
-          <li><%= link_to "Agenda", evenements_path, class: "hover:text-terracotta transition-colors" %></li>
-          <li><%= link_to "À propos", about_path, class: "hover:text-terracotta transition-colors" %></li>
-          <li><%= link_to "Contact", contact_path, class: "hover:text-terracotta transition-colors" %></li>
-        </ul>
-      </div>
-
-      <div>
-        <h3 class="font-script italic text-xl mb-4">Légal</h3>
-        <ul class="space-y-2">
-          <li><a href="#" class="hover:text-terracotta transition-colors">Mentions légales</a></li>
-          <li><a href="#" class="hover:text-terracotta transition-colors">Politique de confidentialité</a></li>
-        </ul>
-      </div>
-    </div>
+<footer class="footer bg-neutral text-neutral-content p-10 mt-12">
+  <nav>
+    <h6 class="footer-title font-script italic text-xl">Navigation</h6>
+    <%= link_to "Agenda", evenements_path, class: "link link-hover" %>
+    <%= link_to "À propos", about_path, class: "link link-hover" %>
+    <%= link_to "Contact", contact_path, class: "link link-hover" %>
+  </nav>
+  <nav>
+    <h6 class="footer-title font-script italic text-xl">Légal</h6>
+    <a href="#" class="link link-hover">Mentions légales</a>
+    <a href="#" class="link link-hover">Politique de confidentialité</a>
+  </nav>
+  <div>
+    <%= render 'shared/newsletter_signup' %>
   </div>
 </footer>

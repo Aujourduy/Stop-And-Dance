@@ -1,106 +1,104 @@
 <div class="space-y-6 sticky top-4">
-  <%# Search component (placeholder for Algolia post-MVP) - Hidden until Algolia integration %>
-  <%#= render "shared/search" %>
-
-  <div data-debug-id="filters" class="bg-white rounded-lg shadow-sm p-6">
+  <div data-debug-id="filters" class="card bg-base-100 shadow-sm">
+    <div class="card-body p-6">
 
     <%# Filter header %>
-  <div class="flex items-center justify-between mb-6 bg-terracotta text-white -mx-6 -mt-6 px-6 py-4 rounded-t-lg">
-    <h2 class="font-script italic text-2xl">Filtrez l'agenda</h2>
-    <%# Close button only visible on mobile overlay (hidden on desktop sidebar) %>
-    <button data-action="click->mobile-filters#close"
-            class="lg:hidden text-2xl">
-      &times;
-    </button>
-  </div>
-
-  <%= form_with url: evenements_path,
-                method: :get,
-                data: {
-                  controller: "auto-submit",
-                  turbo_frame: "events-list"
-                },
-                class: "space-y-6" do |f| %>
-
-    <%# Search field %>
-    <div>
-      <h3 class="font-medium mb-3">Recherche</h3>
-      <%= f.text_field :q,
-                       value: params[:q],
-                       class: "w-full rounded border-gray-300 focus:border-terracotta focus:ring-terracotta",
-                       placeholder: "Ex: marc rennes",
-                       data: { action: "change->auto-submit#submit" } %>
+    <div class="flex items-center justify-between mb-4 bg-primary text-primary-content -mx-6 -mt-6 px-6 py-4 rounded-t-box">
+      <h2 class="card-title font-script italic text-2xl">Filtrez l'agenda</h2>
+      <button data-action="click->mobile-filters#close"
+              class="lg:hidden btn btn-ghost btn-sm text-2xl">
+        &times;
+      </button>
     </div>
 
-    <%# Type & Format filters (2-column grid) %>
-    <div>
-      <h3 class="font-medium mb-3">Type et format</h3>
-      <div class="space-y-2">
-        <div class="flex items-center">
-          <%= f.check_box :en_presentiel,
-                          { checked: params[:en_presentiel] == "true", class: "rounded text-terracotta focus:ring-terracotta", data: { action: "change->auto-submit#submit" } },
-                          "true", nil %>
-          <%= f.label :en_presentiel, "En présentiel", class: "ml-2" %>
-        </div>
+    <%= form_with url: evenements_path,
+                  method: :get,
+                  data: {
+                    controller: "auto-submit",
+                    turbo_frame: "events-list"
+                  },
+                  class: "space-y-6" do |f| %>
 
-        <div class="flex items-center">
-          <%= f.check_box :stage,
-                          { checked: params[:stage] == "true", class: "rounded text-terracotta focus:ring-terracotta", data: { action: "change->auto-submit#submit" } },
-                          "true", nil %>
-          <%= f.label :stage, "Stage", class: "ml-2" %>
-        </div>
+      <%# Search field %>
+      <div>
+        <h3 class="font-medium mb-3">Recherche</h3>
+        <%= f.text_field :q,
+                         value: params[:q],
+                         class: "input input-bordered w-full",
+                         placeholder: "Ex: marc rennes",
+                         data: { action: "change->auto-submit#submit" } %>
+      </div>
 
-        <div class="flex items-center">
-          <%= f.check_box :en_ligne,
-                          { checked: params[:en_ligne] == "true", class: "rounded text-terracotta focus:ring-terracotta", data: { action: "change->auto-submit#submit" } },
-                          "true", nil %>
-          <%= f.label :en_ligne, "En ligne", class: "ml-2" %>
-        </div>
+      <%# Type & Format filters %>
+      <div>
+        <h3 class="font-medium mb-3">Type et format</h3>
+        <div class="space-y-2">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <%= f.check_box :en_presentiel,
+                            { checked: params[:en_presentiel] == "true", class: "checkbox checkbox-primary checkbox-sm", data: { action: "change->auto-submit#submit" } },
+                            "true", nil %>
+            <span>En présentiel</span>
+          </label>
 
-        <div class="flex items-center">
-          <%= f.check_box :gratuit,
-                          { checked: params[:gratuit] == "true", class: "rounded text-terracotta focus:ring-terracotta", data: { action: "change->auto-submit#submit" } },
-                          "true", nil %>
-          <%= f.label :gratuit, "Gratuit", class: "ml-2" %>
-        </div>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <%= f.check_box :stage,
+                            { checked: params[:stage] == "true", class: "checkbox checkbox-primary checkbox-sm", data: { action: "change->auto-submit#submit" } },
+                            "true", nil %>
+            <span>Stage</span>
+          </label>
 
-        <div class="flex items-center">
-          <%= f.check_box :atelier,
-                          { checked: params[:atelier] == "true", class: "rounded text-terracotta focus:ring-terracotta", data: { action: "change->auto-submit#submit" } },
-                          "true", nil %>
-          <%= f.label :atelier, "Atelier", class: "ml-2" %>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <%= f.check_box :en_ligne,
+                            { checked: params[:en_ligne] == "true", class: "checkbox checkbox-primary checkbox-sm", data: { action: "change->auto-submit#submit" } },
+                            "true", nil %>
+            <span>En ligne</span>
+          </label>
+
+          <label class="flex items-center gap-2 cursor-pointer">
+            <%= f.check_box :gratuit,
+                            { checked: params[:gratuit] == "true", class: "checkbox checkbox-primary checkbox-sm", data: { action: "change->auto-submit#submit" } },
+                            "true", nil %>
+            <span>Gratuit</span>
+          </label>
+
+          <label class="flex items-center gap-2 cursor-pointer">
+            <%= f.check_box :atelier,
+                            { checked: params[:atelier] == "true", class: "checkbox checkbox-primary checkbox-sm", data: { action: "change->auto-submit#submit" } },
+                            "true", nil %>
+            <span>Atelier</span>
+          </label>
         </div>
       </div>
-    </div>
 
-    <%# Date filter %>
-    <div>
-      <h3 class="font-medium mb-3">Date</h3>
-      <%= f.label :date_debut, "À partir du", class: "block text-sm mb-1" %>
-      <%= f.date_field :date_debut,
-                       value: params[:date_debut],
-                       class: "w-full rounded border-gray-300 focus:border-terracotta focus:ring-terracotta",
-                       placeholder: "JJ/MM/AAAA",
-                       data: { action: "change->auto-submit#submit" } %>
-    </div>
+      <%# Date filter %>
+      <div>
+        <h3 class="font-medium mb-3">Date</h3>
+        <%= f.label :date_debut, "À partir du", class: "label" %>
+        <%= f.date_field :date_debut,
+                         value: params[:date_debut],
+                         class: "input input-bordered w-full",
+                         placeholder: "JJ/MM/AAAA",
+                         data: { action: "change->auto-submit#submit" } %>
+      </div>
 
-    <%# Geographic filter (basic MVP, full geocoding post-MVP) %>
-    <div>
-      <h3 class="font-medium mb-3">Lieu</h3>
-      <%= f.label :lieu, "Adresse, ville...", class: "block text-sm mb-1" %>
-      <%= f.text_field :lieu,
-                       value: params[:lieu],
-                       class: "w-full rounded border-gray-300 focus:border-terracotta focus:ring-terracotta mb-3",
-                       placeholder: "Paris, Lyon...",
-                       data: { action: "change->auto-submit#submit" } %>
+      <%# Geographic filter %>
+      <div>
+        <h3 class="font-medium mb-3">Lieu</h3>
+        <%= f.label :lieu, "Adresse, ville...", class: "label" %>
+        <%= f.text_field :lieu,
+                         value: params[:lieu],
+                         class: "input input-bordered w-full mb-3",
+                         placeholder: "Paris, Lyon...",
+                         data: { action: "change->auto-submit#submit" } %>
 
-      <%= f.label :distance, "Distance (km)", class: "block text-sm mb-1" %>
-      <%= f.number_field :distance,
-                         class: "w-full rounded border-gray-300 focus:border-terracotta focus:ring-terracotta",
-                         placeholder: "Ex: 20",
-                         disabled: true %>
-      <p class="text-xs text-gray-500 mt-1">Géolocalisation disponible prochainement</p>
+        <%= f.label :distance, "Distance (km)", class: "label" %>
+        <%= f.number_field :distance,
+                           class: "input input-bordered w-full",
+                           placeholder: "Ex: 20",
+                           disabled: true %>
+        <p class="text-xs opacity-50 mt-1">Géolocalisation disponible prochainement</p>
+      </div>
+    <% end %>
     </div>
-  <% end %>
   </div>
 </div>

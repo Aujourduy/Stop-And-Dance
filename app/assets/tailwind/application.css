@@ -1,4 +1,33 @@
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default;
+}
+
+/* Custom DaisyUI theme matching Stop & Dance identity */
+@plugin "daisyui/theme" {
+  name: "stopanddance";
+  default: true;
+  color-scheme: light;
+  --color-base-100: #F5E6D3;
+  --color-base-200: #E8D4BB;
+  --color-base-300: #D4BFA3;
+  --color-base-content: #1A1A1A;
+  --color-primary: #C2623F;
+  --color-primary-content: #FFFFFF;
+  --color-secondary: #D4A017;
+  --color-secondary-content: #FFFFFF;
+  --color-accent: #1A1A1A;
+  --color-accent-content: #FFFFFF;
+  --color-neutral: #1A1A1A;
+  --color-neutral-content: #F5E6D3;
+  --color-info: #3B82F6;
+  --color-success: #22C55E;
+  --color-warning: #D4A017;
+  --color-error: #EF4444;
+  --rounded-box: 0.75rem;
+  --rounded-btn: 0.5rem;
+  --rounded-badge: 1rem;
+}
 
 /* Theme configuration for custom design tokens */
 @theme {

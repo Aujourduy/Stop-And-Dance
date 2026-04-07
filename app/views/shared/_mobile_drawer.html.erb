@@ -1,12 +1,11 @@
 <div class="lg:hidden" data-controller="mobile-drawer">
   <%# Mobile header %>
-  <header class="bg-dark-bg text-white py-4 px-4 flex items-center justify-between sticky top-0 z-50">
-    <%# Logo + Burger + Group4 à gauche %>
-    <div class="flex items-center gap-4">
+  <header class="navbar bg-neutral text-neutral-content sticky top-0 z-50">
+    <div class="navbar-start gap-4">
       <%= link_to root_path, class: "flex items-center" do %>
         <%= image_tag "logo/favicon.ico", alt: "Stop & Dance", class: "h-6 w-6" %>
       <% end %>
-      <button data-action="click->mobile-drawer#toggle" class="text-xl rounded-full h-8 w-8 flex items-center justify-center text-white" style="background-color: rgb(191, 70, 47);" aria-label="Open navigation menu">
+      <button data-action="click->mobile-drawer#toggle" class="btn btn-circle btn-primary btn-sm" aria-label="Open navigation menu">
         ☰
       </button>
       <%= link_to evenements_path, class: "flex items-center" do %>
@@ -22,17 +21,16 @@
   <div data-mobile-drawer-target="overlay" class="hidden fixed inset-0 bg-black/50 z-40" data-action="click->mobile-drawer#close" aria-hidden="true"></div>
 
   <%# Drawer panel %>
-  <aside data-mobile-drawer-target="panel" class="hidden fixed top-14 left-0 h-auto w-64 bg-dark-bg text-white z-50 p-6 transform transition-transform rounded-r-lg shadow-lg" aria-hidden="true">
+  <aside data-mobile-drawer-target="panel" class="hidden fixed top-14 left-0 h-auto w-64 bg-neutral text-neutral-content z-50 p-6 transform transition-transform rounded-r-lg shadow-lg" aria-hidden="true">
     <button data-action="click->mobile-drawer#close" class="absolute top-4 right-4 text-2xl" aria-label="Close navigation menu">×</button>
 
-    <nav class="flex flex-col gap-4">
-      <%= link_to "Accueil", root_path, class: "text-lg hover:text-terracotta transition-colors" %>
-      <%# Note: evenements_path will be defined in Epic 4 %>
-      <%= link_to "Agenda", "#", class: "text-lg hover:text-terracotta transition-colors" %>
-      <%= link_to "S'inscrire à la newsletter", "#", class: "text-lg hover:text-terracotta transition-colors" %>
-      <%= link_to "Liens", "#", class: "text-lg hover:text-terracotta transition-colors" %>
-      <%= link_to "L'espace des proposants", proposants_path, class: "text-lg hover:text-terracotta transition-colors" %>
-      <%= link_to "Admin", admin_root_path, class: "text-lg hover:text-terracotta transition-colors" %>
-    </nav>
+    <ul class="menu">
+      <li><%= link_to "Accueil", root_path %></li>
+      <li><%= link_to "Agenda", evenements_path %></li>
+      <li><%= link_to "S'inscrire à la newsletter", "#" %></li>
+      <li><%= link_to "Liens", "#" %></li>
+      <li><%= link_to "L'espace des proposants", proposants_path %></li>
+      <li><%= link_to "Admin", admin_root_path %></li>
+    </ul>
   </aside>
 </div>

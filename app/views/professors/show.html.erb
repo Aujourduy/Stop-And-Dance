@@ -1,77 +1,81 @@
 <div class="container mx-auto px-4 py-8 max-w-4xl">
   <%# Header with avatar and bio %>
-  <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
-    <div class="flex flex-col md:flex-row gap-6 items-start">
-      <%# Avatar %>
-      <div class="flex-shrink-0">
-        <% if @professor.avatar_url.present? %>
-          <%= image_tag @professor.avatar_url,
-                        alt: @professor.nom,
-                        class: "w-32 h-32 rounded-full object-cover",
-                        loading: "lazy",
-                        onerror: "this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"128\" height=\"128\"%3E%3Crect fill=\"%23C2623F\" width=\"128\" height=\"128\"/%3E%3Ctext x=\"50%25\" y=\"50%25\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"48\" fill=\"white\"%3E#{@professor.nom&.first || '?'}%3C/text%3E%3C/svg%3E'" %>
-        <% else %>
-          <%# Fallback: SVG avatar with initials %>
-          <div class="w-32 h-32 rounded-full bg-terracotta flex items-center justify-center text-white text-5xl font-script">
-            <%= @professor.nom&.first || '?' %>
-          </div>
-        <% end %>
-      </div>
-
-      <%# Bio %>
-      <div class="flex-grow">
-        <h1 class="text-4xl font-script italic mb-4"><%= @professor.nom %></h1>
-
-        <div class="prose max-w-none mb-4">
-          <%= simple_format(@professor.bio) %>
+  <div class="card bg-base-100 shadow-sm mb-8">
+    <div class="card-body">
+      <div class="flex flex-col md:flex-row gap-6 items-start">
+        <%# Avatar %>
+        <div class="flex-shrink-0">
+          <% if @professor.avatar_url.present? %>
+            <%= image_tag @professor.avatar_url,
+                          alt: @professor.nom,
+                          class: "w-32 h-32 rounded-full object-cover",
+                          loading: "lazy",
+                          onerror: "this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"128\" height=\"128\"%3E%3Crect fill=\"%23C2623F\" width=\"128\" height=\"128\"/%3E%3Ctext x=\"50%25\" y=\"50%25\" dominant-baseline=\"middle\" text-anchor=\"middle\" font-size=\"48\" fill=\"white\"%3E#{@professor.nom&.first || '?'}%3C/text%3E%3C/svg%3E'" %>
+          <% else %>
+            <div class="avatar placeholder">
+              <div class="bg-primary text-primary-content w-32 h-32 rounded-full">
+                <span class="text-5xl font-script"><%= @professor.nom&.first || '?' %></span>
+              </div>
+            </div>
+          <% end %>
         </div>
 
-        <%# Links %>
-        <div class="flex flex-wrap gap-3">
-          <% if @professor.site_web.present? %>
-            <%= link_to redirect_to_site_professeur_path(@professor),
-                        target: "_blank",
-                        class: "inline-flex items-center gap-2 bg-terracotta text-white px-4 py-2 rounded hover:bg-terracotta-dark transition-colors" do %>
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
-                <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
-              </svg>
-              Voir le site web
-            <% end %>
-          <% end %>
+        <%# Bio %>
+        <div class="flex-grow">
+          <h1 class="text-4xl font-script italic mb-4"><%= @professor.nom %></h1>
 
-          <%= link_to stats_professeur_path(@professor),
-                      class: "inline-flex items-center gap-2 border border-terracotta text-terracotta px-4 py-2 rounded hover:bg-terracotta hover:text-white transition-colors" do %>
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
-            </svg>
-            Voir les statistiques publiques
-          <% end %>
+          <div class="prose max-w-none mb-4">
+            <%= simple_format(@professor.bio) %>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <% if @professor.site_web.present? %>
+              <%= link_to redirect_to_site_professeur_path(@professor),
+                          target: "_blank",
+                          class: "btn btn-primary btn-sm" do %>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                  <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/>
+                </svg>
+                Voir le site web
+              <% end %>
+            <% end %>
+
+            <%= link_to stats_professeur_path(@professor),
+                        class: "btn btn-outline btn-primary btn-sm" do %>
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+              </svg>
+              Voir les statistiques publiques
+            <% end %>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <%# Upcoming events section %>
-  <div class="bg-white rounded-lg shadow-sm p-8">
-    <h2 class="text-2xl font-script italic mb-6">Prochains ateliers et stages</h2>
+  <%# Upcoming events %>
+  <div class="card bg-base-100 shadow-sm">
+    <div class="card-body">
+      <h2 class="card-title text-2xl font-script italic mb-6">Prochains ateliers et stages</h2>
 
-    <% if @upcoming_events.any? %>
-      <div class="space-y-4">
-        <% @upcoming_events.each do |event| %>
-          <%= render 'events/event_card', event: event %>
-        <% end %>
-      </div>
-
-      <% if @professor.events.futurs.count > 10 %>
-        <div class="mt-6 text-center">
-          <%= link_to "Voir tous les événements de #{@professor.nom}",
-                      evenements_path(professor_id: @professor.id),
-                      class: "text-terracotta hover:underline" %>
+      <% if @upcoming_events.any? %>
+        <div class="space-y-4">
+          <% @upcoming_events.each do |event| %>
+            <%= render 'events/event_card', event: event %>
+          <% end %>
         </div>
+
+        <% if @professor.events.futurs.count > 10 %>
+          <div class="mt-6 text-center">
+            <%= link_to "Voir tous les événements de #{@professor.nom}",
+                        evenements_path(professor_id: @professor.id),
+                        class: "link link-primary" %>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="opacity-50 italic">Aucun événement à venir pour le moment.</p>
       <% end %>
-    <% else %>
-      <p class="text-gray-500 italic">Aucun événement à venir pour le moment.</p>
-    <% end %>
+    </div>
   </div>
 </div>
