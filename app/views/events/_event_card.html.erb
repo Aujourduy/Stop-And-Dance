@@ -1,10 +1,10 @@
 <%# locals: event %>
 <%= link_to evenement_path(event.slug),
-            class: "card card-side bg-base-100 shadow-sm hover:shadow-md transition-shadow mb-2 lg:mb-4 rounded-none lg:rounded-box overflow-hidden",
+            class: "card card-side bg-base-100 mb-0 rounded-none lg:rounded-box overflow-hidden",
             data: { turbo_frame: "event_modal", debug_id: "event-card-#{event.id}" } do %>
 
   <%# Avatar %>
-  <figure class="flex-shrink-0 p-4 pb-0 lg:pb-4">
+  <figure class="flex-shrink-0 p-2 sm:p-4 pb-0 lg:pb-4">
     <% if event.photo_url.present? %>
       <%= image_tag event.photo_url,
                     alt: event.titre,
@@ -17,7 +17,7 @@
     <% end %>
   </figure>
 
-  <div class="card-body p-4 min-w-0">
+  <div class="card-body p-2 sm:p-4 gap-0.5 min-w-0">
     <%# Horaire + Badges %>
     <div class="flex flex-wrap items-center gap-1 sm:gap-2">
       <span class="text-primary font-bold text-base sm:text-lg">
