@@ -95,7 +95,7 @@ class EventsController < ApplicationController
       words.each do |word|
         pattern = "%#{word}%"
         scope = scope.where(
-          "events.titre ILIKE :p OR events.description ILIKE :p OR events.lieu ILIKE :p OR events.adresse_complete ILIKE :p OR events.tags::text ILIKE :p OR professors.nom ILIKE :p",
+          "events.titre ILIKE :p OR events.description ILIKE :p OR events.lieu ILIKE :p OR events.adresse_complete ILIKE :p OR events.tags::text ILIKE :p OR professors.nom ILIKE :p OR professors.prenom ILIKE :p",
           p: pattern
         )
       end
