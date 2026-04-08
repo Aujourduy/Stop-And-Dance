@@ -31,8 +31,21 @@
         <tr class="hover <%= 'bg-warning/10' if professor.status == 'auto' %>">
           <td><%= professor.id %></td>
           <td>
-            <div class="font-medium"><%= professor.prenom %> <%= professor.nom %></div>
-            <div class="text-xs opacity-50"><%= professor.nom_normalise %></div>
+            <div class="flex items-center gap-3">
+              <% if professor.avatar_url.present? %>
+                <%= image_tag professor.avatar_url, alt: professor.nom, class: "w-10 h-10 rounded-full object-cover", loading: "lazy" %>
+              <% else %>
+                <div class="avatar placeholder">
+                  <div class="bg-primary/30 text-primary-content w-10 h-10 rounded-full">
+                    <span><%= professor.nom&.first&.upcase || "?" %></span>
+                  </div>
+                </div>
+              <% end %>
+              <div>
+                <div class="font-medium"><%= professor.prenom %> <%= professor.nom %></div>
+                <div class="text-xs opacity-50"><%= professor.nom_normalise %></div>
+              </div>
+            </div>
           </td>
           <td>
             <% if professor.status == "auto" %>
