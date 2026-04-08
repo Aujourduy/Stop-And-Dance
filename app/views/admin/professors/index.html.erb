@@ -27,6 +27,7 @@
     <thead>
       <tr>
         <th>ID</th>
+        <th>Photo</th>
         <th>Prénom</th>
         <th>Nom</th>
         <th>Status</th>
@@ -41,22 +42,18 @@
         <tr class="hover <%= 'bg-warning/10' if professor.status == 'auto' %>">
           <td><%= professor.id %></td>
           <td>
-            <div class="flex items-center gap-3">
-              <% if professor.avatar_url.present? %>
-                <%= image_tag professor.avatar_url, alt: professor.nom, class: "w-10 h-10 rounded-full object-cover", loading: "lazy" %>
-              <% else %>
-                <div class="avatar placeholder">
-                  <div class="bg-primary/30 text-primary-content w-10 h-10 rounded-full">
-                    <span><%= professor.nom&.first&.upcase || "?" %></span>
-                  </div>
+            <% if professor.avatar_url.present? %>
+              <%= image_tag professor.avatar_url, alt: professor.nom, class: "w-10 h-10 rounded-full object-cover", loading: "lazy" %>
+            <% else %>
+              <div class="avatar placeholder">
+                <div class="bg-primary/30 text-primary-content w-10 h-10 rounded-full">
+                  <span><%= professor.nom&.first&.upcase || "?" %></span>
                 </div>
-              <% end %>
-              <span><%= professor.prenom %></span>
-            </div>
+              </div>
+            <% end %>
           </td>
-          <td>
-            <div class="font-medium"><%= professor.nom %></div>
-          </td>
+          <td><%= professor.prenom %></td>
+          <td class="font-medium"><%= professor.nom %></td>
           <td>
             <% if professor.status == "auto" %>
               <span class="badge badge-warning badge-sm">Auto</span>
