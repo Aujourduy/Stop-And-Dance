@@ -1,4 +1,4 @@
-<%= turbo_stream.append "events-list" do %>
+<%= turbo_stream.replace "page-#{params[:page]}" do %>
   <%= render "events_list", events: @events %>
 
   <%# Next page trigger %>
@@ -7,7 +7,7 @@
                         src: evenements_path(page: @pagy.next, format: :turbo_stream),
                         loading: :lazy do %>
       <div class="text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+        <span class="loading loading-spinner loading-md text-primary"></span>
       </div>
     <% end %>
   <% end %>

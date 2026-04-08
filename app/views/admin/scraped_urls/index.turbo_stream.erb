@@ -1,43 +1,41 @@
 <%= turbo_stream.append "admin-scraped-urls-tbody" do %>
   <% @scraped_urls.each do |url| %>
-    <tr>
-      <td class="px-6 py-4">
-        <%= link_to admin_scraped_url_path(url), class: "text-terracotta hover:underline", data: { turbo_frame: "_top" } do %>
+    <tr class="hover">
+      <td>
+        <%= link_to admin_scraped_url_path(url), class: "link link-primary", data: { turbo_frame: "_top" } do %>
           <div class="font-medium"><%= url.nom.presence || url.url.truncate(40) %></div>
           <% if url.nom.present? %>
-            <div class="text-xs text-gray-500"><%= url.url.truncate(50) %></div>
+            <div class="text-xs opacity-50"><%= url.url.truncate(50) %></div>
           <% end %>
         <% end %>
       </td>
-      <td class="px-6 py-4 text-sm text-gray-900">
-        <%= url.professors.map(&:nom).join(", ").presence || "—" %>
+      <td class="text-sm"><%= url.professors.map(&:nom).join(", ").presence || "—" %></td>
+      <td>
+        <% if url.use_browser %>
+          <span class="badge badge-info badge-sm">Playwright</span>
+        <% else %>
+          <span class="badge badge-success badge-sm">HTTParty</span>
+        <% end %>
       </td>
-      <td class="px-6 py-4">
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                     <%= url.statut_scraping == 'actif' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' %>">
-          <%= url.statut_scraping %>
-        </span>
-      </td>
-      <td class="px-6 py-4 text-sm text-gray-500">
-        <%= url.updated_at.strftime("%d/%m/%Y %H:%M") %>
-      </td>
-      <td class="px-6 py-4 text-right text-sm font-medium space-x-2">
-        <%= link_to "Voir", admin_scraped_url_path(url), class: "text-blue-600 hover:underline", data: { turbo_frame: "_top" } %>
-        <%= link_to "Modifier", edit_admin_scraped_url_path(url), class: "text-blue-600 hover:underline", data: { turbo_frame: "_top" } %>
-        <%= button_to "Scraper", scrape_now_admin_scraped_url_path(url), method: :post, class: "text-green-600 hover:underline inline", data: { turbo_frame: "_top" } %>
+      <td><span class="badge badge-sm <%= url.statut_scraping == 'actif' ? 'badge-success' : 'badge-ghost' %>"><%= url.statut_scraping %></span></td>
+      <td class="text-sm opacity-60"><%= url.updated_at.strftime("%d/%m/%Y %H:%M") %></td>
+      <td class="text-right space-x-1">
+        <%= link_to "Voir", admin_scraped_url_path(url), class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
+        <%= link_to "Modifier", edit_admin_scraped_url_path(url), class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
+        <%= button_to "Scraper", scrape_now_admin_scraped_url_path(url), method: :post, class: "btn btn-success btn-xs", data: { turbo_frame: "_top" } %>
       </td>
     </tr>
   <% end %>
 <% end %>
 
-<%# Next page trigger %>
-<%= turbo_stream.append "admin-scraped-urls-list" do %>
+<%# Replace the current page frame with the next one (removes old spinner) %>
+<%= turbo_stream.replace "admin-scraped-urls-page-#{params[:page]}" do %>
   <% if @pagy.next %>
     <%= turbo_frame_tag "admin-scraped-urls-page-#{@pagy.next}",
                         src: admin_scraped_urls_path(page: @pagy.next, format: :turbo_stream),
                         loading: :lazy do %>
       <div class="text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+        <span class="loading loading-spinner loading-md text-primary"></span>
       </div>
     <% end %>
   <% end %>

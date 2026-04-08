@@ -1,24 +1,23 @@
 <%= turbo_stream.append "admin-events-tbody" do %>
   <% @events.each do |event| %>
-    <tr>
-      <td class="px-6 py-4 text-sm"><%= link_to event.titre, admin_event_path(event), class: "text-terracotta hover:underline", data: { turbo_frame: "_top" } %></td>
-      <td class="px-6 py-4 text-sm"><%= event.date_debut.strftime("%d/%m/%Y") %></td>
-      <td class="px-6 py-4 text-sm"><%= event.professor.nom %></td>
-      <td class="px-6 py-4 text-right text-sm">
-        <%= link_to "Modifier", edit_admin_event_path(event), class: "text-blue-600 hover:underline", data: { turbo_frame: "_top" } %>
+    <tr class="hover">
+      <td><%= link_to event.titre, admin_event_path(event), class: "link link-primary", data: { turbo_frame: "_top" } %></td>
+      <td class="text-sm"><%= event.date_debut.strftime("%d/%m/%Y") %></td>
+      <td class="text-sm"><%= event.professor.nom %></td>
+      <td class="text-right">
+        <%= link_to "Modifier", edit_admin_event_path(event), class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
       </td>
     </tr>
   <% end %>
 <% end %>
 
-<%# Next page trigger %>
-<%= turbo_stream.append "admin-events-list" do %>
+<%= turbo_stream.replace "admin-events-page-#{params[:page]}" do %>
   <% if @pagy.next %>
     <%= turbo_frame_tag "admin-events-page-#{@pagy.next}",
-                        src: admin_events_path(page: @pagy.next, format: :turbo_stream),
+                        src: admin_events_path(page: @pagy.next, format: :turbo_stream, sort: params[:sort], professor_id: params[:professor_id], titre: params[:titre]),
                         loading: :lazy do %>
       <div class="text-center py-8">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-terracotta"></div>
+        <span class="loading loading-spinner loading-md text-primary"></span>
       </div>
     <% end %>
   <% end %>
