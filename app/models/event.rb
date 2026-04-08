@@ -30,7 +30,10 @@ class Event < ApplicationRecord
 
   def normalize_titre
     return if titre.blank?
-    self.titre = titre.gsub(/\b[A-ZÀ-Ü]{2,}\b/) { |word| word.capitalize } if titre == titre.upcase
+    acronymes = Setting.instance.acronymes_preserves.to_s.split(",").map(&:strip).map(&:upcase).to_set
+    self.titre = titre.gsub(/\b([A-ZÀ-Ü]{2,})\b/) do |word|
+      acronymes.include?(word.upcase) ? word.upcase : word.capitalize
+    end
   end
 
   def calculate_duree_minutes

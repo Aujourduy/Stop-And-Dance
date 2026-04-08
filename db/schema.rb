@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_06_043635) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_08_200636) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -137,6 +137,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_043635) do
   end
 
   create_table "settings", force: :cascade do |t|
+    t.text "acronymes_preserves", default: "CI, BMC, DJ, MC, NYC, USA"
     t.text "claude_global_instructions"
     t.datetime "created_at", null: false
     t.string "openrouter_default_model", default: "meta-llama/llama-3.3-70b-instruct:free"

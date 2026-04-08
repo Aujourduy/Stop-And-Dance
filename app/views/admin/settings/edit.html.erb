@@ -29,6 +29,17 @@
         </p>
       </div>
 
+      <div>
+        <%= f.label :acronymes_preserves, "Acronymes à préserver en majuscules", class: "label font-bold" %>
+        <%= f.text_field :acronymes_preserves,
+                         class: "input input-bordered w-full",
+                         placeholder: "CI, BMC, DJ, MC" %>
+        <p class="text-sm opacity-60 mt-2">
+          Liste séparée par des virgules. Ces mots resteront en majuscules dans les titres d'événements.<br>
+          Exemple : CI, BMC, DJ
+        </p>
+      </div>
+
       <div class="flex gap-4">
         <%= f.submit "Enregistrer", class: "btn btn-primary" %>
         <%= link_to "Retour", admin_root_path, class: "btn btn-ghost" %>
