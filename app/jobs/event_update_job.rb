@@ -19,15 +19,19 @@ class EventUpdateJob < ApplicationJob
       raise StandardError, result[:error] # Trigger retry
     end
 
+    # Expand recurring events into individual dates
+    expanded_events = result[:events].flat_map { |e| RecurrenceExpander.expand(e) }
+
     # Create/update events
-    result[:events].each do |event_data|
+    expanded_events.each do |event_data|
       create_or_update_event(scraped_url, event_data)
     end
 
     SCRAPING_LOGGER.info({
       event: "events_updated",
       scraped_url_id: scraped_url_id,
-      events_count: result[:events].size
+      events_from_claude: result[:events].size,
+      events_after_expansion: expanded_events.size
     }.to_json)
   end
 

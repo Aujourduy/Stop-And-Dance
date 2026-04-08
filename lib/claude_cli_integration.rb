@@ -3,7 +3,7 @@ require "tempfile"
 require "json"
 
 class ClaudeCliIntegration
-  CLAUDE_CLI_PATH = "/home/dang/.nvm/versions/node/v22.21.1/bin/claude"
+  CLAUDE_CLI_PATH = "/home/dang/.local/bin/claude"
   TIMEOUT_SECONDS = 120 # Increased from 60s - typical response is ~30-40s
 
   def self.parse_and_generate(scraped_url, html, notes_correctrices)
@@ -90,6 +90,20 @@ class ClaudeCliIntegration
 
       #{data_section}
 
+      RÈGLES POUR LES ÉVÉNEMENTS RÉCURRENTS :
+
+      1. Si le site LISTE des dates explicites (ex: "12 avril, 26 avril, 10 mai") :
+         → Crée UN event séparé pour CHAQUE date listée. Pas de champ "recurrence".
+
+      2. Si le site dit "tous les [jour]" ou "chaque [jour]" SANS lister les dates individuelles :
+         → Crée UN SEUL event template avec le champ "recurrence" (voir schéma ci-dessous).
+         → Utilise la première date trouvée comme date_debut/date_fin du template.
+
+      3. Si le site mentionne des EXCEPTIONS ("sauf le...", "pas de cours le...", "vacances du...au...") :
+         → Les mettre dans excluded_dates (dates isolées) ou excluded_ranges (périodes).
+
+      4. "2 fois par mois" avec dates listées → cas 1 (dates explicites, PAS de recurrence).
+
       Retourne un JSON avec cette structure :
       {
         "events": [
@@ -107,9 +121,22 @@ class ClaudeCliIntegration
             "type_event": "atelier",
             "gratuit": false,
             "en_ligne": false,
-            "en_presentiel": true
+            "en_presentiel": true,
+            "recurrence": null
           }
         ]
+      }
+
+      Le champ "recurrence" est null par défaut. Si récurrence détectée (cas 2), utiliser :
+      {
+        "recurrence": {
+          "type": "weekly",
+          "day_of_week": "friday",
+          "time_start": "19:30",
+          "time_end": "21:30",
+          "excluded_dates": ["2026-04-18"],
+          "excluded_ranges": [{"from": "2026-07-15", "to": "2026-07-30"}]
+        }
       }
 
       CONTENU MARKDOWN :
