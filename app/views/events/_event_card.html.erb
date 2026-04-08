@@ -35,14 +35,14 @@
     <%# Titre %>
     <h3 class="card-title text-base sm:text-lg truncate"><%= event.titre %></h3>
 
-    <%# Animé par %>
-    <p class="text-sm opacity-60 truncate">
-      Animé par <%= event.professor&.nom || "" %>
+    <%# Avec prof %>
+    <p class="opacity-60 truncate" style="font-size: 0.96rem;">
+      Avec <%= [event.professor&.prenom, event.professor&.nom].compact.join(" ") %>
     </p>
 
     <%# Lieu + Prix %>
     <div class="flex flex-wrap items-center justify-between gap-1">
-      <p class="text-sm opacity-60 flex items-center gap-1 truncate">
+      <p class="opacity-60 flex items-center gap-1 truncate" style="font-size: 0.96rem;">
         <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
         </svg>
