@@ -67,14 +67,21 @@ Le système de scraping automatique récupère les événements de danse depuis 
 │  │    │                                                             │
 │  │    └─> Reçoit JSON avec liste d'événements                     │
 │  │                                                                  │
-│  └─> 4. Création/update Events en DB                              │
-│       ├─> Pour chaque event dans le JSON:                         │
+│  ├─> 4. RecurrenceExpander.expand (pour chaque event)             │
+│  │    ├─> Si recurrence=null → pass-through (1 event)            │
+│  │    ├─> Si recurrence.type=weekly → génère N events             │
+│  │    │    (aujourd'hui → 31 août, 1 par semaine)                 │
+│  │    ├─> Exclut excluded_dates + excluded_ranges                 │
+│  │    └─> Si dates explicites → Claude les retourne déjà          │
+│  │                                                                  │
+│  └─> 5. Création/update Events en DB                              │
+│       ├─> Pour chaque event (après expansion):                    │
 │       │    • Parse dates (ISO 8601)                                │
 │       │    • Calcule type_event par durée (<5h = atelier)         │
 │       │    • Find_or_initialize_by (url + date + titre)           │
 │       │    • Sauvegarde en DB                                      │
 │       │                                                             │
-│       └─> Log résultats (nombre events créés/updatés)            │
+│       └─> Log résultats (events Claude + events après expansion) │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -211,7 +218,39 @@ CONTENU MARKDOWN:
 - Parse avec symbolize_names
 - Retourne hash avec `:events`
 
-### 8. EventUpdateJob
+### 8. RecurrenceExpander
+**Rôle:** Expand les événements récurrents en dates individuelles
+**Fichier:** `lib/recurrence_expander.rb`
+
+**3 cas gérés :**
+
+| Cas | Exemple | Comportement |
+|-----|---------|-------------|
+| Dates explicites | "12 avril, 26 avril, 10 mai" | Claude retourne N events séparés. Pass-through. |
+| Récurrence weekly | "Tous les vendredis 19h30" | Claude retourne 1 template avec `recurrence`. Rails génère N events. |
+| Exclusions | "sauf le 18 avril" / "vacances 15-30 juillet" | Dates/périodes retirées du calcul. |
+
+**Période de génération :** aujourd'hui → 31 août (année en cours, ou suivante si on est après le 31 août)
+
+**Champ `recurrence` dans le JSON Claude :**
+```json
+{
+  "recurrence": {
+    "type": "weekly",
+    "day_of_week": "friday",
+    "time_start": "19:30",
+    "time_end": "21:30",
+    "excluded_dates": ["2026-04-18"],
+    "excluded_ranges": [{"from": "2026-07-15", "to": "2026-07-30"}]
+  }
+}
+```
+
+**Résultats réels :**
+- Marc Silvestre : 13 events Claude → 32 après expansion (20 vendredis + 12 stages)
+- Peter Wilberforce : 61 events Claude → 79 après expansion (19 mardis + dates explicites)
+
+### 9. EventUpdateJob
 **Queue:** `:scraping`
 **Retry:** 3 tentatives
 **Logique:**
