@@ -8,10 +8,10 @@
     <% if event.photo_url.present? %>
       <%= image_tag event.photo_url,
                     alt: event.titre,
-                    class: "w-20 h-20 sm:w-32 sm:h-32 object-cover rounded",
+                    class: "w-24 h-24 sm:w-32 sm:h-32 object-cover rounded",
                     loading: "lazy" %>
     <% else %>
-      <div class="w-20 h-20 sm:w-32 sm:h-32 bg-primary/30 rounded flex items-center justify-center text-primary-content text-2xl sm:text-4xl">
+      <div class="w-24 h-24 sm:w-32 sm:h-32 bg-primary/30 rounded flex items-center justify-center text-primary-content text-2xl sm:text-4xl">
         <%= event.professor.nom&.first&.upcase || "?" %>
       </div>
     <% end %>
