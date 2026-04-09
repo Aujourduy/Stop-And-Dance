@@ -44,9 +44,22 @@
         <%# Info block %>
         <div class="space-y-3 mb-6">
           <div><span class="font-medium">Avec :</span> <%= [@event.professor.prenom, @event.professor.nom].compact.join(" ") %></div>
-          <div><span class="font-medium">Début :</span> <%= l(@event.date_debut, format: :long) %></div>
-          <div><span class="font-medium">Fin :</span> <%= l(@event.date_fin, format: :long) %></div>
-          <div><span class="font-medium">Durée :</span> <%= @event.duree_minutes %> minutes</div>
+          <div>
+            <span class="font-medium">Date :</span>
+            <%= l(@event.date_debut_date, format: :long) %>
+            <% if @event.date_fin_date != @event.date_debut_date %>
+              → <%= l(@event.date_fin_date, format: :long) %>
+            <% end %>
+          </div>
+          <% if @event.horaire_connu? %>
+            <div>
+              <span class="font-medium">Horaire :</span>
+              <%= @event.display_heure_debut %> — <%= @event.display_heure_fin %>
+              (<%= @event.duree_minutes %> min)
+            </div>
+          <% else %>
+            <div class="text-sm opacity-60 italic">Horaires à confirmer sur le site source</div>
+          <% end %>
           <div>
             <span class="font-medium">Lieu :</span> <%= @event.lieu %><br>
             <span class="text-sm opacity-60"><%= @event.adresse_complete %></span>

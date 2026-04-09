@@ -39,32 +39,47 @@ class EventUpdateJob < ApplicationJob
 
   def create_or_update_event(scraped_url, event_data)
     # Skip events without required dates
-    return if event_data[:date_debut].blank? || event_data[:date_fin].blank?
+    return if event_data[:date_debut].blank?
 
-    # Parse dates
-    date_debut = Time.zone.parse(event_data[:date_debut])
-    date_fin = Time.zone.parse(event_data[:date_fin])
+    # Parse datetime
+    parsed_debut = Time.zone.parse(event_data[:date_debut])
+    parsed_fin = event_data[:date_fin].present? ? Time.zone.parse(event_data[:date_fin]) : nil
 
-    # Calculate type_event based on duration (ignore Claude's type_event)
-    # < 5h → atelier, >= 5h → stage
-    duration_hours = (date_fin - date_debut) / 3600.0
-    type_event = duration_hours < 5 ? "atelier" : "stage"
+    # Extract date and time separately
+    date_debut_date = parsed_debut.to_date
+    date_fin_date = parsed_fin&.to_date || date_debut_date
 
-    # Find or create professor by name (if provided by Claude)
+    # Heure: nil if Claude indicated "horaires à confirmer" or if time is midnight (likely invented)
+    heure_debut = parsed_debut.strftime("%H:%M") == "00:00" ? nil : parsed_debut
+    heure_fin = parsed_fin && parsed_fin.strftime("%H:%M") == "23:59" ? nil : parsed_fin
+
+    # Calculate type_event
+    if heure_debut.present? && heure_fin.present?
+      duration_hours = (parsed_fin - parsed_debut) / 3600.0
+      type_event = duration_hours < 5 ? "atelier" : "stage"
+    else
+      # Without hours, guess from number of days
+      days = (date_fin_date - date_debut_date).to_i
+      type_event = days >= 1 ? "stage" : "atelier"
+    end
+
+    # Find or create professor
     professor = find_or_create_professor(scraped_url, event_data[:professor_nom])
 
-    # Find or create event
-    # Use scraped_url + date_debut + titre as unique key
+    # Find or create event — use date_debut_date instead of datetime for dedup
     event = Event.find_or_initialize_by(
       scraped_url: scraped_url,
-      date_debut: date_debut,
+      date_debut_date: date_debut_date,
       titre: event_data[:titre]
     )
 
     event.assign_attributes(
       description: event_data[:description],
       tags: event_data[:tags],
-      date_fin: date_fin,
+      date_debut_date: date_debut_date,
+      date_fin_date: date_fin_date,
+      heure_debut: heure_debut,
+      heure_fin: heure_fin,
       lieu: event_data[:lieu],
       adresse_complete: event_data[:adresse_complete],
       prix_normal: event_data[:prix_normal],

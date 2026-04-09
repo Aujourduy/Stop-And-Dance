@@ -22,7 +22,7 @@
     <%# Horaire + Badges %>
     <div class="flex flex-wrap items-center gap-1 sm:gap-2">
       <span class="text-primary font-bold text-base sm:text-lg">
-        <%= l(event.date_debut, format: :time_only) %>
+        <%= event.horaire_connu? ? event.display_heure_debut : "—" %>
       </span>
       <span class="badge badge-primary badge-sm"><%= event.type_event_humanized %></span>
       <% if event.en_ligne %>

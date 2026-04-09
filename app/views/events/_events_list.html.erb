@@ -2,7 +2,7 @@
 
 <% events.each do |event| %>
   <%# Date separator if new day %>
-  <% event_date = event.date_debut.to_date %>
+  <% event_date = event.date_debut_date %>
   <% if current_date != event_date %>
     <% current_date = event_date %>
     <%= render "date_separator", date: event_date %>

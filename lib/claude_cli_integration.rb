@@ -104,10 +104,15 @@ class ClaudeCliIntegration
 
       4. "2 fois par mois" avec dates listées → cas 1 (dates explicites, PAS de recurrence).
 
+      SYNONYMES DE TYPE D'ÉVÉNEMENT :
+      - "Vague", "Vagues", "Wave", "Waves" = atelier (en danse des 5 Rythmes)
+      - "Jam" = atelier
+      - "Intensif", "Retraite", "Retreat", "Résidentiel" = stage
+
       RÈGLE HORAIRES :
-      - Si l'horaire exact est mentionné sur le site, l'utiliser.
-      - Si l'horaire N'EST PAS mentionné : utiliser 10h00-17h00 pour un stage/journée, 19h30-21h30 pour un atelier/soirée.
-      - Si l'horaire est estimé (non mentionné sur le site), ajouter "(horaires à confirmer)" à la fin de la description.
+      - Si l'horaire exact est mentionné sur le site, utiliser le format complet : "2026-04-12T19:30:00+02:00"
+      - Si l'horaire N'EST PAS mentionné sur le site : utiliser le format DATE SEULE : "2026-04-12T00:00:00+02:00" (minuit = horaire inconnu)
+      - NE PAS inventer d'horaire. Minuit signifie "horaire non renseigné".
 
       Retourne un JSON avec cette structure :
       {

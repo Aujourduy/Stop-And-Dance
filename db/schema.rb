@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_08_200636) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_09_032103) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -53,12 +53,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_200636) do
     t.text "adresse_complete"
     t.datetime "created_at", null: false
     t.timestamptz "date_debut", null: false
+    t.date "date_debut_date"
     t.timestamptz "date_fin", null: false
+    t.date "date_fin_date"
     t.text "description"
     t.integer "duree_minutes"
     t.boolean "en_ligne", default: false
     t.boolean "en_presentiel", default: true
     t.boolean "gratuit", default: false
+    t.time "heure_debut"
+    t.time "heure_fin"
     t.string "lieu"
     t.string "photo_url"
     t.decimal "prix_normal", precision: 8, scale: 2
