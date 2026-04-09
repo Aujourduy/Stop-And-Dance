@@ -99,6 +99,7 @@ Scénarios : Homepage (Hero, navbar), liste événements, filtres (Gratuit, date
 - **Jobs** : retry exponentiel 3x. ScrapingDispatchJob enqueue les ScrapingJobs.
 - **Routes publiques** : français (/evenements, /professeurs).
 - **Scraping MVP** : un seul HtmlScraper générique, pas de scrapers spécialisés.
+- **Pagination** : TOUJOURS infinite scroll (turbo frame lazy). JAMAIS de pagination classique avec numéros de pages. Pattern : `pagy` côté controller + `turbo_frame_tag loading: :lazy` côté vue + `turbo_stream.replace` côté turbo_stream.
 
 ---
 

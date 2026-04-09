@@ -2,7 +2,7 @@
 
 **Dernière mise à jour :** 2026-04-09
 **Branch :** main
-**Dernier commit main :** 2fd2f14
+**Dernier commit main :** 324952f
 **Statut :** ✅ **PROJET COMPLET** + DaisyUI + Crawler + Récurrences + Date/heure + Notifications + Photos locales + Jobs admin
 
 ---
