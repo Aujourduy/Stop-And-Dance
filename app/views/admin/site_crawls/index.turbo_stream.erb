@@ -1,0 +1,31 @@
+<%= turbo_stream.append "admin-site-crawls-tbody" do %>
+  <% @site_crawls.each do |crawl| %>
+    <tr class="hover">
+      <td class="text-sm"><%= crawl.scraped_url.nom.presence || truncate(crawl.scraped_url.url, length: 40) %></td>
+      <td>
+        <span class="badge badge-sm <%= case crawl.statut when 'completed' then 'badge-success' when 'running' then 'badge-info' when 'failed' then 'badge-error' else 'badge-ghost' end %>">
+          <%= crawl.statut %>
+        </span>
+      </td>
+      <td><%= crawl.pages_found %></td>
+      <td><span class="text-success"><%= crawl.pages_classified_yes %></span> / <span class="text-error"><%= crawl.pages_classified_no %></span></td>
+      <td class="text-sm opacity-60"><%= crawl.llm_model_used.to_s.split("/").last %></td>
+      <td class="text-sm opacity-60"><%= crawl.created_at.strftime("%d/%m/%Y %H:%M") %></td>
+      <td>
+        <%= link_to "Voir", admin_site_crawl_path(crawl), class: "btn btn-ghost btn-xs" %>
+      </td>
+    </tr>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace "admin-site-crawls-page-#{params[:page]}" do %>
+  <% if @pagy.next %>
+    <%= turbo_frame_tag "admin-site-crawls-page-#{@pagy.next}",
+                        src: admin_site_crawls_path(page: @pagy.next, format: :turbo_stream),
+                        loading: :lazy do %>
+      <div class="text-center py-8">
+        <span class="loading loading-spinner loading-md text-primary"></span>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

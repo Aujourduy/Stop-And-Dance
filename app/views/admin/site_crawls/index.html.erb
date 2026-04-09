@@ -4,38 +4,49 @@
 
 <h1 class="text-2xl font-bold mb-6">Site Crawls</h1>
 
-<div class="overflow-x-auto">
-  <table class="table">
-    <thead>
-      <tr>
-        <th>URL source</th>
-        <th>Statut</th>
-        <th>Pages</th>
-        <th>Oui / Non</th>
-        <th>Modèle</th>
-        <th>Date</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @site_crawls.each do |crawl| %>
+<%= turbo_frame_tag "admin-site-crawls-list", data: { controller: "infinite-scroll" } do %>
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
         <tr>
-          <td class="text-sm"><%= crawl.scraped_url.nom.presence || truncate(crawl.scraped_url.url, length: 40) %></td>
-          <td>
-            <span class="badge badge-sm <%= case crawl.statut when 'completed' then 'badge-success' when 'running' then 'badge-info' when 'failed' then 'badge-error' else 'badge-ghost' end %>">
-              <%= crawl.statut %>
-            </span>
-          </td>
-          <td><%= crawl.pages_found %></td>
-          <td><span class="text-success"><%= crawl.pages_classified_yes %></span> / <span class="text-error"><%= crawl.pages_classified_no %></span></td>
-          <td class="text-sm opacity-60"><%= crawl.llm_model_used.to_s.split("/").last %></td>
-          <td class="text-sm opacity-60"><%= crawl.created_at.strftime("%d/%m/%Y %H:%M") %></td>
-          <td>
-            <%= link_to "Voir", admin_site_crawl_path(crawl), class: "btn btn-ghost btn-xs" %>
-          </td>
+          <th>URL source</th>
+          <th>Statut</th>
+          <th>Pages</th>
+          <th>Oui / Non</th>
+          <th>Modèle</th>
+          <th>Date</th>
+          <th>Actions</th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+      </thead>
+      <tbody id="admin-site-crawls-tbody">
+        <% @site_crawls.each do |crawl| %>
+          <tr class="hover">
+            <td class="text-sm"><%= crawl.scraped_url.nom.presence || truncate(crawl.scraped_url.url, length: 40) %></td>
+            <td>
+              <span class="badge badge-sm <%= case crawl.statut when 'completed' then 'badge-success' when 'running' then 'badge-info' when 'failed' then 'badge-error' else 'badge-ghost' end %>">
+                <%= crawl.statut %>
+              </span>
+            </td>
+            <td><%= crawl.pages_found %></td>
+            <td><span class="text-success"><%= crawl.pages_classified_yes %></span> / <span class="text-error"><%= crawl.pages_classified_no %></span></td>
+            <td class="text-sm opacity-60"><%= crawl.llm_model_used.to_s.split("/").last %></td>
+            <td class="text-sm opacity-60"><%= crawl.created_at.strftime("%d/%m/%Y %H:%M") %></td>
+            <td>
+              <%= link_to "Voir", admin_site_crawl_path(crawl), class: "btn btn-ghost btn-xs" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 
+  <% if @pagy.next %>
+    <%= turbo_frame_tag "admin-site-crawls-page-#{@pagy.next}",
+                        src: admin_site_crawls_path(page: @pagy.next, format: :turbo_stream),
+                        loading: :lazy do %>
+      <div class="text-center py-8">
+        <span class="loading loading-spinner loading-md text-primary"></span>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

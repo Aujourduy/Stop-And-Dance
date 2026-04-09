@@ -1,6 +1,13 @@
 class Admin::SiteCrawlsController < Admin::ApplicationController
+  include Pagy::Method
+
   def index
-    @site_crawls = SiteCrawl.includes(:scraped_url).recent.limit(50)
+    @pagy, @site_crawls = pagy(SiteCrawl.includes(:scraped_url).recent, limit: 20)
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def show

@@ -1,4 +1,6 @@
 class Admin::NotificationsController < Admin::ApplicationController
+  include Pagy::Method
+
   def index
     scope = AdminNotification.recent
 
@@ -12,8 +14,13 @@ class Admin::NotificationsController < Admin::ApplicationController
       end
     end
 
-    @notifications = scope.limit(100)
+    @pagy, @notifications = pagy(scope, limit: 30)
     @non_lu_count = AdminNotification.non_lu.count
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def update

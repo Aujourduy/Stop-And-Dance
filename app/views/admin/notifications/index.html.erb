@@ -22,84 +22,50 @@
   <% end %>
 </div>
 
-<% if @notifications.any? %>
-  <%= form_with url: bulk_update_admin_notifications_path, method: :post, class: "space-y-2" do |f| %>
-    <%# Bulk actions %>
-    <div class="flex gap-2 mb-2">
-      <button type="submit" name="status" value="lu" class="btn btn-ghost btn-xs">Marquer lu</button>
-      <button type="submit" name="status" value="archive" class="btn btn-ghost btn-xs">Archiver</button>
-    </div>
+<%= turbo_frame_tag "admin-notifications-list", data: { controller: "infinite-scroll" } do %>
+  <% if @notifications.any? %>
+    <%= form_with url: bulk_update_admin_notifications_path, method: :post, class: "space-y-2" do |f| %>
+      <div class="flex gap-2 mb-2">
+        <button type="submit" name="status" value="lu" class="btn btn-ghost btn-xs">Marquer lu</button>
+        <button type="submit" name="status" value="archive" class="btn btn-ghost btn-xs">Archiver</button>
+      </div>
 
-    <div class="overflow-x-auto">
-      <table class="table">
-        <thead>
-          <tr>
-            <th><input type="checkbox" class="checkbox checkbox-sm" onclick="document.querySelectorAll('input[name=\\'ids[]\\']').forEach(c => c.checked = this.checked)"></th>
-            <th>Catégorie</th>
-            <th>Status</th>
-            <th>Titre</th>
-            <th>Source</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @notifications.each do |notif| %>
-            <tr class="hover <%= 'font-bold' if notif.status == 'non_lu' %>">
-              <td><input type="checkbox" name="ids[]" value="<%= notif.id %>" class="checkbox checkbox-sm"></td>
-              <td>
-                <span class="badge badge-sm
-                  <%= case notif.category
-                      when 'error' then 'badge-error'
-                      when 'warning' then 'badge-warning'
-                      when 'recurrence' then 'badge-secondary'
-                      when 'scraping' then 'badge-info'
-                      when 'crawl' then 'badge-accent'
-                      else 'badge-ghost'
-                      end %>">
-                  <%= notif.category %>
-                </span>
-              </td>
-              <td>
-                <span class="badge badge-sm
-                  <%= case notif.status
-                      when 'non_lu' then 'badge-error'
-                      when 'lu' then 'badge-ghost'
-                      when 'valide' then 'badge-success'
-                      when 'archive' then 'badge-ghost opacity-50'
-                      end %>">
-                  <%= notif.status %>
-                </span>
-              </td>
-              <td>
-                <div><%= notif.title %></div>
-                <% if notif.message.present? %>
-                  <div class="text-xs opacity-60 truncate max-w-md"><%= notif.message.truncate(100) %></div>
-                <% end %>
-              </td>
-              <td class="text-sm opacity-60"><%= notif.source %></td>
-              <td class="text-sm opacity-60"><%= notif.created_at.strftime("%d/%m %H:%M") %></td>
-              <td class="space-x-1">
-                <% if notif.status == "non_lu" %>
-                  <%= button_to "Lu", admin_notification_path(notif, status: "lu"), method: :patch, class: "btn btn-ghost btn-xs" %>
-                <% end %>
-                <% if notif.status != "valide" %>
-                  <%= button_to "Validé", admin_notification_path(notif, status: "valide"), method: :patch, class: "btn btn-success btn-xs" %>
-                <% end %>
-                <% if notif.status != "archive" %>
-                  <%= button_to "Archiver", admin_notification_path(notif, status: "archive"), method: :patch, class: "btn btn-ghost btn-xs" %>
-                <% end %>
-              </td>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" class="checkbox checkbox-sm" onclick="document.querySelectorAll('input[name=\'ids[]\']').forEach(c => c.checked = this.checked)"></th>
+              <th>Catégorie</th>
+              <th>Status</th>
+              <th>Titre</th>
+              <th>Source</th>
+              <th>Date</th>
+              <th>Actions</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody id="admin-notifications-tbody">
+            <% @notifications.each do |notif| %>
+              <%= render "notification_row", notif: notif %>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body text-center opacity-50">
+        <p>Aucune notification</p>
+      </div>
     </div>
   <% end %>
-<% else %>
-  <div class="card bg-base-100 shadow-sm">
-    <div class="card-body text-center opacity-50">
-      <p>Aucune notification</p>
-    </div>
-  </div>
+
+  <% if @pagy.next %>
+    <%= turbo_frame_tag "admin-notifications-page-#{@pagy.next}",
+                        src: admin_notifications_path(page: @pagy.next, status: params[:status], category: params[:category], q: params[:q], format: :turbo_stream),
+                        loading: :lazy do %>
+      <div class="text-center py-8">
+        <span class="loading loading-spinner loading-md text-primary"></span>
+      </div>
+    <% end %>
+  <% end %>
 <% end %>

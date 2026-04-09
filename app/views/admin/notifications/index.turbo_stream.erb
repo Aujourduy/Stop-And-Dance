@@ -1,0 +1,17 @@
+<%= turbo_stream.append "admin-notifications-tbody" do %>
+  <% @notifications.each do |notif| %>
+    <%= render "notification_row", notif: notif %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace "admin-notifications-page-#{params[:page]}" do %>
+  <% if @pagy.next %>
+    <%= turbo_frame_tag "admin-notifications-page-#{@pagy.next}",
+                        src: admin_notifications_path(page: @pagy.next, status: params[:status], category: params[:category], q: params[:q], format: :turbo_stream),
+                        loading: :lazy do %>
+      <div class="text-center py-8">
+        <span class="loading loading-spinner loading-md text-primary"></span>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
