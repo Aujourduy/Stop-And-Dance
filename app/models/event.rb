@@ -57,6 +57,17 @@ class Event < ApplicationRecord
     heure_fin&.strftime("%Hh%M")
   end
 
+  def display_duree
+    return nil unless duree_minutes.present? && duree_minutes > 0
+    if duree_minutes < 60
+      "#{duree_minutes}min"
+    else
+      h = duree_minutes / 60
+      m = duree_minutes % 60
+      m > 0 ? "#{h}h#{format('%02d', m)}min" : "#{h}h"
+    end
+  end
+
   private
 
   def normalize_titre

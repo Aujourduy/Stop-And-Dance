@@ -55,7 +55,7 @@
             <div>
               <span class="font-medium">Horaire :</span>
               <%= @event.display_heure_debut %> — <%= @event.display_heure_fin %>
-              (<%= @event.duree_minutes %> min)
+              (<%= @event.display_duree %>)
             </div>
           <% else %>
             <div class="text-sm opacity-60 italic">Horaires à confirmer sur le site source</div>
