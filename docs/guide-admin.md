@@ -413,6 +413,19 @@ Alerte bleue en haut de `/admin/professors` indiquant combien de profs n'ont pas
 
 ## 10. Sécurité
 
+### Restriction Tailscale
+
+L'accès à `/admin` est restreint au réseau Tailscale uniquement (IPs `100.64.0.0/10`).
+
+- **Avec Tailscale activé** : accès admin OK (via `server-dang:3002/admin`)
+- **Sans Tailscale** : 403 Forbidden (même avec le bon mot de passe)
+- **Via Cloudflare** (`stopand.dance/admin`) : 403 Forbidden (IP Cloudflare pas dans le range Tailscale)
+
+Double protection : restriction IP Tailscale + HTTP Basic Auth.
+
+Config dans `app/controllers/admin/application_controller.rb`.
+
+
 ### A. Changer les credentials admin
 
 ⚠️ **OBLIGATOIRE EN PRODUCTION**

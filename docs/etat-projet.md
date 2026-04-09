@@ -2,7 +2,7 @@
 
 **Dernière mise à jour :** 2026-04-09
 **Branch :** main
-**Dernier commit main :** f318d25
+**Dernier commit main :** 2fd2f14
 **Statut :** ✅ **PROJET COMPLET** + DaisyUI + Crawler + Récurrences + Date/heure + Notifications + Photos locales + Jobs admin
 
 ---
@@ -592,6 +592,7 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 - Auto-download photos depuis sites profs (33 profs avec photo sur 65)
 - Prompt Claude : `professor_photo_url` pour auto-download au parsing
 - Alerte + filtre "Sans photo" dans admin professors
+- `/admin` restreint au réseau Tailscale (100.64.0.0/10) + HTTP Basic Auth
 
 **Admin Jobs :**
 - Page `/admin/jobs` : stats, jobs en attente/cours, échoués (relancer/supprimer), recurring
