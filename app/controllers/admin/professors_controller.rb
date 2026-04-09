@@ -33,6 +33,17 @@ class Admin::ProfessorsController < Admin::ApplicationController
   end
 
   def update
+    # Handle photo upload
+    if params[:professor][:photo].present?
+      result = ProfessorPhotoService.process_upload(@professor, params[:professor][:photo])
+      if result.is_a?(String)
+        @professor.avatar_url = result
+      else
+        redirect_to edit_admin_professor_path(@professor), alert: "Erreur photo : #{result[:error]}"
+        return
+      end
+    end
+
     if @professor.update(professor_params)
       redirect_to admin_professors_path, notice: "Professeur mis à jour avec succès."
     else

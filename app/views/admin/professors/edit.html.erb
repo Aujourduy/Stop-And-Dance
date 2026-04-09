@@ -8,7 +8,7 @@
 
 <div class="card bg-base-100 shadow-sm">
   <div class="card-body">
-    <%= form_with model: @professor, url: admin_professor_path(@professor), method: :patch, local: true, class: "space-y-6" do |form| %>
+    <%= form_with model: @professor, url: admin_professor_path(@professor), method: :patch, local: true, multipart: true, class: "space-y-6" do |form| %>
       <% if @professor.errors.any? %>
         <div role="alert" class="alert alert-error">
           <ul class="list-disc list-inside">
@@ -41,13 +41,18 @@
       </div>
 
       <div>
-        <%= form.label :avatar_url, "URL Avatar (photo)", class: "label font-bold" %>
-        <%= form.url_field :avatar_url, class: "input input-bordered w-full", placeholder: "https://..." %>
+        <%= form.label :photo, "Photo (upload)", class: "label font-bold" %>
+        <%= form.file_field :photo, accept: "image/*", class: "file-input file-input-bordered w-full" %>
+        <p class="text-sm opacity-60 mt-1">L'image sera automatiquement recadrée en carré (300×300, 150×150, 80×80).</p>
+
         <% if @professor.avatar_url.present? %>
-          <div class="avatar mt-2">
-            <div class="w-20 rounded-full">
-              <img src="<%= @professor.avatar_url %>" alt="Avatar">
+          <div class="flex items-center gap-4 mt-2">
+            <div class="avatar">
+              <div class="w-20 rounded-full">
+                <img src="<%= @professor.avatar_url %>" alt="Avatar">
+              </div>
             </div>
+            <span class="text-sm opacity-60">Photo actuelle</span>
           </div>
         <% end %>
       </div>
