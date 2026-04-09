@@ -2,15 +2,23 @@
 <p class="text-sm opacity-60 mb-6">Gérer et vérifier les professeurs détectés automatiquement</p>
 
 <% if @pending_review_count > 0 %>
-  <div role="alert" class="alert alert-warning mb-6">
+  <div role="alert" class="alert alert-warning mb-4">
     <span><strong><%= @pending_review_count %> professeur(s)</strong> en attente de vérification.
     <%= link_to "Voir →", admin_professors_path(status: "auto"), class: "link" %></span>
   </div>
 <% end %>
 
+<% if @no_photo_count > 0 %>
+  <div role="alert" class="alert alert-info mb-6">
+    <span><strong><%= @no_photo_count %> professeur(s)</strong> sans photo.
+    <%= link_to "Voir →", admin_professors_path(photo: "missing"), class: "link" %></span>
+  </div>
+<% end %>
+
 <div class="mb-4 flex flex-wrap gap-2 items-end">
-  <%= link_to "Tous", admin_professors_path, class: "btn btn-sm #{params[:status].nil? && params[:q].blank? ? 'btn-primary' : 'btn-ghost'}" %>
+  <%= link_to "Tous", admin_professors_path, class: "btn btn-sm #{params[:status].nil? && params[:photo].nil? && params[:q].blank? ? 'btn-primary' : 'btn-ghost'}" %>
   <%= link_to "À vérifier (auto)", admin_professors_path(status: "auto"), class: "btn btn-sm #{params[:status] == 'auto' ? 'btn-primary' : 'btn-ghost'}" %>
+  <%= link_to "Sans photo", admin_professors_path(photo: "missing"), class: "btn btn-sm #{params[:photo] == 'missing' ? 'btn-info' : 'btn-ghost'}" %>
 
   <%= form_with url: admin_professors_path, method: :get, class: "flex gap-2 items-center ml-auto" do |f| %>
     <%= f.hidden_field :status, value: params[:status] %>

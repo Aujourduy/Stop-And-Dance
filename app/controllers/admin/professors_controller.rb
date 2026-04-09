@@ -10,6 +10,10 @@ class Admin::ProfessorsController < Admin::ApplicationController
       Professor.order(created_at: :desc)
     end
 
+    if params[:photo] == "missing"
+      scope = scope.where(avatar_url: [nil, ""])
+    end
+
     if params[:q].present?
       params[:q].strip.split(/\s+/).each do |word|
         pattern = "%#{word}%"
@@ -19,8 +23,9 @@ class Admin::ProfessorsController < Admin::ApplicationController
 
     @professors = scope.all
 
-    # Count professors pending review for alert
+    # Counts for alerts
     @pending_review_count = Professor.where(status: "auto").count
+    @no_photo_count = Professor.where(avatar_url: [nil, ""]).count
 
     respond_to do |format|
       format.html
