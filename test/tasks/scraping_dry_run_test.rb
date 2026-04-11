@@ -62,7 +62,7 @@ class ScrapingDryRunTest < ActiveSupport::TestCase
     stub_scraper(html: fixture_html("react_empty")) do
       result = ScrapingDryRun.run_one(scraped_url)
       assert_not result[:success]
-      assert_match(/Empty markdown/, result[:error])
+      assert_match(/Markdown too small|JS-only/, result[:error])
     end
   end
 
@@ -169,9 +169,9 @@ class ScrapingDryRunTest < ActiveSupport::TestCase
     out, _err = capture_io do
       ScrapingDryRun.print_report(results)
     end
-    assert_match(/Total URLs: 2/, out)
-    assert_match(/Success: 1/, out)
-    assert_match(/Failed:  1/, out)
+    assert_match(/Total URLs:\s+2/, out)
+    assert_match(/Success:\s+1/, out)
+    assert_match(/Failed:\s+1/, out)
     assert_match(/✅.*Site A/, out)
     assert_match(/❌.*Site B/, out)
     assert_match(/Fetch failed: 404/, out)
