@@ -22,6 +22,12 @@ namespace :scraping do
     puts "Done. Job enqueued to :scraping queue."
   end
 
+  desc "Dry-run scraping pipeline for all active URLs (no DB write). Reports ✅/❌ per URL."
+  task dry_run: :environment do
+    results = ScrapingDryRun.run_all
+    ScrapingDryRun.print_report(results)
+  end
+
   desc "Dry-run test scraping for URL (no DB write): rake scraping:test[123]"
   task :test, [ :scraped_url_id ] => :environment do |t, args|
     scraped_url = ScrapedUrl.find(args[:scraped_url_id])
