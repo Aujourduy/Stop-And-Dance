@@ -36,9 +36,13 @@ class EventUpdateJob < ApplicationJob
       create_or_update_event(scraped_url, event_data)
     end
 
+    # Deduplicate: remove events that duplicate another URL's events (same prof + date + heure)
+    dedup_count = deduplicate_events(scraped_url)
+
     SCRAPING_LOGGER.info({
       event: "events_updated",
       scraped_url_id: scraped_url_id,
+      events_deduplicated: dedup_count,
       events_deleted: old_count,
       events_from_claude: result[:events].size,
       events_after_expansion: expanded_events.size
@@ -174,5 +178,48 @@ class EventUpdateJob < ApplicationJob
     end
 
     professor
+  end
+
+  # Remove events from THIS scraped_url that duplicate events from OTHER scraped_urls.
+  # Duplicate = same professor + same date + same heure (or both nil).
+  # Keep the one from the OTHER url (already in DB), delete the one just created.
+  def deduplicate_events(scraped_url)
+    count = 0
+    Event.where(scraped_url: scraped_url).find_each do |event|
+      duplicate = Event.where.not(scraped_url: scraped_url)
+                       .where(professor_id: event.professor_id, date_debut_date: event.date_debut_date)
+                       .where(heure_debut: event.heure_debut)
+                       .first
+
+      if duplicate
+        # Keep the one with more info (longer description, more fields filled)
+        keep, remove = completeness_score(duplicate) >= completeness_score(event) ? [ duplicate, event ] : [ event, duplicate ]
+        remove.destroy
+        count += 1
+
+        SCRAPING_LOGGER.info({
+          event: "event_deduplicated",
+          kept_id: keep.id,
+          removed_id: remove.id,
+          professor: keep.professor&.nom,
+          date: keep.date_debut_date.to_s,
+          scraped_url_kept: keep.scraped_url_id,
+          scraped_url_removed: remove.scraped_url_id
+        }.to_json)
+      end
+    end
+    count
+  end
+
+  def completeness_score(event)
+    score = 0
+    score += 1 if event.titre.present?
+    score += 1 if event.description.present?
+    score += 2 if event.heure_debut.present?
+    score += 1 if event.lieu.present?
+    score += 1 if event.adresse_complete.present?
+    score += 1 if event.prix_normal.present?
+    score += 1 if event.tags.present? && event.tags.any?
+    score
   end
 end
