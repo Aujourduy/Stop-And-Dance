@@ -90,12 +90,16 @@ class ScrapingMissingCheck
 
       Ta mission : identifier les événements VISIBLES sur le screenshot que nous N'AVONS PAS dans notre base.
 
-      Cherche sur le screenshot :
-      - Des ateliers, stages, cours, vagues, jams avec des dates
-      - Des événements avec un lieu, un horaire, un prix
-      - Tout ce qui ressemble à un événement de danse avec une date future
+      RÈGLE IMPORTANTE : la comparaison se fait par DATE (et HEURE si disponible), PAS par titre.
+      Un event est "en base" s'il existe une entrée avec la MÊME DATE (et même heure si renseignée),
+      peu importe que le titre soit différent. Les profs peuvent donner des noms différents au même event.
 
-      Compare avec notre liste et identifie ce qui MANQUE.
+      Cherche sur le screenshot :
+      - Des ateliers, stages, cours, vagues, jams avec des dates futures (après #{Date.current})
+      - Des événements avec un lieu, un horaire, un prix
+
+      Pour chaque event visible sur le screenshot, vérifie s'il existe une entrée dans notre base
+      à la MÊME DATE. Si oui → il est couvert. Si non → il manque.
 
       Réponds UNIQUEMENT en JSON valide :
       {
@@ -105,6 +109,7 @@ class ScrapingMissingCheck
         "summary": "résumé en 1 phrase (ex: '2 events manquants détectés' ou 'aucun event manquant')"
       }
 
+      IGNORE les events dont la date est PASSÉE (avant #{Date.current}).
       Si tu ne détectes aucun event manquant, retourne : {"missing_events": [], "summary": "Tous les events visibles sont en base"}
     PROMPT
 
