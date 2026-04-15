@@ -12,7 +12,7 @@
       <td class="text-sm opacity-60"><%= crawl.llm_model_used.to_s.split("/").last %></td>
       <td class="text-sm opacity-60"><%= crawl.created_at.strftime("%d/%m/%Y %H:%M") %></td>
       <td>
-        <%= link_to "Voir", admin_site_crawl_path(crawl), class: "btn btn-ghost btn-xs" %>
+        <%= link_to "Voir", admin_site_crawl_path(crawl), class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
       </td>
     </tr>
   <% end %>

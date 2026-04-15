@@ -35,13 +35,13 @@
   <td class="text-sm opacity-60"><%= notif.created_at.strftime("%d/%m %H:%M") %></td>
   <td class="space-x-1">
     <% if notif.status == "non_lu" %>
-      <%= button_to "Lu", admin_notification_path(notif, status: "lu"), method: :patch, class: "btn btn-ghost btn-xs" %>
+      <%= button_to "Lu", admin_notification_path(notif, status: "lu"), method: :patch, class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
     <% end %>
     <% if notif.status != "valide" %>
-      <%= button_to "Validé", admin_notification_path(notif, status: "valide"), method: :patch, class: "btn btn-success btn-xs" %>
+      <%= button_to "Validé", admin_notification_path(notif, status: "valide"), method: :patch, class: "btn btn-success btn-xs", data: { turbo_frame: "_top" } %>
     <% end %>
     <% if notif.status != "archive" %>
-      <%= button_to "Archiver", admin_notification_path(notif, status: "archive"), method: :patch, class: "btn btn-ghost btn-xs" %>
+      <%= button_to "Archiver", admin_notification_path(notif, status: "archive"), method: :patch, class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
     <% end %>
   </td>
 </tr>
