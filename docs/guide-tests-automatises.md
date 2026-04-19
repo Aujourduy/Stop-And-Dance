@@ -2,16 +2,18 @@
 
 ## Vue d'ensemble
 
-Le projet dispose de 4 niveaux de tests automatisés, du plus basique au plus intelligent :
+Le projet dispose de 6 niveaux de tests automatisés, du plus basique au plus intelligent :
 
 | Niveau | Commande | IA ? | Durée | Ce que ça vérifie |
 |--------|----------|------|-------|-------------------|
 | 0 | `bin/rails test` | Non | ~2s | Models, controllers, services, jobs |
 | 1 | `bin/rails scraping:dry_run` | Non | ~100s | Pipeline fetch + markdown sur toutes les URLs |
-| 2 | `bin/rails scraping:verify` | Oui (Claude) | ~3min | Events DB correspondent au site |
-| 3 | `bin/rails scraping:missing` | Oui (Claude) | ~1min | Events sur le site absents de la DB |
+| 2a | `node script/ux-audit.js` | Non | ~30s | UI/UX headless (Playwright) : clics, saisies, nav, SEO |
+| 2b | `bin/rails runner script/data-sanity.rb` | Non | ~2s | Sanity sémantique des données scrapées |
+| 3 | `bin/rails scraping:verify` | Oui (Claude) | ~3min | Events DB correspondent au site |
+| 4 | `bin/rails scraping:missing` | Oui (Claude) | ~1min | Events sur le site absents de la DB |
 
-**Ordre recommandé :** 0 → 1 → 2 → 3
+**Ordre recommandé :** 0 → 1 → 2a → 2b → 3 → 4
 
 ---
 
@@ -146,6 +148,56 @@ bin/rails scraping:missing
 
 ---
 
+## Niveau 2a : UX headless Playwright
+
+```bash
+node script/ux-audit.js
+```
+
+Serveur Rails requis sur `:3002`. **49 tests** qui vérifient :
+
+- **Mobile** (viewport 390x844) : pas de scroll horizontal sur 5 pages
+- **Navigation** : burger → drawer, clic "Agenda" navigue, Escape ferme
+- **Homepage** : hero, clic AGENDA → /evenements, saisie newsletter
+- **Agenda** : titre, jours français, badges DaisyUI, mention "Gratuit"
+- **Filtres** : recherche `q` (paris/xxx/silvestre/reset), checkboxes gratuit/stage/en_ligne, champ lieu (via request sniffing)
+- **Modal** : clic carte → turbo-frame rempli, bouton × navigue, clic overlay ferme
+- **Infinite scroll** : 30 → 60 events
+- **Prof/Stats** : nom affiché, clic "Voir stats" → /stats
+- **Footer + SEO** : liens 200, meta description, 1 h1, sitemap.xml
+
+**Résultat attendu :** 49/49 passés.
+
+### Bug trouvé grâce à ce test
+`app/javascript/controllers/modal_controller.js` manquant — les vues utilisaient `data-controller="modal"` sans Stimulus controller associé → clic overlay inerte. Corrigé 2026-04-19.
+
+---
+
+## Niveau 2b : Data sanity sémantique
+
+```bash
+bin/rails runner script/data-sanity.rb
+```
+
+Complète les tests syntaxiques (ça existe, ça répond 200) par un **contrôle du sens métier** des données scrapées par l'IA. 7 contrôles :
+
+| # | Contrôle | Signal |
+|---|----------|--------|
+| 1 | Noms composites (`" et "`, `" & "`) | fail — parsing raté |
+| 2 | Noms > 40 caractères | warn |
+| 3 | Profs orphelins (0 events, 0 URLs) | warn — reliquats |
+| 4 | Attribution prof.site_web ≠ scraped_url host | warn — sampling requis |
+| 5 | Un prof concentre > 90% des events d'une URL ≠ owner | fail |
+| 6 | Events liés à un prof non listé dans scraped_url.professors | fail |
+| 7 | Sampling 3 events aléatoires | affichage pour vérif manuelle |
+
+**Résultat attendu :** 0 fail. Les warnings sont acceptables s'ils sont expliqués (ex. duo Marc+Peter).
+
+### Bug trouvé grâce à ce test
+Event "Paris - Le Corps De La Danse" attribué à Marc alors que scrapé depuis le site de Peter. `data-sanity` aurait détecté via **profs composites** (`#67 "Marc Silvestre et Peter Wilberforce"`) + **distribution déséquilibrée** (54 events Marc sur bodyvoiceandbeing vs 10 pour Peter owner). Corrigé 2026-04-19 (`ScrapedUrl#owner_professor`).
+
+---
+
 ## Compléments : Rubocop + Brakeman
 
 ```bash
@@ -161,11 +213,13 @@ bin/brakeman --no-progress  # Scan sécurité (1 weak warning connu, faux positi
 |-----------|---------------|
 | Après modification du code | `bin/rails test` |
 | Avant un commit | `bin/rails test` + `bin/rubocop` |
+| Après modification UI/vue/JS | `node script/ux-audit.js` |
 | Après ajout d'une nouvelle URL | `scraping:dry_run` |
-| Après un scraping complet | `scraping:verify` + `scraping:missing` |
+| Après un scraping complet | `data-sanity` + `scraping:verify` + `scraping:missing` |
+| Après re-parsing Claude (EventUpdateJob) | `data-sanity` |
 | Debug : events manquants | `scraping:missing` |
-| Debug : events incorrects | `scraping:verify` |
-| Audit régulier (hebdo) | Les 4 niveaux dans l'ordre |
+| Debug : events incorrects ou mal attribués | `data-sanity` puis `scraping:verify` |
+| Audit régulier (hebdo) | Les 6 niveaux dans l'ordre |
 
 ---
 
@@ -178,7 +232,9 @@ bin/brakeman --no-progress  # Scan sécurité (1 weak warning connu, faux positi
 | 2026-04-14 | Doublon intra-URL Marc 12 juin (récurrent + explicite) | `verify` | Dédup intra-URL, flag `generated_from_recurrence` |
 | 2026-04-14 | Section stages JS-only Peter non récupérée | `missing` | URL #9 → `use_browser: true` |
 | 2026-04-14 | Event #94 horaire de fin manquant | `verify` | Identifié (prompt à améliorer) |
+| 2026-04-19 | `modal_controller.js` manquant → clic overlay modal inerte | `ux-audit` | Création du controller Stimulus |
+| 2026-04-19 | Event attribué à Marc au lieu de Peter sur URL multi-profs | analyse manuelle (aurait été vu par `data-sanity` rétroactivement) | `ScrapedUrl#owner_professor` + création de `data-sanity.rb` |
 
 ---
 
-**Dernière mise à jour :** 2026-04-14
+**Dernière mise à jour :** 2026-04-19

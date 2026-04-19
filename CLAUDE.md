@@ -84,9 +84,15 @@ Jouer le rôle de QA Engineer. Audit complet via slash command `/qa` ou manuel.
 Capybara + Playwright local (PAS Selenium), port 3002.
 Scénarios : Homepage (Hero, navbar), liste événements, filtres (Gratuit, date), modal, newsletter, infinite scroll, admin (HTTP Basic).
 
+**Scripts QA dédiés (headless, sans navigateur humain) :**
+- `node script/ux-audit.js` — 49 tests Playwright : clics, saisies, navigation, modal, filtres, SEO
+- `bin/rails runner script/data-sanity.rb` — 7 contrôles sémantiques : noms composites, attribution prof cohérente, distribution events/URL, sampling
+
+**Détails :** `docs/guide-tests-automatises.md` (6 niveaux de tests documentés).
+
 **Process :** Pour chaque bug → corriger, tester, commit + push → rapport final `tmp/QA_AUDIT_[DATE].md`
 
-**Détails complets :** `~/.claude/commands/qa.md`
+**Détails `/qa` :** `~/.claude/commands/qa.md`
 
 ---
 
