@@ -13,10 +13,8 @@
 
     <%= form_with url: evenements_path,
                   method: :get,
-                  data: {
-                    controller: "auto-submit",
-                    turbo_frame: "events-list"
-                  },
+                  format: :turbo_stream,
+                  data: { controller: "auto-submit", turbo_action: "advance" },
                   class: "space-y-6" do |f| %>
 
       <%# Search field %>

@@ -1,14 +1,43 @@
-<%= turbo_stream.replace "page-#{params[:page]}" do %>
-  <%= render "events_list", events: @events %>
+<% if params[:page].present? && params[:page].to_i > 1 %>
+  <%# Infinite scroll : remplace juste le trigger lazy par la page suivante %>
+  <%= turbo_stream.replace "page-#{params[:page]}" do %>
+    <%= render "events_list", events: @events %>
 
-  <%# Next page trigger %>
-  <% if @pagy.next %>
-    <%= turbo_frame_tag "page-#{@pagy.next}",
-                        src: evenements_path(page: @pagy.next, format: :turbo_stream),
-                        loading: :lazy do %>
-      <div class="text-center py-8">
-        <span class="loading loading-spinner loading-md text-primary"></span>
-      </div>
+    <% if @pagy.next %>
+      <%= turbo_frame_tag "page-#{@pagy.next}",
+                          src: evenements_path(page: @pagy.next, format: :turbo_stream),
+                          loading: :lazy do %>
+        <div class="text-center py-8">
+          <span class="loading loading-spinner loading-md text-primary"></span>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%# Filter submit : met à jour la liste ET le pill (pour texte + dot) %>
+  <%= turbo_stream.replace "events-list" do %>
+    <%= turbo_frame_tag "events-list", data: { controller: "infinite-scroll" } do %>
+      <h1 class="text-3xl font-script italic mb-8 px-4 lg:px-0">
+        <%= @filtered ? "Agenda filtré" : "Agenda complet" %> : Ateliers (<%= @atelier_count %>) et Stages (<%= @stage_count %>)
+      </h1>
+
+      <%= render "events_list", events: @events %>
+
+      <% if @pagy.next %>
+        <%= turbo_frame_tag "page-#{@pagy.next}",
+                            src: evenements_path(page: @pagy.next, format: :turbo_stream),
+                            loading: :lazy do %>
+          <div class="text-center py-8">
+            <span class="loading loading-spinner loading-md text-primary"></span>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <%= turbo_stream.replace "filter-pill" do %>
+    <%= turbo_frame_tag "filter-pill" do %>
+      <%= render "filter_pill" %>
     <% end %>
   <% end %>
 <% end %>
