@@ -123,9 +123,11 @@ class EventUpdateJob < ApplicationJob
   end
 
   def find_or_create_professor(scraped_url, professor_nom)
-    # If no professor name provided by Claude, fallback to first professor
+    # If no professor name provided by Claude, fallback to the owner of the site
+    # (professor with the most ScrapedUrls on this host). Avoids arbitrary
+    # attribution when the URL aggregates multiple collaborators.
     if professor_nom.blank?
-      return scraped_url.professors.first
+      return scraped_url.owner_professor
     end
 
     # Normalize professor name for matching

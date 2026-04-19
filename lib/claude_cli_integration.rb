@@ -4,7 +4,7 @@ require "json"
 
 class ClaudeCliIntegration
   CLAUDE_CLI_PATH = "/home/dang/.local/bin/claude"
-  TIMEOUT_SECONDS = 120 # Increased from 60s - typical response is ~30-40s
+  TIMEOUT_SECONDS = 300 # URLs volumineuses (ex. aggrégateurs multi-profs) peuvent dépasser 120s
 
   def self.parse_and_generate(scraped_url, html, notes_correctrices)
     # Clean HTML and convert to Markdown for better Claude parsing

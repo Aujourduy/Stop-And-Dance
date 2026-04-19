@@ -10,4 +10,17 @@ class ScrapedUrl < ApplicationRecord
 
   # Validations
   validates :url, presence: true, uniqueness: true, format: { with: URI::DEFAULT_PARSER.make_regexp([ "http", "https" ]) }
+
+  # Prof "propriétaire" du site : celui qui a le plus de ScrapedUrls sur ce host.
+  # Utilisé comme fallback quand Claude ne trouve pas de nom explicite dans le HTML.
+  def owner_professor
+    host = URI(url).host rescue nil
+    return professors.first if host.blank?
+
+    Professor.joins(:scraped_urls)
+      .where("scraped_urls.url LIKE ?", "%#{host}%")
+      .group("professors.id")
+      .order(Arel.sql("COUNT(scraped_urls.id) DESC"))
+      .first || professors.first
+  end
 end

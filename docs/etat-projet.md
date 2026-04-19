@@ -640,6 +640,14 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 - Routes : 9/9 publiques 200, 4/4 admin 403 (Tailscale filter actif)
 - **UX Playwright 49/49 (100%)** via `script/ux-audit.js` : mobile (5 pages sans scroll horizontal), burger + drawer + navigation clic "Agenda" + Escape, homepage (clic AGENDA, saisie newsletter), agenda (badges, jours français), filtres complets (recherche q=paris/silvestre/xxx/reset, checkboxes gratuit/stage/en_ligne, lieu via request sniffing), modal (clic carte, bouton ×, clic overlay), clic "Voir stats" → /stats, infinite scroll 30→60, footer links 200, SEO.
 - **Bug corrigé :** `app/javascript/controllers/modal_controller.js` créé (actions `close` + `stopPropagation`). Les vues utilisaient `data-controller="modal"` mais le fichier n'existait pas → clic overlay modal inerte. Désormais fonctionnel.
+
+**Bug attribution professor corrigé (événement "Paris - Le Corps De La Danse") :**
+- Symptôme : event scrapé depuis le site de Peter (bodyvoiceandbeing.com) attribué à Marc Silvestre.
+- Cause racine : `EventUpdateJob#find_or_create_professor` fallback sur `scraped_url.professors.first` quand Claude ne trouve pas de nom. `.first` = ORDER BY id ASC → plus petit ID (Marc #6 avant Peter #55) sans lien avec la sémantique.
+- Fix : `ScrapedUrl#owner_professor` déduit le "propriétaire" du site (prof avec le plus de ScrapedUrls sur ce host). URL #9 (bodyvoiceandbeing) → Peter (14 URLs sur ce host vs 1 pour les autres). Utilisé comme fallback.
+- `TIMEOUT_SECONDS` CLI 120→300s (URL #9 = 3.7MB de HTML dépassait 120s).
+- Re-scrape URL #9 : Peter=54, Marc=10 (explicitement "Marc Silvestre et Peter" dans HTML), Aurélie Desboist #60=6, Makovec=1.
+- Nettoyage : suppression profs composites #67 "Marc Silvestre et Peter Wilberforce" et #68 "Aurélie Desboist et Vincent Fournout" (devenus orphelins, signature d'un bug parsing). 63 → 61 profs.
 - Nettoyage : seeds fictifs supprimés (16 events + 5 changelogs + 7 URLs + 5 profs), `db/seeds.rb` vidé, 10 events orphans scraped_url_id=NULL purgés
 
 ---
