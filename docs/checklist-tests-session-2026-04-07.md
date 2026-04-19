@@ -19,9 +19,9 @@ Cocher chaque item après validation manuelle sur téléphone et/ou desktop.
 
 - [x] Menu burger s'ouvre correctement *(Playwright 2026-04-19)*
 - [x] Menu burger contient : Accueil, Agenda, Newsletter, Proposants *(Playwright 2026-04-19 — "Liens"/"Admin" non testés)*
-- [ ] Lien "Agenda" dans le burger mène bien à /evenements
+- [x] Lien "Agenda" dans le burger mène bien à /evenements *(Playwright 2026-04-19)*
 - [ ] Lien "Admin" dans le burger mène bien à /admin (popup login)
-- [ ] Fermeture du burger (bouton × ou clic overlay)
+- [x] Fermeture du burger via Escape *(Playwright 2026-04-19 — clic overlay non testé)*
 
 ## 3. Page d'accueil
 
@@ -49,7 +49,11 @@ Cocher chaque item après validation manuelle sur téléphone et/ou desktop.
 - [x] Taper "paris" → résultats *(Playwright 2026-04-19)*
 - [x] Taper "xxxxyyyzzzz" → 0 résultats *(Playwright 2026-04-19)*
 - [x] Effacer le champ → retour à tous les events *(Playwright 2026-04-19)*
-- [ ] Taper "marc rennes" → filtre AND (events avec marc ET rennes)
+- [x] Taper "marc silvestre" → filtre AND *(Playwright 2026-04-19)*
+- [x] Checkbox "Gratuit" filtre *(Playwright 2026-04-19 — 30 → 0)*
+- [x] Checkbox "Stage" filtre *(Playwright 2026-04-19 — 30 → 24)*
+- [x] Checkbox "En ligne" filtre *(Playwright 2026-04-19 — 30 → 0)*
+- [x] Champ "Lieu" filtre *(Playwright 2026-04-19 — requête ?lieu=Paris émise)*
 - [ ] Checkbox "Gratuit" filtre correctement
 - [ ] Checkbox "Stage" filtre correctement
 - [ ] Checkbox "En ligne" filtre correctement
@@ -61,7 +65,8 @@ Cocher chaque item après validation manuelle sur téléphone et/ou desktop.
 
 - [x] Cliquer sur une carte événement ouvre la modal *(Playwright 2026-04-19 — turbo-frame#event_modal rempli)*
 - [x] Modal affiche le titre *(Playwright 2026-04-19 — autres champs non vérifiés)*
-- [ ] Bouton fermeture (×) fonctionne
+- [x] Bouton × ferme la modal *(Playwright 2026-04-19 — navigue vers /evenements)*
+- [ ] ⚠️ **Clic overlay ferme la modal — BUG : modal_controller.js manquant**
 - [ ] Description affichée
 - [ ] Tags/Pratiques affichés si présents
 - [ ] Lien "Voir le site du prof" si disponible
@@ -69,23 +74,23 @@ Cocher chaque item après validation manuelle sur téléphone et/ou desktop.
 ## 7. Page Professeur (/professeurs/:id)
 
 - [ ] Avatar ou placeholder avec initiale affiché
-- [ ] Nom du professeur affiché
+- [x] Nom du professeur affiché *(Playwright 2026-04-19)*
 - [ ] Bio affichée
 - [ ] Bouton "Voir le site web" si disponible
-- [ ] Bouton "Voir les statistiques publiques"
+- [x] Bouton "Voir les statistiques publiques" — clic navigue vers /stats *(Playwright 2026-04-19)*
 - [ ] Liste "Prochains ateliers et stages" affichée
 
 ## 8. Page Stats Professeur (/professeurs/:id/stats)
 
-- [ ] Compteurs affichés (consultations + clics sortants)
-- [ ] Design DaisyUI stats
+- [x] Compteurs affichés (DaisyUI stat-value) *(Playwright 2026-04-19)*
+- [ ] Design DaisyUI stats — rendu visuel
 - [ ] Section "À propos de ces statistiques" (alert info)
 - [ ] Champ "Partager ce lien" avec bouton Copier
 
 ## 9. Newsletter
 
 - [ ] Formulaire newsletter dans la sidebar desktop (page agenda)
-- [ ] Formulaire newsletter dans le footer
+- [x] Formulaire newsletter dans le footer — saisie email acceptée *(Playwright 2026-04-19 — submit non testé)*
 - [ ] Soumettre email valide → message succès
 - [ ] Soumettre email déjà inscrit → message "déjà inscrite"
 - [ ] Soumettre email invalide → message erreur

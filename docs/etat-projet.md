@@ -638,12 +638,15 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 - `scraping:dry_run` 20/20 URLs réelles OK (7 seeds example.com supprimées avec leurs events/profs/changelogs)
 - Checklist SQL 12/12 items (0 event orphan, 0 doublon, 0 date inversée, 0 prix incohérent)
 - Routes : 9/9 publiques 200, 4/4 admin 403 (Tailscale filter actif)
-- **UX Playwright 37/37 (100%)** via `script/ux-audit.js` : mobile (5 pages sans scroll horizontal), burger+drawer, homepage, agenda (badges, jours français), filtres (recherche q=paris/silvestre/xxx), modal turbo-frame, infinite scroll 30→60, SEO (meta, h1, sitemap.xml)
+- **UX Playwright 48/49 (98%)** via `script/ux-audit.js` : mobile (5 pages sans scroll horizontal), burger + drawer + navigation clic "Agenda" + Escape, homepage (clic AGENDA, saisie newsletter), agenda (badges, jours français), filtres complets (recherche q=paris/silvestre/xxx/reset, checkboxes gratuit/stage/en_ligne, lieu via request sniffing), modal (clic carte, bouton × navigue), clic "Voir stats" → /stats, infinite scroll 30→60, footer links 200, SEO. **Bug découvert :** `app/javascript/controllers/modal_controller.js` manquant (data-action="click->modal#close" inerte, clic overlay modal ne ferme pas)
 - Nettoyage : seeds fictifs supprimés (16 events + 5 changelogs + 7 URLs + 5 profs), `db/seeds.rb` vidé, 10 events orphans scraped_url_id=NULL purgés
 
 ---
 
 ## ⚠️ TODO Prochaine Session
+
+**Priorité 1 — Bug fix :**
+- Créer `app/javascript/controllers/modal_controller.js` (actions `close` + `stopPropagation`) — clic overlay modal inerte depuis toujours
 
 **Priorité 1 — Améliorations scraping :**
 - Support récurrence monthly dans RecurrenceExpander
