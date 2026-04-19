@@ -633,6 +633,14 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 - Test E2E OK (CLI 57s, 14 events parsés via perform_later + worker Solid Queue).
 - Nettoyage 2 FailedExecution orphelines.
 
+**Audit QA complet 2026-04-19 (rapport `tmp/QA_AUDIT_2026-04-19.md`) :**
+- Minitest 110/110 tests ✅, system 8/8 ✅, rubocop 0 offense ✅, brakeman 0 issue critique ✅
+- `scraping:dry_run` 20/20 URLs réelles OK (7 seeds example.com supprimées avec leurs events/profs/changelogs)
+- Checklist SQL 12/12 items (0 event orphan, 0 doublon, 0 date inversée, 0 prix incohérent)
+- Routes : 9/9 publiques 200, 4/4 admin 403 (Tailscale filter actif)
+- **UX Playwright 37/37 (100%)** via `script/ux-audit.js` : mobile (5 pages sans scroll horizontal), burger+drawer, homepage, agenda (badges, jours français), filtres (recherche q=paris/silvestre/xxx), modal turbo-frame, infinite scroll 30→60, SEO (meta, h1, sitemap.xml)
+- Nettoyage : seeds fictifs supprimés (16 events + 5 changelogs + 7 URLs + 5 profs), `db/seeds.rb` vidé, 10 events orphans scraped_url_id=NULL purgés
+
 ---
 
 ## ⚠️ TODO Prochaine Session

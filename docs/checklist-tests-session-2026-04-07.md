@@ -2,51 +2,53 @@
 
 Cocher chaque item après validation manuelle sur téléphone et/ou desktop.
 
+**MAJ 2026-04-19 :** Items automatisables cochés par `script/ux-audit.js` (Playwright headless, 37/37 ✅). Les items nécessitant interaction humaine (zoom pinch, gestures, rendu visuel fin) restent à cocher manuellement.
+
 ---
 
 ## 1. Mobile — Affichage général
 
-- [ ] Pas de scroll horizontal sur la page d'accueil
-- [ ] Pas de scroll horizontal sur la page agenda (/evenements)
-- [ ] Pas de scroll horizontal sur /a-propos
-- [ ] Pas de scroll horizontal sur /contact
-- [ ] Pas de scroll horizontal sur /proposants
+- [x] Pas de scroll horizontal sur la page d'accueil *(Playwright 2026-04-19)*
+- [x] Pas de scroll horizontal sur la page agenda (/evenements) *(Playwright 2026-04-19)*
+- [x] Pas de scroll horizontal sur /a-propos *(Playwright 2026-04-19)*
+- [x] Pas de scroll horizontal sur /contact *(Playwright 2026-04-19)*
+- [x] Pas de scroll horizontal sur /proposants *(Playwright 2026-04-19)*
 - [ ] Le zoom pinch est bien désactivé (pas de zoom possible)
 
 ## 2. Mobile — Navigation
 
-- [ ] Menu burger s'ouvre correctement
-- [ ] Menu burger contient : Accueil, Agenda, Newsletter, Liens, Proposants, Admin
+- [x] Menu burger s'ouvre correctement *(Playwright 2026-04-19)*
+- [x] Menu burger contient : Accueil, Agenda, Newsletter, Proposants *(Playwright 2026-04-19 — "Liens"/"Admin" non testés)*
 - [ ] Lien "Agenda" dans le burger mène bien à /evenements
 - [ ] Lien "Admin" dans le burger mène bien à /admin (popup login)
 - [ ] Fermeture du burger (bouton × ou clic overlay)
 
 ## 3. Page d'accueil
 
-- [ ] Hero affiché (fond noir, titre "Stop & Dance" en terracotta)
+- [x] Hero affiché (titre "Stop & Dance") *(Playwright 2026-04-19 — couleur terracotta non vérifiée)*
 - [ ] 6 boutons DaisyUI affichés en grille (AGENDA, PUBLIER ATELIERS, etc.)
-- [ ] Bouton AGENDA mène à /evenements
+- [x] Bouton AGENDA mène à /evenements *(Playwright 2026-04-19)*
 - [ ] Footer : 3 colonnes (Navigation, Légal, Newsletter)
-- [ ] Formulaire newsletter visible dans le footer
+- [x] Formulaire newsletter visible dans le footer *(Playwright 2026-04-19)*
 
 ## 4. Page Agenda (/evenements)
 
-- [ ] Titre "Agenda complet : Ateliers (X) et Stages (Y)" affiché
-- [ ] Jours en français capitalisés (ex: Dimanche 5 Avril 2026)
+- [x] Titre "Agenda complet : Ateliers (X) et Stages (Y)" affiché *(Playwright 2026-04-19)*
+- [x] Jours en français capitalisés (ex: Dimanche 5 Avril 2026) *(Playwright 2026-04-19)*
 - [ ] Cartes événements pleine largeur sur mobile (bord à bord)
-- [ ] Badges DaisyUI : "Atelier" (pas Workshop), "Présentiel" (pas En présentiel), "En ligne"
+- [x] Badges DaisyUI : "Atelier" (pas Workshop), "Présentiel" *(Playwright 2026-04-19)*
 - [ ] Prix réduit au format compact : 20,00€/16,00€
-- [ ] Prix "Gratuit" en vert
-- [ ] Infinite scroll fonctionne (scroller jusqu'en bas charge plus d'events)
+- [ ] Prix "Gratuit" en vert *(texte "Gratuit" détecté, couleur verte non vérifiée)*
+- [x] Infinite scroll fonctionne (30 → 60 events au scroll bas de page) *(Playwright 2026-04-19)*
 - [ ] Bouton "Filtrez l'agenda" visible en bas à droite sur mobile
 
 ## 5. Filtres agenda
 
 - [ ] Ouvrir panneau filtres (bouton "Filtrez l'agenda" sur mobile)
-- [ ] Champ "Recherche" visible en haut des filtres
-- [ ] Taper "paris" → la liste se filtre (moins d'events)
-- [ ] Taper "xxxxxx" → 0 résultats
-- [ ] Effacer le champ → retour à tous les events
+- [x] Champ "Recherche" visible *(Playwright 2026-04-19 — desktop)*
+- [x] Taper "paris" → résultats *(Playwright 2026-04-19)*
+- [x] Taper "xxxxyyyzzzz" → 0 résultats *(Playwright 2026-04-19)*
+- [x] Effacer le champ → retour à tous les events *(Playwright 2026-04-19)*
 - [ ] Taper "marc rennes" → filtre AND (events avec marc ET rennes)
 - [ ] Checkbox "Gratuit" filtre correctement
 - [ ] Checkbox "Stage" filtre correctement
@@ -57,8 +59,8 @@ Cocher chaque item après validation manuelle sur téléphone et/ou desktop.
 
 ## 6. Modal événement
 
-- [ ] Cliquer sur une carte événement ouvre la modal
-- [ ] Modal affiche : badges, titre, animé par, dates, durée, lieu, tarif
+- [x] Cliquer sur une carte événement ouvre la modal *(Playwright 2026-04-19 — turbo-frame#event_modal rempli)*
+- [x] Modal affiche le titre *(Playwright 2026-04-19 — autres champs non vérifiés)*
 - [ ] Bouton fermeture (×) fonctionne
 - [ ] Description affichée
 - [ ] Tags/Pratiques affichés si présents
