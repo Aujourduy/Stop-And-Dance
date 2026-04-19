@@ -625,6 +625,23 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 
 ---
 
+### Session 2026-04-19 (soir) ✅ — Page "Les proposants"
+
+- Nouveau controller `ProposantsController` (index + show) remplace le stub `pages#proposants`
+- Route `resources :proposants, only: [ :index, :show ]` — helpers `proposants_path` / `proposant_path(prof)`
+- **Index** : liste scroll infini (pagy 30/page), cards terracotta/beige (réutilise `.card-side` DaisyUI), tri profs avec events futurs en tête, champ recherche **auto sans bouton** (debounce 300ms sur `input` via `auto_submit_controller` enrichi), Turbo Drive + turbo_stream pour l'infinite scroll
+- **Card** : avatar rond, prénom+nom en font-script terracotta-dark, badges activités (tags events moutarde), villes avec icône, aperçu URL principale (host) + compteur "+N liens". **Pas de `<a>` nested** (badges URL en `<span>`, seul le `<a>` extérieur vers `proposant_modal`).
+- **Show en modal** (turbo-frame `proposant_modal`) : avatar XL, tous les tags/villes, bio, section "Liens" avec URL principale + toutes les secondaires (lisibles, cliquables avec `data-turbo: false` pour lien externe), CTA "Profil complet" + "Statistiques"
+- Menu nav renommé "L'espace des proposants" → **"Les proposants"** (navbar + drawer mobile)
+- **Nouvelles méthodes `Professor`** : `activites` (tags futurs distincts), `villes` (lieux events futurs), `url_principale` (site_web OU URL racine des scraped_urls), `urls_secondaires`
+- **`modal_controller.js` étendu** : supporte `/proposants/:id` en plus de `/evenements/:slug` (liste configurable des collections)
+- **`auto_submit_controller.js` enrichi** : debounce configurable (300ms par défaut sur événement `input`, immédiat sur `change`) — zéro régression sur events
+- Tests : +2 integration (`proposants_path` 200 + search filter + modal turbo-frame). Minitest 112/112 ✅
+- UX audit : +4 tests (GET /proposants, cartes affichées, recherche "silvestre" 88→3, modal remplie + clic overlay ferme). Audit Playwright 54/54 ✅
+- Leçon technique : **`<a>` ne peut pas contenir d'autres `<a>`** — le parseur HTML5 extrait les enfants `<a>` hors du parent, ce qui casse le layout `.card-side`. Bug repéré via screenshot + `getComputedStyle` (card-body manquant dans le DOM rendu).
+
+---
+
 ### Session 2026-04-18 → 2026-04-19 ✅
 
 **Robustesse jobs Solid Queue :**

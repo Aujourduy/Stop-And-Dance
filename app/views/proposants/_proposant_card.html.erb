@@ -1,0 +1,71 @@
+<%# locals: proposant %>
+<%= link_to proposant_path(proposant),
+            class: "card card-side bg-beige hover:bg-beige-dark transition-colors mb-0 rounded-none lg:rounded-box overflow-hidden items-start border border-terracotta/20",
+            data: { turbo_frame: "proposant_modal", debug_id: "proposant-card-#{proposant.id}" } do %>
+
+  <%# Avatar %>
+  <figure class="flex-shrink-0 p-2 sm:p-4 pb-0 lg:pb-4">
+    <% if proposant.avatar_url.present? %>
+      <%= image_tag proposant.avatar_url,
+                    alt: [ proposant.prenom, proposant.nom ].compact.join(" "),
+                    class: "w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-full",
+                    loading: "lazy" %>
+    <% else %>
+      <div class="w-24 h-24 sm:w-32 sm:h-32 bg-terracotta/30 rounded-full flex items-center justify-center text-terracotta-dark text-2xl sm:text-4xl font-script italic">
+        <%= proposant.prenom&.first&.upcase || proposant.nom&.first&.upcase || "?" %>
+      </div>
+    <% end %>
+  </figure>
+
+  <div class="card-body p-2 sm:p-4 gap-1 min-w-0">
+    <%# Prénom Nom %>
+    <h3 class="card-title font-script italic text-terracotta-dark text-lg sm:text-2xl truncate">
+      <%= [ proposant.prenom, proposant.nom ].compact.join(" ") %>
+    </h3>
+
+    <%# Activités (tags) %>
+    <% activites = proposant.activites %>
+    <% if activites.any? %>
+      <div class="flex flex-wrap gap-1">
+        <% activites.first(4).each do |tag| %>
+          <span class="badge badge-sm bg-moutarde/30 text-dark-bg border-moutarde"><%= tag %></span>
+        <% end %>
+        <% if activites.size > 4 %>
+          <span class="badge badge-sm badge-ghost">+<%= activites.size - 4 %></span>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Villes %>
+    <% villes = proposant.villes %>
+    <% if villes.any? %>
+      <p class="text-sm text-dark-bg/70 flex items-center gap-1 truncate">
+        <svg class="w-4 h-4 flex-shrink-0 text-terracotta" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+        </svg>
+        <span class="truncate"><%= villes.join(" · ") %></span>
+      </p>
+    <% end %>
+
+    <%# Aperçu URLs (non cliquables — les vrais liens sont dans la modal pour éviter <a> imbriqués) %>
+    <% url_count = proposant.scraped_urls.count + (proposant.site_web.present? ? 1 : 0) %>
+    <% if url_count > 0 %>
+      <div class="flex flex-wrap items-center gap-1.5 mt-auto pt-1">
+        <% if proposant.url_principale.present? %>
+          <span class="badge badge-sm bg-terracotta text-white border-terracotta gap-1">
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+            </svg>
+            <%= URI(proposant.url_principale).host.to_s.sub(/^www\./, "").truncate(22) %>
+          </span>
+        <% end %>
+        <% extra = proposant.urls_secondaires.size %>
+        <% if extra > 0 %>
+          <span class="badge badge-sm badge-outline border-terracotta/50 text-terracotta-dark">
+            + <%= extra %> lien<%= extra > 1 ? "s" : "" %>
+          </span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

@@ -1,8 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  submit() {
-    // Submit the form automatically when any input changes
-    this.element.requestSubmit()
+  static values = { debounce: { type: Number, default: 0 } }
+
+  submit(event) {
+    const delay = this.debounceValue || (event?.type === "input" ? 300 : 0)
+
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
+      this.element.requestSubmit()
+    }, delay)
   }
 }

@@ -1,0 +1,6 @@
+<%# locals: proposants %>
+<div class="space-y-4 px-4 lg:px-0">
+  <% proposants.each do |proposant| %>
+    <%= render "proposant_card", proposant: proposant %>
+  <% end %>
+</div>

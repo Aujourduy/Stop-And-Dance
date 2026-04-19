@@ -1,0 +1,53 @@
+<div class="container mx-auto px-0 lg:px-4 py-8">
+  <h1 class="text-3xl font-script italic text-terracotta mb-2 px-4 lg:px-0">Les proposants</h1>
+  <p class="text-dark-bg/70 mb-6 px-4 lg:px-0">
+    Les professeurs qui animent ateliers et stages de danse exploratoire en France.
+  </p>
+
+  <%# Champ recherche auto (pas de bouton) %>
+  <%= form_with url: proposants_path, method: :get, local: true,
+                data: { turbo_frame: "proposants-list", turbo_action: "advance", controller: "auto-submit" },
+                class: "px-4 lg:px-0 mb-6" do |f| %>
+    <div class="form-control">
+      <div class="relative">
+        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-terracotta pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/>
+        </svg>
+        <%= f.text_field :q,
+                         value: params[:q],
+                         placeholder: "Rechercher un proposant, une discipline…",
+                         class: "input input-bordered w-full pl-10 bg-white",
+                         data: { action: "input->auto-submit#submit" },
+                         autocomplete: "off" %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag "proposants-list", data: { controller: "infinite-scroll" } do %>
+    <% if @proposants.any? %>
+      <%= render "proposants_list", proposants: @proposants %>
+
+      <%# Infinite scroll trigger %>
+      <% if @pagy.next %>
+        <%= turbo_frame_tag "page-#{@pagy.next}",
+                            src: proposants_path(page: @pagy.next, q: params[:q], format: :turbo_stream),
+                            loading: :lazy do %>
+          <div class="text-center py-8">
+            <span class="loading loading-spinner loading-md text-terracotta"></span>
+          </div>
+        <% end %>
+      <% end %>
+    <% else %>
+      <p class="opacity-60 italic text-center py-12 px-4">
+        <% if params[:q].present? %>
+          Aucun proposant ne correspond à « <%= params[:q] %> ».
+        <% else %>
+          Aucun proposant pour le moment.
+        <% end %>
+      </p>
+    <% end %>
+  <% end %>
+</div>
+
+<%# Modal container (Turbo Frame) %>
+<%= turbo_frame_tag "proposant_modal" %>

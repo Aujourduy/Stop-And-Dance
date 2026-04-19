@@ -15,7 +15,8 @@ Rails.application.routes.draw do
   # Static pages
   get "/a-propos", to: "pages#about", as: :about
   get "/contact", to: "pages#contact"
-  get "/proposants", to: "pages#proposants", as: :proposants  # "Publier ateliers" form
+  # Page publique "Les proposants" : liste profs + recherche + modal
+  resources :proposants, only: [ :index, :show ], controller: "proposants"
   get "/actualites", to: "pages#actualites", as: :actualites  # Stub page
 
   # Events (public French routes)

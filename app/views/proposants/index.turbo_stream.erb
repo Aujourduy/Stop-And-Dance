@@ -1,0 +1,13 @@
+<%= turbo_stream.replace "page-#{params[:page]}" do %>
+  <%= render "proposants_list", proposants: @proposants %>
+
+  <% if @pagy.next %>
+    <%= turbo_frame_tag "page-#{@pagy.next}",
+                        src: proposants_path(page: @pagy.next, q: params[:q], format: :turbo_stream),
+                        loading: :lazy do %>
+      <div class="text-center py-8">
+        <span class="loading loading-spinner loading-md text-terracotta"></span>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

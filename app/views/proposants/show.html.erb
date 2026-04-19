@@ -1,0 +1,117 @@
+<%= turbo_frame_tag "proposant_modal" do %>
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+       data-controller="modal"
+       data-action="click->modal#close">
+
+    <div data-debug-id="proposant-modal"
+         class="card bg-beige max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-terracotta/30"
+         data-modal-target="panel"
+         data-action="click->modal#stopPropagation">
+
+      <%# Close button %>
+      <%= link_to proposants_path,
+                  class: "btn btn-ghost btn-sm absolute top-4 right-4 text-2xl text-terracotta-dark hover:bg-terracotta/10",
+                  data: { turbo_frame: "_top" } do %>
+        &times;
+      <% end %>
+
+      <div class="card-body">
+        <%# Header : avatar + prénom nom %>
+        <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start mb-4">
+          <div class="flex-shrink-0">
+            <% if @proposant.avatar_url.present? %>
+              <%= image_tag @proposant.avatar_url,
+                            alt: [ @proposant.prenom, @proposant.nom ].compact.join(" "),
+                            class: "w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-full",
+                            loading: "lazy" %>
+            <% else %>
+              <div class="w-24 h-24 sm:w-32 sm:h-32 bg-terracotta/30 rounded-full flex items-center justify-center text-terracotta-dark text-4xl sm:text-5xl font-script italic">
+                <%= @proposant.prenom&.first&.upcase || @proposant.nom&.first&.upcase || "?" %>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="flex-grow min-w-0">
+            <h2 class="card-title font-script italic text-terracotta-dark text-2xl sm:text-4xl mb-2">
+              <%= [ @proposant.prenom, @proposant.nom ].compact.join(" ") %>
+            </h2>
+
+            <%# Activités %>
+            <% activites = @proposant.activites %>
+            <% if activites.any? %>
+              <div class="flex flex-wrap gap-1.5 mb-2">
+                <% activites.each do |tag| %>
+                  <span class="badge bg-moutarde/30 text-dark-bg border-moutarde"><%= tag %></span>
+                <% end %>
+              </div>
+            <% end %>
+
+            <%# Villes %>
+            <% villes = @proposant.villes %>
+            <% if villes.any? %>
+              <p class="text-sm text-dark-bg/70 flex items-center gap-1">
+                <svg class="w-4 h-4 flex-shrink-0 text-terracotta" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                </svg>
+                <span><%= villes.join(" · ") %></span>
+              </p>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Bio / message perso %>
+        <% if @proposant.bio.present? %>
+          <div class="prose max-w-none mb-4 text-dark-bg/90">
+            <%= simple_format(@proposant.bio) %>
+          </div>
+        <% end %>
+
+        <%# URLs lisibles %>
+        <% if @proposant.scraped_urls.any? || @proposant.site_web.present? %>
+          <div class="mt-4 pt-4 border-t border-terracotta/20">
+            <h3 class="text-sm font-semibold text-terracotta-dark mb-2 uppercase tracking-wide">Liens</h3>
+            <ul class="space-y-1.5">
+              <% principale = @proposant.url_principale %>
+              <% if principale %>
+                <li class="flex items-start gap-2">
+                  <span class="badge badge-sm bg-terracotta text-white border-terracotta flex-shrink-0 mt-1">Site</span>
+                  <%= link_to principale, target: "_blank", rel: "noopener",
+                              class: "link link-hover break-all text-terracotta-dark",
+                              data: { turbo: false } do %>
+                    <%= principale %>
+                  <% end %>
+                </li>
+              <% end %>
+              <% @proposant.urls_secondaires.each do |u| %>
+                <li class="flex items-start gap-2">
+                  <svg class="w-4 h-4 flex-shrink-0 mt-1 text-terracotta/60" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/>
+                  </svg>
+                  <%= link_to u, target: "_blank", rel: "noopener",
+                              class: "link link-hover break-all text-dark-bg/80 text-sm",
+                              data: { turbo: false } do %>
+                    <%= u %>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <%# CTA stats + profil complet %>
+        <div class="flex flex-wrap gap-2 mt-6">
+          <%= link_to professeur_path(@proposant),
+                      class: "btn btn-sm bg-terracotta hover:bg-terracotta-dark text-white border-terracotta",
+                      data: { turbo_frame: "_top" } do %>
+            Profil complet
+          <% end %>
+          <%= link_to stats_professeur_path(@proposant),
+                      class: "btn btn-sm btn-outline border-terracotta text-terracotta-dark hover:bg-terracotta hover:text-white",
+                      data: { turbo_frame: "_top" } do %>
+            Statistiques
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

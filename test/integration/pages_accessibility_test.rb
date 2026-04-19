@@ -44,6 +44,21 @@ class PagesAccessibilityTest < ActionDispatch::IntegrationTest
   test "proposants page is accessible" do
     get proposants_path, headers: @headers
     assert_response :success
+    assert_select "h1", text: /proposants/i
+    assert_select "input[name=q]"
+  end
+
+  test "proposants search filters results" do
+    get proposants_path(q: "Test Professor"), headers: @headers
+    assert_response :success
+    assert_select "[data-debug-id^=proposant-card-]", minimum: 1
+  end
+
+  test "proposant modal (show) returns turbo frame" do
+    get proposant_path(@professor), headers: @headers
+    assert_response :success
+    assert_select "turbo-frame#proposant_modal"
+    assert_select "[data-controller=modal]"
   end
 
   test "actualites page is accessible" do

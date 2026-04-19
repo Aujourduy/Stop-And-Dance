@@ -306,6 +306,46 @@ async function noHorizontalScroll(page, section, pageName) {
     }
   }
 
+  // Section 8b — Proposants (liste + recherche + modal)
+  const propResp = await page.goto(BASE + '/proposants', { waitUntil: 'networkidle' });
+  log('8b. Proposants', 'GET /proposants', propResp.status() === 200, `HTTP ${propResp.status()}`);
+
+  const propCards = await page.locator('a[data-debug-id^="proposant-card-"]').count();
+  log('8b. Proposants', 'Cartes proposants affichées', propCards > 0, `count=${propCards}`);
+
+  const searchProp = page.locator('form input[name="q"]:visible').first();
+  if (await searchProp.count() > 0) {
+    await searchProp.fill('silvestre');
+    await page.waitForTimeout(1200);
+    const filtered = await page.locator('a[data-debug-id^="proposant-card-"]').count();
+    log('8b. Proposants', 'Recherche "silvestre" filtre la liste', filtered > 0 && filtered < propCards, `${propCards} → ${filtered}`);
+    await searchProp.fill('');
+    await page.waitForTimeout(1200);
+  } else {
+    log('8b. Proposants', 'Champ recherche présent', false);
+  }
+
+  // Modal proposant
+  const firstPropCard = page.locator('a[data-debug-id^="proposant-card-"]').first();
+  if (await firstPropCard.count() > 0) {
+    await firstPropCard.click();
+    await page.waitForTimeout(1500);
+    const modalContent = await page.locator('turbo-frame#proposant_modal').innerHTML().catch(() => '');
+    log('8b. Proposants', 'Modal proposant remplie au clic', modalContent.length > 200, `size=${modalContent.length}`);
+
+    // Clic overlay → ferme
+    const propOverlay = page.locator('turbo-frame#proposant_modal [data-controller="modal"]').first();
+    if (await propOverlay.count() > 0) {
+      const box = await propOverlay.boundingBox();
+      if (box) {
+        await page.mouse.click(box.x + 20, box.y + 20);
+        await page.waitForTimeout(600);
+        const after = await page.locator('turbo-frame#proposant_modal').innerHTML().catch(() => '');
+        log('8b. Proposants', 'Clic overlay ferme la modal proposant', after.length < 500, `size=${after.length}`);
+      }
+    }
+  }
+
   // Section 9 — Footer : clics sur liens
   await page.goto(BASE + '/', { waitUntil: 'networkidle' });
   const footerLinks = await page.locator('footer a[href^="/"]').all();
