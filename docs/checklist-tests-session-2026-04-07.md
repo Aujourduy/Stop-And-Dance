@@ -66,7 +66,7 @@ Cocher chaque item après validation manuelle sur téléphone et/ou desktop.
 - [x] Cliquer sur une carte événement ouvre la modal *(Playwright 2026-04-19 — turbo-frame#event_modal rempli)*
 - [x] Modal affiche le titre *(Playwright 2026-04-19 — autres champs non vérifiés)*
 - [x] Bouton × ferme la modal *(Playwright 2026-04-19 — navigue vers /evenements)*
-- [ ] ⚠️ **Clic overlay ferme la modal — BUG : modal_controller.js manquant**
+- [x] Clic overlay ferme la modal *(Playwright 2026-04-19 — modal_controller.js créé)*
 - [ ] Description affichée
 - [ ] Tags/Pratiques affichés si présents
 - [ ] Lien "Voir le site du prof" si disponible
