@@ -5,16 +5,30 @@
        data-action="click->modal#close">
 
     <%# Modal panel %>
-    <div data-debug-id="event-modal" class="card bg-base-100 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+    <div data-debug-id="event-modal" class="card bg-base-100 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
          data-modal-target="panel"
          data-action="click->modal#stopPropagation">
 
       <%# Close button %>
       <%= link_to evenements_path,
-                  class: "btn btn-ghost btn-sm absolute top-4 right-4 text-2xl",
+                  class: "btn btn-circle btn-sm absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-dark-bg border-0 shadow-md text-2xl",
                   data: { turbo_frame: "_top" } do %>
         &times;
       <% end %>
+
+      <%# Hero : photo event en priorité, avatar prof en fallback, placeholder sinon %>
+      <% hero_photo = @event.photo_url.presence || @event.professor&.avatar_url %>
+      <figure class="relative">
+        <% if hero_photo.present? %>
+          <%= image_tag hero_photo,
+                        alt: @event.titre,
+                        class: "w-full h-64 object-cover rounded-t-box" %>
+        <% else %>
+          <div class="w-full h-64 bg-terracotta/30 flex items-center justify-center text-terracotta-dark text-8xl font-script italic rounded-t-box">
+            <%= @event.professor&.prenom&.first&.upcase || @event.professor&.nom&.first&.upcase || "?" %>
+          </div>
+        <% end %>
+      </figure>
 
       <div class="card-body">
         <%# Badges %>
@@ -30,13 +44,6 @@
             <span class="badge badge-outline">Présentiel</span>
           <% end %>
         </div>
-
-        <%# Photo %>
-        <% if @event.photo_url.present? %>
-          <figure class="mb-4">
-            <%= image_tag @event.photo_url, alt: @event.titre, class: "w-full h-64 object-cover rounded-box" %>
-          </figure>
-        <% end %>
 
         <%# Title %>
         <h2 class="card-title font-script italic text-3xl mb-4"><%= @event.titre %></h2>
