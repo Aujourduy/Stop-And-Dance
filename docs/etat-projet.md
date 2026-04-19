@@ -648,6 +648,12 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 - `TIMEOUT_SECONDS` CLI 120→300s (URL #9 = 3.7MB de HTML dépassait 120s).
 - Re-scrape URL #9 : Peter=54, Marc=10 (explicitement "Marc Silvestre et Peter" dans HTML), Aurélie Desboist #60=6, Makovec=1.
 - Nettoyage : suppression profs composites #67 "Marc Silvestre et Peter Wilberforce" et #68 "Aurélie Desboist et Vincent Fournout" (devenus orphelins, signature d'un bug parsing). 63 → 61 profs.
+
+**Sanity check sémantique (`script/data-sanity.rb`) :**
+- Complète `script/ux-audit.js` qui teste la plomberie — `data-sanity` vérifie le sens métier des données scrapées.
+- 7 contrôles : profs composites (noms contenant "et"/"&"), noms >40 chars, profs orphelins, attribution cohérente (prof.site_web vs scraped_url host, agrégé par combo), distribution events/URL (alerte si >90% sur un prof ≠ owner), liens professor/scraped_url, sampling 3 events aléatoires pour vérif manuelle.
+- Sortie codée : ✅ (ok) / ⚠️ (warn) / ❌ (fail). Exit 1 si fail.
+- **Lancer :** `bin/rails runner script/data-sanity.rb`
 - Nettoyage : seeds fictifs supprimés (16 events + 5 changelogs + 7 URLs + 5 profs), `db/seeds.rb` vidé, 10 events orphans scraped_url_id=NULL purgés
 
 ---
