@@ -161,26 +161,47 @@ class ClaudeCliIntegration
   end
 
   def self.execute_cli(prompt_file_path)
-    # Check auth token validity
     unless claude_authenticated?
       return { success: false, error: "Claude CLI not authenticated" }
     end
 
-    # Execute command - pass prompt via stdin
-    # Use --dangerously-skip-permissions for headless mode
     prompt_content = File.read(prompt_file_path)
 
-    # Execute without timeout wrapper to avoid IO thread issues
-    # Claude CLI has its own timeouts
-    output, status = Open3.capture2e(
-      CLAUDE_CLI_PATH, "--dangerously-skip-permissions",
-      stdin_data: prompt_content
-    )
+    Open3.popen2e(CLAUDE_CLI_PATH, "--dangerously-skip-permissions") do |stdin, stdout_err, wait_thr|
+      stdin.write(prompt_content)
+      stdin.close
 
-    if status.success?
-      { success: true, output: output }
-    else
-      { success: false, error: "CLI exited with status #{status.exitstatus}: #{output}" }
+      deadline = Time.current + TIMEOUT_SECONDS
+      output = +""
+
+      loop do
+        remaining = deadline - Time.current
+        if remaining <= 0
+          Process.kill("TERM", wait_thr.pid) rescue nil
+          sleep 1
+          Process.kill("KILL", wait_thr.pid) rescue nil
+          wait_thr.join
+          return { success: false, error: "CLI timeout after #{TIMEOUT_SECONDS}s" }
+        end
+
+        ready = IO.select([ stdout_err ], nil, nil, [ remaining, 1 ].min)
+        if ready
+          begin
+            output << stdout_err.read_nonblock(65_536)
+          rescue IO::WaitReadable
+            next
+          rescue EOFError
+            break
+          end
+        end
+      end
+
+      status = wait_thr.value
+      if status.success?
+        { success: true, output: output }
+      else
+        { success: false, error: "CLI exited with status #{status.exitstatus}: #{output}" }
+      end
     end
   rescue StandardError => e
     { success: false, error: e.message }

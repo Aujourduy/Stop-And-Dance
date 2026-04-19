@@ -625,6 +625,16 @@ bin/rails scraping:test[1]      # Test parsing sans sauvegarder
 
 ---
 
+### Session 2026-04-18 → 2026-04-19 ✅
+
+**Robustesse jobs Solid Queue :**
+- `retry_on wait: :exponentially_longer` → `:polynomially_longer` (4 jobs : ApplicationJob, ScrapingJob, EventUpdateJob, SiteCrawlJob). `exponentially_longer` est déprécié Rails 8 et provoquait `Couldn't determine a delay` silencieux en retry.
+- Timeout réel sur Claude CLI (`lib/claude_cli_integration.rb`) : `Open3.popen2e` + `IO.select` + `Process.kill TERM/KILL`. Constante `TIMEOUT_SECONDS = 120` désormais appliquée. Avant : `Open3.capture2e` sans wrapper, un CLI pendu bloquait 1 des 3 threads workers indéfiniment.
+- Test E2E OK (CLI 57s, 14 events parsés via perform_later + worker Solid Queue).
+- Nettoyage 2 FailedExecution orphelines.
+
+---
+
 ## ⚠️ TODO Prochaine Session
 
 **Priorité 1 — Améliorations scraping :**
