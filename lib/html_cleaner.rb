@@ -1,5 +1,23 @@
 class HtmlCleaner
   def self.clean_and_convert(html)
+    # Si le contenu est du JSON (API REST, pas HTML), le retourner en bloc
+    # code Markdown sans passage par Nokogiri/ReverseMarkdown.
+    if json_payload?(html)
+      pretty = begin
+        JSON.pretty_generate(JSON.parse(html))
+      rescue JSON::ParserError
+        html
+      end
+      markdown = "```json\n#{pretty}\n```"
+      return {
+        markdown: markdown,
+        data_attributes: {},
+        original_size_kb: (html.bytesize / 1024.0).round(2),
+        markdown_size_kb: (markdown.bytesize / 1024.0).round(2),
+        reduction_percent: 0.0
+      }
+    end
+
     doc = Nokogiri::HTML(html)
 
     # 1. Extract data-attributes BEFORE cleaning (structured data)
@@ -23,6 +41,16 @@ class HtmlCleaner
   end
 
   private
+
+  def self.json_payload?(body)
+    return false if body.blank?
+    stripped = body.strip
+    return false unless stripped.start_with?("{") || stripped.start_with?("[")
+    JSON.parse(stripped)
+    true
+  rescue JSON::ParserError
+    false
+  end
 
   def self.extract_data_attributes(doc)
     # Extract structured data from common data-* attributes

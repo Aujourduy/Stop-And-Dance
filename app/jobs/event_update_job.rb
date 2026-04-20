@@ -127,14 +127,16 @@ class EventUpdateJob < ApplicationJob
       generated_from_recurrence: event_data[:generated_from_recurrence] || false
     )
 
-    # Reset puis recrée les participations dans l'ordre
-    event.save!
-    event.event_participations.delete_all
-    resolved_profs.each_with_index do |rp, idx|
-      EventParticipation.create!(event: event, professor: rp[:professor], role: rp[:role], position: idx)
+    # Reset puis recrée les participations avant save (pour passer validation)
+    if event.persisted?
+      event.event_participations.delete_all
+    else
+      event.event_participations.clear
     end
-    event.reload
-    event.save!  # resync professor_id via callback
+    resolved_profs.each_with_index do |rp, idx|
+      event.event_participations.build(professor: rp[:professor], role: rp[:role], position: idx)
+    end
+    event.save!
   end
 
   # Convertit event_data en array uniforme [{ nom:, photo_url:, role: }, ...]

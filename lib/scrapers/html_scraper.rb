@@ -14,8 +14,12 @@ module Scrapers
       )
 
       if response.success?
+        body = response.body
+        # Force UTF-8 encoding (HTTParty may return ASCII-8BIT)
+        body = body.dup.force_encoding("UTF-8") if body.is_a?(String) && !body.encoding.to_s.include?("UTF-8")
+        body = body.scrub if body.is_a?(String) && !body.valid_encoding?
         {
-          html: response.body,
+          html: body,
           status: response.code,
           content_type: response.headers["content-type"]
         }
