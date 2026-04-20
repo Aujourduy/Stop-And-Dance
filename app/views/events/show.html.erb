@@ -16,8 +16,8 @@
         &times;
       <% end %>
 
-      <%# Hero : photo event en priorité, avatar prof en fallback, placeholder sinon %>
-      <% hero_photo = @event.photo_url.presence || @event.professor&.avatar_url %>
+      <%# Hero : photo event (variété), fallback avatar scraped_url puis prof %>
+      <% hero_photo = @event.detail_image_url %>
       <figure class="relative">
         <% if hero_photo.present? %>
           <%= image_tag hero_photo,
@@ -25,7 +25,7 @@
                         class: "w-full h-64 object-cover rounded-t-box" %>
         <% else %>
           <div class="w-full h-64 bg-terracotta/30 flex items-center justify-center text-terracotta-dark text-8xl font-script italic rounded-t-box">
-            <%= @event.professor&.prenom&.first&.upcase || @event.professor&.nom&.first&.upcase || "?" %>
+            <%= @event.primary_professor&.prenom&.first&.upcase || @event.primary_professor&.nom&.first&.upcase || "?" %>
           </div>
         <% end %>
       </figure>

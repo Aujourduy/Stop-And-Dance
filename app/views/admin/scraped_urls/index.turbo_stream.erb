@@ -2,11 +2,18 @@
   <% @scraped_urls.each do |url| %>
     <tr class="hover">
       <td>
-        <%= link_to admin_scraped_url_path(url), class: "link link-primary", data: { turbo_frame: "_top" } do %>
-          <div class="font-medium"><%= url.nom.presence || url.url.truncate(40) %></div>
-          <% if url.nom.present? %>
-            <div class="text-xs opacity-50"><%= url.url.truncate(50) %></div>
+        <%= link_to admin_scraped_url_path(url), class: "link link-primary flex items-start gap-2", data: { turbo_frame: "_top" } do %>
+          <% if url.avatar_url.present? %>
+            <%= image_tag url.avatar_url, class: "w-8 h-8 object-cover rounded flex-shrink-0", alt: "" %>
+          <% else %>
+            <span class="badge badge-error badge-sm flex-shrink-0" title="Avatar manquant (affiché sur l'agenda)">no avatar</span>
           <% end %>
+          <div>
+            <div class="font-medium"><%= url.nom.presence || url.url.truncate(40) %></div>
+            <% if url.nom.present? %>
+              <div class="text-xs opacity-50"><%= url.url.truncate(50) %></div>
+            <% end %>
+          </div>
         <% end %>
       </td>
       <td class="text-sm"><%= url.professors.map(&:nom).join(", ").presence || "—" %></td>

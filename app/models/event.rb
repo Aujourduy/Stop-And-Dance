@@ -88,6 +88,18 @@ class Event < ApplicationRecord
     professors.map(&:display_nom).join(" × ")
   end
 
+  # Image pour la card agenda : prio avatar_url du scraped_url (reconnaissance
+  # collectif/prof), fallback photo event puis avatar prof principal.
+  def card_image_url
+    scraped_url&.avatar_url.presence || photo_url.presence || primary_professor&.avatar_url
+  end
+
+  # Image pour la modal/détail : prio photo event (variété), fallback avatar
+  # scraped_url puis prof.
+  def detail_image_url
+    photo_url.presence || scraped_url&.avatar_url.presence || primary_professor&.avatar_url
+  end
+
   private
 
   def normalize_titre

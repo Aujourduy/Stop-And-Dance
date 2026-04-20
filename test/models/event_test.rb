@@ -67,6 +67,41 @@ class EventTest < ActiveSupport::TestCase
     assert_not dup.valid?
   end
 
+  test "card_image_url prio scraped_url.avatar_url" do
+    scraped = ScrapedUrl.create!(url: "https://example.com/test-#{SecureRandom.hex(4)}", avatar_url: "https://img/logo.png")
+    e = solo_event(@prof1)
+    e.update!(scraped_url: scraped, photo_url: "https://img/cover.png")
+    @prof1.update!(avatar_url: "https://img/prof.png")
+    assert_equal "https://img/logo.png", e.card_image_url
+  end
+
+  test "card_image_url fallback photo_url si pas d'avatar scraped_url" do
+    e = solo_event(@prof1)
+    e.update!(photo_url: "https://img/cover.png")
+    @prof1.update!(avatar_url: "https://img/prof.png")
+    assert_equal "https://img/cover.png", e.card_image_url
+  end
+
+  test "card_image_url fallback prof.avatar_url en dernier recours" do
+    e = solo_event(@prof1)
+    @prof1.update!(avatar_url: "https://img/prof.png")
+    assert_equal "https://img/prof.png", e.card_image_url
+  end
+
+  test "detail_image_url prio photo_url" do
+    scraped = ScrapedUrl.create!(url: "https://example.com/test-#{SecureRandom.hex(4)}", avatar_url: "https://img/logo.png")
+    e = solo_event(@prof1)
+    e.update!(scraped_url: scraped, photo_url: "https://img/cover.png")
+    assert_equal "https://img/cover.png", e.detail_image_url
+  end
+
+  test "detail_image_url fallback avatar scraped_url" do
+    scraped = ScrapedUrl.create!(url: "https://example.com/test-#{SecureRandom.hex(4)}", avatar_url: "https://img/logo.png")
+    e = solo_event(@prof1)
+    e.update!(scraped_url: scraped)
+    assert_equal "https://img/logo.png", e.detail_image_url
+  end
+
   private
 
   def solo_event(prof)

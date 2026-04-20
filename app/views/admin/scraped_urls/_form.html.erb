@@ -21,6 +21,21 @@
   </div>
 
   <div>
+    <%= f.label :avatar_url, "Avatar URL (affiché sur l'agenda)", class: "label font-bold" %>
+    <%= f.url_field :avatar_url, class: "input input-bordered w-full", placeholder: "https://.../logo.png ou photo du prof" %>
+    <p class="text-sm opacity-60 mt-1">
+      Photo affichée sur les cards de l'agenda pour identifier la source.
+      <strong>Prof solo</strong> : photo du prof.
+      <strong>Collectif</strong> : logo du collectif (Swell, etc.).
+    </p>
+    <% if scraped_url.avatar_url.present? %>
+      <div class="mt-2">
+        <%= image_tag scraped_url.avatar_url, class: "w-20 h-20 object-cover rounded", alt: "Aperçu" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div>
     <%= f.label :statut_scraping, "Statut", class: "label font-bold" %>
     <%= f.select :statut_scraping,
                  [['Actif', 'actif'], ['Pause', 'pause'], ['Erreur', 'erreur']],

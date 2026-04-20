@@ -3,9 +3,9 @@
             class: "card card-side bg-base-100 mb-0 rounded-none lg:rounded-box overflow-hidden items-start",
             data: { turbo_frame: "event_modal", debug_id: "event-card-#{event.id}" } do %>
 
-  <%# Avatar %>
+  <%# Avatar — prio scraped_url.avatar_url (identification collectif/prof) %>
   <figure class="flex-shrink-0 p-2 sm:p-4 pb-0 lg:pb-4">
-    <% photo = event.photo_url.presence || event.professor&.avatar_url %>
+    <% photo = event.card_image_url %>
     <% if photo.present? %>
       <%= image_tag photo,
                     alt: event.titre,
@@ -13,7 +13,7 @@
                     loading: "lazy" %>
     <% else %>
       <div class="w-24 h-24 sm:w-32 sm:h-32 bg-primary/30 rounded flex items-center justify-center text-primary-content text-2xl sm:text-4xl">
-        <%= event.professor.nom&.first&.upcase || "?" %>
+        <%= event.primary_professor&.nom&.first&.upcase || "?" %>
       </div>
     <% end %>
   </figure>
