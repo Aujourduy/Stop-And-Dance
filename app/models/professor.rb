@@ -4,12 +4,18 @@ class Professor < ApplicationRecord
   # Associations
   has_many :professor_scraped_urls, dependent: :destroy
   has_many :scraped_urls, through: :professor_scraped_urls
-  has_many :events, dependent: :destroy
+  has_many :event_participations, dependent: :destroy
+  has_many :events, through: :event_participations
 
   # Validations
   validates :nom, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
   validates :site_web, format: { with: URI::DEFAULT_PARSER.make_regexp([ "http", "https" ]) }, allow_blank: true
+
+  # Nom affichable : "Prénom Nom" si prenom présent, sinon nom seul
+  def display_nom
+    prenom.present? ? "#{prenom} #{nom}" : nom
+  end
 
   # Tags uniques extraits des events futurs (ex. "Danse des 5 Rythmes", "Contact Improvisation")
   def activites

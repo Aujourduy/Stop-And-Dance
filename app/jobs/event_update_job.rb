@@ -77,20 +77,29 @@ class EventUpdateJob < ApplicationJob
       type_event = days >= 1 ? "stage" : "atelier"
     end
 
-    # Find or create professor
-    professor = find_or_create_professor(scraped_url, event_data[:professor_nom])
+    # Résolution des profs : nouveau format array "professeurs" ou rétrocompat "professor_nom"
+    professors_data = resolve_professors_data(event_data)
 
-    # Auto-download professor photo if available and prof has none
-    if professor.avatar_url.blank? && event_data[:professor_photo_url].present?
-      begin
-        result = ProfessorPhotoService.download_from_url(professor, event_data[:professor_photo_url])
-        if result.is_a?(String)
-          professor.update!(avatar_url: result)
-          SCRAPING_LOGGER.info({ event: "professor_photo_downloaded", professor_id: professor.id, url: event_data[:professor_photo_url] }.to_json)
-        end
-      rescue => e
-        SCRAPING_LOGGER.error({ event: "professor_photo_failed", professor_id: professor.id, error: e.message }.to_json)
+    if professors_data.empty?
+      # Fallback legacy : pas de nom fourni → owner du site
+      owner = scraped_url.owner_professor
+      if owner.nil?
+        SCRAPING_LOGGER.warn({
+          event: "event_skipped_no_professor",
+          scraped_url_id: scraped_url.id,
+          titre: event_data[:titre]
+        }.to_json)
+        return
       end
+      resolved_profs = [ { professor: owner, role: nil } ]
+    else
+      resolved_profs = professors_data.map do |pdata|
+        prof = find_or_create_professor(scraped_url, pdata[:nom])
+        download_prof_photo(prof, pdata[:photo_url])
+        { professor: prof, role: pdata[:role] }
+      end
+      # Dédup : un même prof ne peut apparaître qu'une fois sur l'event
+      resolved_profs = resolved_profs.uniq { |r| r[:professor].id }
     end
 
     # Find or create event — use date_debut_date instead of datetime for dedup
@@ -115,11 +124,47 @@ class EventUpdateJob < ApplicationJob
       gratuit: event_data[:gratuit],
       en_ligne: event_data[:en_ligne],
       en_presentiel: event_data[:en_presentiel],
-      professor: professor,
       generated_from_recurrence: event_data[:generated_from_recurrence] || false
     )
 
+    # Reset puis recrée les participations dans l'ordre
     event.save!
+    event.event_participations.delete_all
+    resolved_profs.each_with_index do |rp, idx|
+      EventParticipation.create!(event: event, professor: rp[:professor], role: rp[:role], position: idx)
+    end
+    event.reload
+    event.save!  # resync professor_id via callback
+  end
+
+  # Convertit event_data en array uniforme [{ nom:, photo_url:, role: }, ...]
+  # Gère le nouveau format "professeurs" et rétrocompat "professor_nom"
+  def resolve_professors_data(event_data)
+    list = event_data[:professeurs]
+
+    if list.is_a?(Array) && list.any?
+      list.map do |p|
+        next nil if p[:nom].blank?
+        { nom: p[:nom].strip, photo_url: p[:photo_url], role: p[:role] }
+      end.compact
+    else
+      nom = event_data[:professor_nom]
+      return [] if nom.blank?
+      [ { nom: nom.strip, photo_url: event_data[:professor_photo_url], role: nil } ]
+    end
+  end
+
+  def download_prof_photo(professor, photo_url)
+    return if photo_url.blank? || professor.avatar_url.present?
+    begin
+      result = ProfessorPhotoService.download_from_url(professor, photo_url)
+      if result.is_a?(String)
+        professor.update!(avatar_url: result)
+        SCRAPING_LOGGER.info({ event: "professor_photo_downloaded", professor_id: professor.id, url: photo_url }.to_json)
+      end
+    rescue => e
+      SCRAPING_LOGGER.error({ event: "professor_photo_failed", professor_id: professor.id, error: e.message }.to_json)
+    end
   end
 
   def find_or_create_professor(scraped_url, professor_nom)
@@ -190,9 +235,13 @@ class EventUpdateJob < ApplicationJob
     count = 0
 
     Event.where(scraped_url: scraped_url).find_each do |event|
+      # Dedup par prof principal (event.professor_id, auto-synced via participations)
+      primary_id = event.professor_id
+      next if primary_id.blank?
+
       # Cross-URL dedup
       cross_dup = Event.where.not(scraped_url: scraped_url)
-                       .where(professor_id: event.professor_id, date_debut_date: event.date_debut_date)
+                       .where(professor_id: primary_id, date_debut_date: event.date_debut_date)
                        .where(heure_debut: event.heure_debut)
                        .first
 
@@ -206,7 +255,7 @@ class EventUpdateJob < ApplicationJob
 
       # Intra-URL dedup (same URL, same prof + date + heure, different titre)
       intra_dup = Event.where(scraped_url: scraped_url)
-                       .where(professor_id: event.professor_id, date_debut_date: event.date_debut_date)
+                       .where(professor_id: primary_id, date_debut_date: event.date_debut_date)
                        .where(heure_debut: event.heure_debut)
                        .where.not(id: event.id)
                        .first

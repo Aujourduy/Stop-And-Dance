@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_14_041033) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_20_155750) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -51,6 +51,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_041033) do
     t.index ["site_crawl_id"], name: "index_crawled_pages_on_site_crawl_id"
   end
 
+  create_table "event_participations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "event_id", null: false
+    t.integer "position", default: 0, null: false
+    t.bigint "professor_id", null: false
+    t.string "role"
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "position"], name: "index_event_participations_on_event_id_and_position"
+    t.index ["event_id", "professor_id"], name: "index_event_participations_on_event_id_and_professor_id", unique: true
+    t.index ["event_id"], name: "index_event_participations_on_event_id"
+    t.index ["professor_id"], name: "index_event_participations_on_professor_id"
+  end
+
   create_table "event_sources", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "event_id", null: false
@@ -81,7 +94,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_041033) do
     t.string "photo_url"
     t.decimal "prix_normal", precision: 8, scale: 2
     t.decimal "prix_reduit", precision: 8, scale: 2
-    t.bigint "professor_id", null: false
+    t.bigint "professor_id"
     t.bigint "scraped_url_id"
     t.string "slug"
     t.string "tags", default: [], array: true
@@ -300,6 +313,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_14_041033) do
 
   add_foreign_key "change_logs", "scraped_urls"
   add_foreign_key "crawled_pages", "site_crawls"
+  add_foreign_key "event_participations", "events", on_delete: :cascade
+  add_foreign_key "event_participations", "professors", on_delete: :cascade
   add_foreign_key "event_sources", "events"
   add_foreign_key "event_sources", "scraped_urls"
   add_foreign_key "events", "professors"

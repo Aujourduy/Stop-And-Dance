@@ -3,18 +3,22 @@ class Event < ApplicationRecord
   enum :type_event, { atelier: 0, stage: 1 }
 
   # Associations
-  belongs_to :professor
+  belongs_to :professor, optional: true
   belongs_to :scraped_url, optional: true
   has_many :event_sources, dependent: :destroy
   has_many :additional_scraped_urls, through: :event_sources, source: :scraped_url
+  has_many :event_participations, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :event
+  has_many :professors, -> { order("event_participations.position, event_participations.id") }, through: :event_participations
 
   # Validations
   validates :titre, presence: true
   validates :date_debut_date, presence: true
   validates :date_fin_date, comparison: { greater_than_or_equal_to: :date_debut_date }
-  validates :professor, presence: true
+  validate :must_have_at_least_one_professor
 
   # Callbacks
+  before_validation :sync_participations_from_legacy_professor
+  before_save :sync_primary_professor_from_participations
   before_save :calculate_duree_minutes
   before_save :normalize_titre
   before_save :sync_legacy_datetime
@@ -68,6 +72,22 @@ class Event < ApplicationRecord
     end
   end
 
+  def primary_professor
+    professors.first
+  end
+
+  def coanimators
+    professors.to_a[1..] || []
+  end
+
+  def coanimation?
+    event_participations.size > 1
+  end
+
+  def display_professors
+    professors.map(&:display_nom).join(" × ")
+  end
+
   private
 
   def normalize_titre
@@ -105,5 +125,23 @@ class Event < ApplicationRecord
     return if titre.blank? || date_debut_date.blank?
     base_slug = "#{titre.parameterize}-#{lieu.to_s.parameterize}-#{date_debut_date.strftime('%Y-%m-%d')}"
     self.slug = base_slug
+  end
+
+  def must_have_at_least_one_professor
+    return if professor.present? || event_participations.any?
+    errors.add(:base, "doit avoir au moins un professeur")
+  end
+
+  def sync_primary_professor_from_participations
+    first_participation = event_participations.reject(&:marked_for_destruction?).min_by { |p| [ p.position || 0, p.id || 0 ] }
+    self.professor_id = first_participation.professor_id if first_participation
+  end
+
+  # Rétrocompat : Event.create!(professor: X) crée automatiquement une participation
+  # pour que la nouvelle API (event.professors) soit cohérente.
+  def sync_participations_from_legacy_professor
+    return if event_participations.any? { |p| !p.marked_for_destruction? }
+    return if professor_id.blank?
+    event_participations.build(professor_id: professor_id, position: 0)
   end
 end

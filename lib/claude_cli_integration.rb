@@ -114,12 +114,22 @@ class ClaudeCliIntegration
       - Si l'horaire N'EST PAS mentionné sur le site : utiliser le format DATE SEULE : "2026-04-12T00:00:00+02:00" (minuit = horaire inconnu)
       - NE PAS inventer d'horaire. Minuit signifie "horaire non renseigné".
 
+      RÈGLE COANIMATION / MULTI-PROFS :
+      - Si l'événement est animé par PLUSIEURS professeurs (duos, collectifs, format "X x Y", "avec X et Y", "chorégraphe + DJ", "coanimé par") :
+        → Utiliser le champ "professeurs" (array) avec un objet par prof, dans l'ordre d'importance affiché sur le site (principal en premier).
+      - Si un seul prof : utiliser quand même "professeurs" avec un seul élément.
+      - Le champ "professor_nom" (ancien, singulier) est accepté pour rétrocompat mais préférer "professeurs".
+
       Retourne un JSON avec cette structure :
       {
         "events": [
           {
             "titre": "Titre de l'événement",
-            "professor_nom": "Prénom Nom du professeur animant cet événement (extrait du HTML si disponible, sinon laisser vide)",
+            "professeurs": [
+              { "nom": "Prénom Nom du 1er prof", "photo_url": "URL portrait ou null", "role": "guide | DJ | chorégraphe | null" },
+              { "nom": "Prénom Nom du 2e prof (si coanimation)", "photo_url": "URL ou null", "role": null }
+            ],
+            "professor_nom": "Prénom Nom du prof principal (rétrocompat, identique à professeurs[0].nom)",
             "professor_photo_url": "URL complète de la photo/avatar du professeur si visible sur la page (portrait, headshot). null si pas trouvée.",
             "description": "Description complète",
             "tags": ["Contact Improvisation", "Danse des 5 Rythmes"],
