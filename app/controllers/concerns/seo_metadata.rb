@@ -32,9 +32,10 @@ module SeoMetadata
   end
 
   def set_event_metadata(event)
+    profs_display = event.display_professors.presence || event.professor&.display_nom
     set_meta_tags(
       title: "#{event.titre} - #{l(event.date_debut, format: :long)}",
-      description: event.description&.truncate(160) || "Atelier de danse avec #{event.professor.nom}",
+      description: event.description&.truncate(160) || "Atelier de danse avec #{profs_display}",
       keywords: [ event.tags, "danse", event.lieu ].flatten.compact.join(", "),
       canonical: evenement_url(event.slug),
       og: {
@@ -67,10 +68,11 @@ module SeoMetadata
           name: event.lieu,
           address: event.adresse_complete
         },
+        performer: event.professors.map { |p| { '@type': "Person", name: p.display_nom, url: p.site_web } },
         organizer: {
           '@type': "Person",
-          name: event.professor.nom,
-          url: event.professor.site_web
+          name: event.primary_professor&.display_nom,
+          url: event.primary_professor&.site_web
         },
         offers: {
           '@type': "Offer",

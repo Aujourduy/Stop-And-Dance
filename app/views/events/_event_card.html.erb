@@ -36,9 +36,9 @@
     <%# Titre %>
     <h3 class="card-title text-base sm:text-lg truncate"><%= event.titre %></h3>
 
-    <%# Avec prof %>
+    <%# Avec prof(s) — " × " si coanimation %>
     <p class="opacity-60 truncate" style="font-size: 0.96rem;">
-      Avec <%= [event.professor&.prenom, event.professor&.nom].compact.join(" ") %>
+      Avec <%= event.display_professors.presence || event.professor&.display_nom %>
     </p>
 
     <%# Lieu + Prix %>

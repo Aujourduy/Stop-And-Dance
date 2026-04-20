@@ -50,7 +50,10 @@
 
         <%# Info block %>
         <div class="space-y-3 mb-6">
-          <div><span class="font-medium">Avec :</span> <%= [@event.professor.prenom, @event.professor.nom].compact.join(" ") %></div>
+          <div>
+            <span class="font-medium"><%= @event.coanimation? ? "Coanimé par :" : "Avec :" %></span>
+            <% @event.professors.each_with_index do |prof, idx| %><%= " × " unless idx.zero? %><%= link_to prof.display_nom, professeur_path(prof), data: { turbo_frame: "_top" }, class: "link link-hover" %><% end %>
+          </div>
           <div>
             <span class="font-medium">Date :</span>
             <%= l(@event.date_debut_date, format: :long) %>
@@ -91,12 +94,14 @@
                           rel: "noopener noreferrer",
                           class: "btn btn-primary btn-sm" %>
             <% end %>
-            <% if @event.professor.site_web.present? && @event.professor.site_web != @event.scraped_url&.url %>
-              <%= link_to "Site de #{@event.professor.prenom || @event.professor.nom} →",
-                          @event.professor.site_web,
-                          target: "_blank",
-                          rel: "noopener noreferrer",
-                          class: "btn btn-outline btn-primary btn-sm" %>
+            <% @event.professors.each do |prof| %>
+              <% if prof.site_web.present? && prof.site_web != @event.scraped_url&.url %>
+                <%= link_to "Site de #{prof.prenom || prof.nom} →",
+                            prof.site_web,
+                            target: "_blank",
+                            rel: "noopener noreferrer",
+                            class: "btn btn-outline btn-primary btn-sm" %>
+              <% end %>
             <% end %>
           </div>
         </div>

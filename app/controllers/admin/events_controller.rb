@@ -44,10 +44,15 @@ class Admin::EventsController < Admin::ApplicationController
       params[:event][:tags] = params[:event][:tags].split(",").map(&:strip).reject(&:blank?)
     end
 
-    if @event.update(event_params)
-      redirect_to admin_event_path(@event), notice: "Événement mis à jour avec succès."
-    else
-      render :edit, status: :unprocessable_entity
+    coanim_ids = Array(params[:event][:coanimator_ids]).reject(&:blank?).map(&:to_i)
+
+    Event.transaction do
+      if @event.update(event_params)
+        sync_coanimators(@event, coanim_ids)
+        redirect_to admin_event_path(@event), notice: "Événement mis à jour avec succès."
+      else
+        render :edit, status: :unprocessable_entity
+      end
     end
   end
 
@@ -85,5 +90,23 @@ class Admin::EventsController < Admin::ApplicationController
       :professor_id,
       tags: []
     )
+  end
+
+  # Met les participations à jour : prof principal (position 0) + coanimateurs (position 1..n).
+  # Exclut systématiquement professor_id de coanim_ids (pas de doublon).
+  def sync_coanimators(event, coanim_ids)
+    coanim_ids = coanim_ids - [ event.professor_id ]
+
+    event.event_participations.where.not(professor_id: event.professor_id).destroy_all
+    coanim_ids.each_with_index do |prof_id, idx|
+      event.event_participations.find_or_create_by(professor_id: prof_id) do |part|
+        part.position = idx + 1
+      end
+    end
+    # Réajuste les positions
+    event.event_participations.where(professor_id: event.professor_id).update_all(position: 0)
+    coanim_ids.each_with_index do |prof_id, idx|
+      event.event_participations.where(professor_id: prof_id).update_all(position: idx + 1)
+    end
   end
 end

@@ -9,10 +9,10 @@
   </div>
 
   <dl class="space-y-4">
-    <!-- Professeur -->
+    <!-- Professeur(s) -->
     <div>
-      <dt class="font-bold text-gray-700">Animé par</dt>
-      <dd class="text-gray-900"><%= @event.professor.nom %></dd>
+      <dt class="font-bold text-gray-700"><%= @event.coanimation? ? "Coanimé par" : "Animé par" %></dt>
+      <dd class="text-gray-900"><%= @event.display_professors.presence || @event.professor&.nom %></dd>
     </div>
 
     <!-- Type et format -->
