@@ -134,7 +134,11 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
 
   def fetch_with_playwright
     # Test fetch with Playwright (slower, executes JavaScript)
-    result = Scrapers::PlaywrightScraper.fetch(@scraped_url.url, click_selector: @scraped_url.click_selector.presence)
+    result = Scrapers::PlaywrightScraper.fetch(
+      @scraped_url.url,
+      click_selector: @scraped_url.click_selector.presence,
+      detail_link_selector: (@scraped_url.enrich_detail_pages ? @scraped_url.detail_link_selector.presence : nil)
+    )
 
     if result[:error]
       redirect_to preview_admin_scraped_url_path(@scraped_url),
@@ -238,6 +242,6 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
   end
 
   def scraped_url_params
-    params.require(:scraped_url).permit(:url, :nom, :avatar_url, :commentaire, :notes_correctrices, :statut_scraping, :use_browser, :auto_recrawl, :click_selector)
+    params.require(:scraped_url).permit(:url, :nom, :avatar_url, :commentaire, :notes_correctrices, :statut_scraping, :use_browser, :auto_recrawl, :click_selector, :enrich_detail_pages, :detail_link_selector)
   end
 end

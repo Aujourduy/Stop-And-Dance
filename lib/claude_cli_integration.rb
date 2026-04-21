@@ -139,6 +139,14 @@ class ClaudeCliIntegration
       - Si un seul prof : utiliser quand même "professeurs" avec un seul élément.
       - Le champ "professor_nom" (ancien, singulier) est accepté pour rétrocompat mais préférer "professeurs".
 
+      RÈGLE NOMS DE PROFS / DJ :
+      - NE JAMAIS inclure de préfixe de titre dans le nom : "DJ", "Dr.", "Prof.", "M.", "Mme".
+      - Exemples :
+        ❌ "DJ Mike Polarny"   ✅ "Mike Polarny"
+        ❌ "DJ Ô Djinn"        ✅ "Ô Djinn"
+        ❌ "Dr. Marie Dupont"  ✅ "Marie Dupont"
+      - Si le site met "avec DJ X", extraire juste "X" comme nom du prof.
+
       Retourne un JSON avec cette structure :
       {
         "events": [

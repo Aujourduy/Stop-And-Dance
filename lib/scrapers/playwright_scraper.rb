@@ -8,7 +8,7 @@ module Scrapers
                         "(KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
     BOT_OPERATOR = "stopand.dance bot - contact@stopand.dance"
 
-    def self.fetch(url, click_selector: nil)
+    def self.fetch(url, click_selector: nil, detail_link_selector: nil)
       Playwright.create(playwright_cli_executable_path: "./node_modules/.bin/playwright") do |playwright|
         playwright.chromium.launch(
           headless: true,
@@ -52,9 +52,14 @@ module Scrapers
 
             # Si un sélecteur "voir plus" est fourni, cliquer dessus pour
             # révéler le contenu masqué (ex. HelloAsso "Voir tous les événements").
-            # On clique en boucle tant que le bouton est présent, pour révéler
-            # plusieurs pages si besoin.
+            # Attend que le bouton apparaisse (jusqu'à 15s) avant de cliquer.
             if click_selector
+              begin
+                page.locator(click_selector).first.wait_for(state: "visible", timeout: 15_000)
+              rescue StandardError
+                # Bouton absent/pas visible → on continue sans click
+              end
+
               3.times do
                 break unless page.locator(click_selector).count > 0
 
@@ -72,6 +77,15 @@ module Scrapers
             end
 
             html = page.content
+
+            # Enrichissement Phase 2 : visite des pages détail pour récupérer
+            # des infos manquantes sur la page index (typiquement les horaires
+            # sur HelloAsso qui n'apparaissent que sur la page détail).
+            # Les sections détail sont injectées DANS le body avant </body>
+            # pour que Nokogiri les conserve lors du cleaning.
+            if detail_link_selector
+              html = enrich_with_detail_pages(page, context, html, detail_link_selector)
+            end
 
             {
               html: html,
@@ -91,6 +105,51 @@ module Scrapers
       end
     rescue StandardError => e
       { error: "Playwright launch failed: #{e.message}", status: nil }
+    end
+
+    # Enrichit le HTML index en visitant chaque URL détail trouvée via
+    # detail_link_selector. Pour chaque page détail, extrait le body text
+    # et l'ajoute dans le HTML principal sous forme de <section> avec
+    # data-detail-url. Le parseur Claude voit ainsi les infos détaillées
+    # associées à chaque event (heure, tarif, adresse).
+    def self.enrich_with_detail_pages(page, context, index_html, selector)
+      detail_urls = page.eval_on_selector_all(selector, "els => [...new Set(els.map(e => e.href))]")
+      return index_html if detail_urls.empty?
+
+      # Limite de sécurité : max 20 pages détail par scrape.
+      detail_urls = detail_urls.first(20)
+
+      snippets = []
+      detail_page = context.new_page
+      begin
+        detail_urls.each do |durl|
+          begin
+            detail_page.goto(durl, waitUntil: "domcontentloaded", timeout: 45_000)
+            detail_page.wait_for_timeout(3000)
+            body_text = detail_page.evaluate("document.body.innerText")
+            # Garder les 3000 premiers chars (zone au-dessus de la billetterie
+            # qui contient titre + date/heure + description + lieu).
+            snippet = body_text.to_s.gsub("\r", "").squeeze("\n")[0, 3000]
+            # Escape HTML pour éviter que des < > dans le texte cassent Nokogiri
+            escaped = snippet.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;")
+            snippets << %(<div data-detail-url="#{durl}">\n#{escaped}\n</div>)
+          rescue StandardError
+            # Page détail inaccessible : on continue sans bloquer l'index
+          end
+        end
+      ensure
+        detail_page.close rescue nil
+      end
+
+      return index_html if snippets.empty?
+
+      # Injecter avant </body> pour que Nokogiri conserve les div dans le DOM
+      injection = "<section id=\"detail-pages-enrichment\">\n#{snippets.join("\n")}\n</section>"
+      if index_html =~ %r{</body>}i
+        index_html.sub(%r{</body>}i, "#{injection}\n</body>")
+      else
+        index_html + injection
+      end
     end
   end
 end

@@ -88,6 +88,24 @@
     </p>
   </div>
 
+  <div class="card bg-base-200 p-4">
+    <h3 class="font-bold mb-2">Enrichissement via pages détail</h3>
+    <label class="flex items-center gap-2 cursor-pointer mb-2">
+      <%= f.check_box :enrich_detail_pages, class: "checkbox checkbox-primary" %>
+      <span>Visiter les pages détail de chaque événement</span>
+    </label>
+    <p class="text-sm opacity-60 mb-3">
+      Utile pour les sites qui cachent les heures/tarifs sur les pages individuelles
+      (ex. HelloAsso). Ralentit le scraping (jusqu'à 20 pages supplémentaires).
+    </p>
+
+    <%= f.label :detail_link_selector, "Sélecteur des liens vers pages détail", class: "label font-bold" %>
+    <%= f.text_field :detail_link_selector, class: "input input-bordered w-full", placeholder: 'Ex: a[href*="/evenements/"]' %>
+    <p class="text-sm opacity-60 mt-1">
+      Sélecteur CSS des liens <code>&lt;a href="..."&gt;</code> qui pointent vers les pages détail à visiter.
+    </p>
+  </div>
+
   <div>
     <%= f.label :notes_correctrices, "Notes correctrices (pour Claude)", class: "label font-bold" %>
     <%= f.text_area :notes_correctrices, class: "textarea textarea-bordered w-full font-mono", rows: 10, placeholder: "Instructions pour corriger les erreurs de parsing..." %>
