@@ -80,6 +80,15 @@
   </div>
 
   <div>
+    <%= f.label :click_selector, "Clic à exécuter avant parsing (Playwright uniquement)", class: "label font-bold" %>
+    <%= f.text_field :click_selector, class: "input input-bordered w-full", placeholder: 'Ex: a:has-text("Voir tous les événements")' %>
+    <p class="text-sm opacity-60 mt-1">
+      Sélecteur CSS/Playwright d'un bouton à cliquer après le chargement de la page
+      pour révéler du contenu masqué. Laisser vide si non applicable.
+    </p>
+  </div>
+
+  <div>
     <%= f.label :notes_correctrices, "Notes correctrices (pour Claude)", class: "label font-bold" %>
     <%= f.text_area :notes_correctrices, class: "textarea textarea-bordered w-full font-mono", rows: 10, placeholder: "Instructions pour corriger les erreurs de parsing..." %>
   </div>

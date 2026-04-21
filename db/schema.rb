@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_20_160830) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_081258) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -146,6 +146,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_160830) do
   create_table "scraped_urls", force: :cascade do |t|
     t.boolean "auto_recrawl", default: false, null: false
     t.string "avatar_url"
+    t.string "click_selector"
     t.text "commentaire"
     t.datetime "created_at", null: false
     t.jsonb "data_attributes", default: {}, null: false

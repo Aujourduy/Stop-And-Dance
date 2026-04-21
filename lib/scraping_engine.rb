@@ -11,8 +11,13 @@ class ScrapingEngine
     # Detect appropriate scraper based on use_browser flag
     scraper = detect_scraper(scraped_url)
 
-    # Fetch HTML/data
-    result = scraper.fetch(scraped_url.url)
+    # Fetch HTML/data (PlaywrightScraper accepte un click_selector pour
+    # révéler du contenu masqué derrière un bouton, ex. "Voir tous").
+    result = if scraper == Scrapers::PlaywrightScraper
+      scraper.fetch(scraped_url.url, click_selector: scraped_url.click_selector.presence)
+    else
+      scraper.fetch(scraped_url.url)
+    end
 
     if result[:error]
       handle_error(scraped_url, result[:error])
