@@ -63,9 +63,23 @@ class EventUpdateJob < ApplicationJob
     date_debut_date = parsed_debut.to_date
     date_fin_date = parsed_fin&.to_date || date_debut_date
 
-    # Heure: nil if Claude indicated "horaires à confirmer" or if time is midnight (likely invented)
+    # Heure: nil si "horaires à confirmer" (00:00 début, 23:59 fin = convention Claude)
     heure_debut = parsed_debut.strftime("%H:%M") == "00:00" ? nil : parsed_debut
     heure_fin = parsed_fin && parsed_fin.strftime("%H:%M") == "23:59" ? nil : parsed_fin
+
+    # Filet de sécurité : Claude invente parfois des heures malgré le prompt.
+    # Heure aberrante pour un atelier/stage de danse → on la nullifie + log.
+    if heure_debut.present? && suspicious_hour?(heure_debut, heure_fin)
+      SCRAPING_LOGGER.warn({
+        event: "suspicious_hour_nullified",
+        scraped_url_id: scraped_url.id,
+        titre: event_data[:titre],
+        original_date_debut: event_data[:date_debut],
+        original_date_fin: event_data[:date_fin]
+      }.to_json)
+      heure_debut = nil
+      heure_fin = nil
+    end
 
     # Calculate type_event
     if heure_debut.present? && heure_fin.present?
@@ -137,6 +151,22 @@ class EventUpdateJob < ApplicationJob
       event.event_participations.build(professor: rp[:professor], role: rp[:role], position: idx)
     end
     event.save!
+  end
+
+  # Détecte une heure vraisemblablement inventée par Claude.
+  # Hypothèse métier : les ateliers/stages de danse ont lieu entre 7h et 23h.
+  # Une heure < 7h ou ≥ 23h est presque toujours une hallucination.
+  def suspicious_hour?(heure_debut, heure_fin)
+    h = heure_debut.hour
+    return true if h < 7 || h >= 23
+
+    # heure_fin < heure_debut sur la même date = fin avant début → impossible
+    if heure_fin && heure_fin < heure_debut
+      duration_to_next_day = (heure_fin + 1.day - heure_debut) / 3600.0
+      return duration_to_next_day > 6
+    end
+
+    false
   end
 
   # Convertit event_data en array uniforme [{ nom:, photo_url:, role: }, ...]

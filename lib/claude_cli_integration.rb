@@ -109,10 +109,29 @@ class ClaudeCliIntegration
       - "Jam" = atelier
       - "Intensif", "Retraite", "Retreat", "Résidentiel" = stage
 
-      RÈGLE HORAIRES :
-      - Si l'horaire exact est mentionné sur le site, utiliser le format complet : "2026-04-12T19:30:00+02:00"
-      - Si l'horaire N'EST PAS mentionné sur le site : utiliser le format DATE SEULE : "2026-04-12T00:00:00+02:00" (minuit = horaire inconnu)
-      - NE PAS inventer d'horaire. Minuit signifie "horaire non renseigné".
+      RÈGLE HORAIRES — CRITIQUE, LIRE ATTENTIVEMENT :
+      - Si l'horaire exact est mentionné sur le site (ex. "19h30-21h30", "de 10h à 13h") :
+        → utiliser le format complet : "2026-04-12T19:30:00+02:00"
+      - Si l'horaire N'EST PAS mentionné sur le site :
+        → OBLIGATOIRE utiliser : "2026-04-12T00:00:00+02:00" (date à minuit local)
+        → INTERDIT d'inventer une heure, même "plausible" (type 19h, 20h, 23h, etc.)
+        → date_fin doit aussi être à "23:59:00+02:00" (fin de journée inconnue)
+      - Exemples interdits si horaire absent :
+        ❌ "2026-04-28T19:00:00+02:00" (heure inventée)
+        ❌ "2026-04-27T23:00:00+02:00" (heure + jour inventés)
+      - Si tu vois "Mardi 28 avril" sans heure → date_debut = "2026-04-28T00:00:00+02:00"
+        (PAS 19h, PAS 23h, PAS 20h, JUSTE 00:00)
+
+      RÈGLE DATES — CRITIQUE, LIRE ATTENTIVEMENT :
+      - L'année par défaut si non mentionnée = année courante ou prochaine
+        (si date déjà passée dans l'année courante, prendre année suivante).
+      - Si une date du type "Mardi 28 avril" est donnée et que tu calcules
+        le jour de la semaine, VÉRIFIE que ton année est correcte :
+        le 28 avril 2026 tombe un mardi ; le 28 avril 2025 tombait un lundi.
+        → Si ambigu, PRIVILÉGIE toujours la date numérique (28) sur le jour
+          de semaine annoncé. Ne JAMAIS décaler la date pour "matcher" le jour.
+      - Exemple correct : site dit "Mardi 28 avril" sans année
+        → date_debut = "2026-04-28T00:00:00+02:00" (PAS "2026-04-27...")
 
       RÈGLE COANIMATION / MULTI-PROFS :
       - Si l'événement est animé par PLUSIEURS professeurs (duos, collectifs, format "X x Y", "avec X et Y", "chorégraphe + DJ", "coanimé par") :
