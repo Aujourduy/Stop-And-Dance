@@ -14,6 +14,13 @@ class ScrapedUrl < ApplicationRecord
   # Callbacks
   after_commit :process_avatar_url, on: [ :create, :update ], if: :saved_change_to_avatar_url?
 
+  # URL affichable côté utilisateur. Si `url` est une API JSON ou un
+  # endpoint technique, public_url pointe vers la page vitrine humaine.
+  # Sinon, fallback sur `url` (cas classique).
+  def display_url
+    public_url.presence || url
+  end
+
   # Prof "propriétaire" du site : celui qui a le plus de ScrapedUrls sur ce host.
   # Utilisé comme fallback quand Claude ne trouve pas de nom explicite dans le HTML.
   def owner_professor

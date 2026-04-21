@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_082509) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_121127) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -161,6 +161,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_082509) do
     t.string "html_hash"
     t.string "nom"
     t.text "notes_correctrices"
+    t.string "public_url"
     t.bigint "source_site_crawl_id"
     t.string "statut_scraping", default: "actif"
     t.datetime "updated_at", null: false

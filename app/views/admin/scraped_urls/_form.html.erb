@@ -10,8 +10,20 @@
   <% end %>
 
   <div>
-    <%= f.label :url, "URL", class: "label font-bold" %>
+    <%= f.label :url, "URL à scraper (technique)", class: "label font-bold" %>
     <%= f.url_field :url, class: "input input-bordered w-full", placeholder: "https://example.com/agenda", required: true %>
+    <p class="text-sm opacity-60 mt-1">
+      L'URL d'où on récupère les événements. Peut être une API JSON (ex: bsport.io).
+    </p>
+  </div>
+
+  <div>
+    <%= f.label :public_url, "URL publique (optionnel)", class: "label font-bold" %>
+    <%= f.url_field :public_url, class: "input input-bordered w-full", placeholder: "https://example.com (site vitrine)" %>
+    <p class="text-sm opacity-60 mt-1">
+      À remplir UNIQUEMENT si l'URL à scraper ci-dessus est une API ou un endpoint technique.
+      Cette URL sera affichée à l'utilisateur sous "Voir la page source" dans la modal d'un event.
+    </p>
   </div>
 
   <div>

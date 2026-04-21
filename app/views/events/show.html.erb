@@ -89,7 +89,7 @@
             <% if @event.scraped_url.present? %>
               <%# brakeman:disable LinkToHref %>
               <%= link_to "Voir la page source →",
-                          @event.scraped_url.url,
+                          @event.scraped_url.display_url,
                           target: "_blank",
                           rel: "noopener noreferrer",
                           class: "btn btn-primary btn-sm" %>
