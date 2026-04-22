@@ -14,6 +14,10 @@
     <% end %>
   </div>
 
+  <div class="navbar-end">
+    <%= link_to "Signaler une erreur", contact_form_url, target: "_blank", rel: "noopener", class: "btn btn-sm btn-error text-white" %>
+  </div>
+
   <%# Drawer overlay %>
   <div data-mobile-drawer-target="overlay" class="hidden fixed inset-0 bg-black/50 z-40" data-action="click->mobile-drawer#close" aria-hidden="true"></div>
 
@@ -27,6 +31,8 @@
       <li><%= link_to "S'inscrire à la newsletter", "#" %></li>
       <li><%= link_to "Liens", "#" %></li>
       <li><%= link_to "Les proposants", proposants_path %></li>
+      <li><%= link_to "Signaler une erreur", contact_form_url, target: "_blank", rel: "noopener" %></li>
+      <li><%= link_to "Admin", admin_root_path %></li>
     </ul>
   </aside>
 </nav>
