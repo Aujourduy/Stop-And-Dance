@@ -86,6 +86,7 @@ production:
     database: stopanddance_production
     username: stopanddance
     password: <%= ENV["APP_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("APP_DATABASE_HOST", "db") %>
   cache:
     <<: *primary_production
     database: stopanddance_production_cache

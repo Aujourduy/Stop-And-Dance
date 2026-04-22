@@ -3,6 +3,7 @@ services:
     image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d:ro
     environment:
       POSTGRES_USER: stopanddance
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -17,16 +18,16 @@ services:
       - db
     environment:
       RAILS_ENV: production
-      DATABASE_URL: postgresql://stopanddance:${DB_PASSWORD}@db/stopanddance_production
+      APP_DATABASE_PASSWORD: ${DB_PASSWORD}
+      APP_DATABASE_HOST: db
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       ALERT_EMAIL: ${ALERT_EMAIL}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
     volumes:
       - ./log:/rails/log
       - ~/.claude:/root/.claude  # Claude CLI auth persistence
-    ports:
-      - "8080:3000"  # Avoid conflict with v1 (3000/3001), Nextcloud (80/443)
     restart: unless-stopped
     networks:
       - app_network
@@ -37,8 +38,10 @@ services:
       - db
     environment:
       RAILS_ENV: production
-      DATABASE_URL: postgresql://stopanddance:${DB_PASSWORD}@db/stopanddance_production
+      APP_DATABASE_PASSWORD: ${DB_PASSWORD}
+      APP_DATABASE_HOST: db
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
     command: bundle exec rake solid_queue:start
     volumes:
       - ./log:/rails/log
@@ -47,15 +50,9 @@ services:
     networks:
       - app_network
 
-  caddy:
-    image: caddy:2
-    ports:
-      - "8443:443"  # Temporary - Nextcloud occupies 80/443
-      - "8000:80"   # Temporary - needs resolution for Let's Encrypt
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     depends_on:
       - web
     restart: unless-stopped
@@ -64,8 +61,6 @@ services:
 
 volumes:
   postgres_data:
-  caddy_data:
-  caddy_config:
 
 networks:
   app_network:

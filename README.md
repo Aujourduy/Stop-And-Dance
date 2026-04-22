@@ -56,6 +56,45 @@ Development mode runs jobs inline (immediately). To test worker processes:
 rails solid_queue:start
 ```
 
+## Déploiement en production (Cloudflare Tunnel)
+
+Le site tourne sur `https://stopand.dance` derrière un Cloudflare Tunnel (pas d'exposition de port, pas de Let's Encrypt, HTTPS géré par Cloudflare).
+
+### Architecture
+
+```
+navigateur → Cloudflare (HTTPS) → Cloudflare Tunnel → docker compose (cloudflared) → web:3000 (Rails)
+```
+
+Services Docker : `db` (Postgres 16) · `web` (Rails + Puma) · `jobs` (Solid Queue) · `cloudflared` (tunnel).
+
+### Setup initial (une seule fois)
+
+1. **Créer le tunnel côté Cloudflare** (via API ou UI Zero Trust). Nom : `stopand-dance`. Ingress : `stopand.dance` + `www.stopand.dance` → `http://web:3000`. Récupérer le token du tunnel.
+2. **Configurer le DNS Cloudflare** : CNAME `stopand.dance` + `www.stopand.dance` → `<tunnel-id>.cfargotunnel.com` (proxied).
+3. **SSL/TLS mode** : `Full` (ou `Full (strict)` une fois stable).
+
+### Déploiement
+
+```bash
+cp .env.production.example .env.production
+# Remplir .env.production (DB_PASSWORD, SECRET_KEY_BASE, RAILS_MASTER_KEY,
+# ADMIN_*, CLOUDFLARE_TUNNEL_TOKEN, etc.) — chmod 600
+
+docker compose --env-file .env.production build
+docker compose --env-file .env.production run --rm web bin/rails db:prepare
+docker compose --env-file .env.production up -d
+
+# Vérifier
+curl -I https://stopand.dance
+docker compose logs -f cloudflared
+```
+
+### Rollback
+
+- Tunnel KO → révoquer les CNAME, restaurer les A/AAAA depuis `tmp/dns-backup-*.json`
+- App KO → `docker compose down && git checkout <commit-précédent> && docker compose up -d`
+
 ## Outils développement
 
 - **Ctrl+Shift+D** : Mode debug design
