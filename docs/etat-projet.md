@@ -1,9 +1,41 @@
 # État du Projet - Stop & Dance
 
-**Dernière mise à jour :** 2026-04-23 (soir)
+**Dernière mise à jour :** 2026-04-23 (nuit)
 **Branch :** main
-**Dernier commit main :** 2258473
+**Dernier commit main :** 933fdda
 **Statut :** ✅ PROJET COMPLET — **Prod en ligne : https://stopand.dance** + badge beta + admin sécurisé
+
+---
+
+## 🎨 SESSION 2026-04-23 (nuit) — Refonte navbar icônes ✅
+
+**Remplacement des 3 liens navbar (burger / agenda / news) par des boutons ronds colorés avec icônes FontAwesome.**
+
+### Changements UI
+
+- **FontAwesome 6.5.2** chargé via CDN cdnjs dans `application.html.erb`
+- **3 boutons ronds** (btn-circle + text-xl) :
+  - Burger (`fa-solid fa-bars`) sur terracotta
+  - Agenda (`fa-regular fa-calendar`) sur moutarde
+  - News (`fa-regular fa-newspaper`) sur vert (bg-green-600)
+- **Logo Stop & Dance** également mis en rond même taille (btn-circle + overflow-hidden + object-cover) — 4 ronds homogènes dans la navbar
+- Badge "BETA" sur mobile repositionné en overlay absolu sur le rond logo
+
+### Fichiers modifiés
+
+- `app/views/layouts/application.html.erb` (CDN FontAwesome)
+- `app/views/shared/_navbar.html.erb` (desktop)
+- `app/views/shared/_mobile_drawer.html.erb` (mobile)
+
+### Commits
+
+- `40dfcd6` — feat: Navbar — boutons ronds colorés avec icônes FontAwesome
+- `933fdda` — feat: Logo en rond de même taille que les boutons navbar
+
+### Validation
+
+- Screenshots Playwright (desktop 1440px + mobile 375px) dans `tmp/ui-test-2026-04-23-navbar-icons/`
+- Navigations testées : burger ouvre drawer, agenda → /evenements, news → /actualites
 
 ---
 
