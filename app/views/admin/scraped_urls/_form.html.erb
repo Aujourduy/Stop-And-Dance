@@ -58,7 +58,10 @@
 
     <div>
       <%= f.label :avatar_url, "…ou coller une URL externe", class: "label font-bold" %>
-      <%= f.url_field :avatar_url, class: "input input-bordered w-full", placeholder: "https://.../logo.png ou photo du prof" %>
+      <%# text_field plutôt que url_field : accepte aussi les chemins locaux
+          (/avatars/...) générés par ScrapedUrlAvatarService sans déclencher
+          la validation HTML5 "url" qui bloquerait le submit. %>
+      <%= f.text_field :avatar_url, class: "input input-bordered w-full", placeholder: "https://.../logo.png ou photo du prof" %>
     </div>
   </div>
 
