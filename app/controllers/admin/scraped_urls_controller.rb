@@ -74,7 +74,16 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
     @scraped_url = ScrapedUrl.new(scraped_url_params)
 
     if @scraped_url.save
-      handle_avatar_upload
+      # Avatar upload après save (besoin de l'id pour le filename)
+      if params[:scraped_url][:avatar_file].present?
+        result = ScrapedUrlAvatarService.process_upload(@scraped_url, params[:scraped_url][:avatar_file])
+        if result.is_a?(String)
+          @scraped_url.update_column(:avatar_url, result)
+        else
+          redirect_to edit_admin_scraped_url_path(@scraped_url), alert: "Erreur avatar : #{result[:error]}"
+          return
+        end
+      end
       redirect_to admin_scraped_url_path(@scraped_url), notice: "URL ajoutée avec succès."
     else
       render :new, status: :unprocessable_entity
@@ -85,8 +94,26 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
   end
 
   def update
-    if @scraped_url.update(scraped_url_params)
-      handle_avatar_upload
+    # Avatar upload AVANT update : process_upload écrit le fichier + retourne
+    # le chemin qu'on assigne à @scraped_url.avatar_url AVANT update, pour
+    # que le save intègre la nouvelle URL (pattern identique à Professor).
+    if params[:scraped_url][:avatar_file].present?
+      result = ScrapedUrlAvatarService.process_upload(@scraped_url, params[:scraped_url][:avatar_file])
+      if result.is_a?(String)
+        # Cache busting : timestamp en query string pour forcer navigateur à recharger.
+        @scraped_url.avatar_url = "#{result}?v=#{Time.current.to_i}"
+      else
+        redirect_to edit_admin_scraped_url_path(@scraped_url), alert: "Erreur avatar : #{result[:error]}"
+        return
+      end
+    end
+
+    # Params du form : on ignore avatar_url si un fichier vient d'être uploadé
+    # (sinon le champ texte du form écraserait le résultat de process_upload).
+    update_params = scraped_url_params
+    update_params = update_params.except(:avatar_url) if params[:scraped_url][:avatar_file].present?
+
+    if @scraped_url.update(update_params)
       redirect_to admin_scraped_url_path(@scraped_url), notice: "URL mise à jour avec succès."
     else
       render :edit, status: :unprocessable_entity
@@ -245,19 +272,5 @@ class Admin::ScrapedUrlsController < Admin::ApplicationController
 
   def scraped_url_params
     params.require(:scraped_url).permit(:url, :public_url, :nom, :avatar_url, :commentaire, :notes_correctrices, :statut_scraping, :use_browser, :auto_recrawl, :click_selector, :enrich_detail_pages, :detail_link_selector)
-  end
-
-  # Gère l'upload direct d'un fichier avatar depuis le form. Si un fichier
-  # est uploadé, il prend priorité sur le champ avatar_url (URL externe).
-  def handle_avatar_upload
-    uploaded = params.dig(:scraped_url, :avatar_file)
-    return if uploaded.blank?
-
-    result = ScrapedUrlAvatarService.process_upload(@scraped_url, uploaded)
-    if result.is_a?(String)
-      @scraped_url.update_column(:avatar_url, result)
-    else
-      Rails.logger.warn("ScrapedUrl ##{@scraped_url.id} avatar upload failed: #{result[:error]}")
-    end
   end
 end
