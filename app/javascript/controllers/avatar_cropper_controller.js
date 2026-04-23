@@ -122,10 +122,12 @@ export default class extends Controller {
     setTimeout(() => this.updatePreview(), 300)
   }
 
-  // Au submit du form : génère le blob carré et remplace le fichier.
-  // On intercepte le submit, on fait le crop async (toBlob → DataTransfer),
-  // puis on re-submit avec requestSubmit() pour conserver le flow natif
-  // (CSRF token, validators, Turbo Drive si activé, etc.).
+  // Au submit du form : génère le blob carré, substitue le fichier dans
+  // l'input, puis laisse le navigateur soumettre le form normalement.
+  //
+  // Approche : intercepter le submit, faire le crop ASYNCHRONE, injecter
+  // le blob dans le DOM, puis cliquer le bouton submit natif (pas requestSubmit
+  // qui peut causer des soucis CSRF/Turbo).
   async handleSubmit(event) {
     // Si on a déjà généré le blob cropé, laisser passer ce submit-là
     if (this._croppedReady) {
@@ -135,7 +137,7 @@ export default class extends Controller {
     const selection = this.containerTarget.querySelector("cropper-selection")
     if (!selection) return // Pas de cropper actif, laisser passer
 
-    event.preventDefault() // on va resubmit après génération async
+    event.preventDefault()
 
     try {
       const canvas = await selection.$toCanvas({
@@ -144,19 +146,25 @@ export default class extends Controller {
       })
       canvas.toBlob((blob) => {
         if (blob) {
-          // Substituer le fichier dans le FormData
           const file = new File([blob], "cropped.png", { type: "image/png" })
           const dt = new DataTransfer()
           dt.items.add(file)
           this.inputTarget.files = dt.files
         }
         this._croppedReady = true
-        this.form.requestSubmit()
+        // Click natif sur le bouton submit : équivalent à un vrai click utilisateur,
+        // conserve CSRF token + déclenche la soumission normalement (pas de Turbo
+        // AJAX XHR, vraie navigation avec redirect suivi).
+        const submitBtn = this.form.querySelector('input[type="submit"], button[type="submit"]')
+        if (submitBtn) submitBtn.click()
+        else this.form.submit()
       }, "image/png")
     } catch (e) {
       console.error("crop error", e)
       this._croppedReady = true
-      this.form.requestSubmit()
+      const submitBtn = this.form.querySelector('input[type="submit"], button[type="submit"]')
+      if (submitBtn) submitBtn.click()
+      else this.form.submit()
     }
   }
 

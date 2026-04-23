@@ -8,7 +8,7 @@
 
 <div class="card bg-base-100 shadow-sm">
   <div class="card-body">
-    <%= form_with model: @professor, url: admin_professor_path(@professor), method: :patch, local: true, multipart: true, class: "space-y-6" do |form| %>
+    <%= form_with model: @professor, url: admin_professor_path(@professor), method: :patch, multipart: true, class: "space-y-6", data: { turbo: false } do |form| %>
       <% if @professor.errors.any? %>
         <div role="alert" class="alert alert-error">
           <ul class="list-disc list-inside">
