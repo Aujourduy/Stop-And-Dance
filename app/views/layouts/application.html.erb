@@ -26,6 +26,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Shrikhand&display=swap" rel="stylesheet">
     <%= javascript_importmap_tags %>
+
+    <%# Plausible Analytics (self-hosted) — tracking automatique des pages publiques %>
+    <% if Rails.env.production? %>
+      <script defer data-domain="stopand.dance" src="https://stats.stopand.dance/js/script.js"></script>
+    <% end %>
   </head>
 
   <body class="bg-base-100" data-theme="stopanddance" <%= "data-controller=debug-design" if Rails.env.development? %>>

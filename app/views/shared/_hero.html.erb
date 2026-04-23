@@ -6,6 +6,14 @@
         Agenda de référence des pratiques de danse exploratoires et non-performatives en France.
         "Quel atelier ce soir à Paris ?" — ce que Google et Facebook ne savent pas faire.
       </p>
+
+      <% stats = Setting.instance %>
+      <% if stats.stats_visits_7d.to_i >= 10 %>
+        <p class="text-sm md:text-base opacity-70 mt-6">
+          Cette semaine : <strong class="text-primary"><%= stats.stats_visits_7d %> visites</strong>
+          de <strong class="text-primary"><%= stats.stats_visitors_7d %> visiteurs</strong>
+        </p>
+      <% end %>
     </div>
   </div>
 </section>

@@ -25,3 +25,8 @@ production:
     class: SiteCrawlDispatchJob
     schedule: every day at 4am
     queue: scraping
+
+  # Plausible stats : rafraîchit visits/visitors 7d toutes les 15 min
+  update_plausible_stats:
+    class: UpdateStatsJob
+    schedule: every 15 minutes
