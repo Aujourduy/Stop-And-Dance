@@ -1,7 +1,7 @@
 <nav data-debug-id="navbar" class="navbar bg-neutral text-neutral-content hidden lg:flex sticky top-0 z-50" data-controller="mobile-drawer">
   <div class="navbar-start gap-4">
-    <%= link_to root_path, class: "flex items-center" do %>
-      <%= image_tag "logo/favicon.ico", alt: "Stop & Dance", class: "h-6 w-6" %>
+    <%= link_to root_path, class: "btn btn-circle border-none p-0 overflow-hidden", aria: { label: "Accueil" } do %>
+      <%= image_tag "logo/favicon.svg", alt: "Stop & Dance", class: "w-full h-full object-cover" %>
     <% end %>
     <button data-action="click->mobile-drawer#toggle" class="btn btn-circle bg-terracotta hover:bg-terracotta border-none text-white text-xl" aria-label="Open navigation menu">
       <i class="fa-solid fa-bars"></i>
