@@ -1,9 +1,42 @@
 # État du Projet - Stop & Dance
 
-**Dernière mise à jour :** 2026-04-23 (nuit)
+**Dernière mise à jour :** 2026-04-23 (très tard)
 **Branch :** main
-**Dernier commit main :** 1e3ba23 (Cropper visuel avatar)
-**Statut :** ✅ PROJET COMPLET — **Prod en ligne : https://stopand.dance** + badge beta + admin sécurisé
+**Dernier commit main :** c2cb287 (Plausible Analytics + compteur hero)
+**Statut :** ✅ PROJET COMPLET — **Prod en ligne : https://stopand.dance** + badge beta + admin sécurisé + analytics
+
+---
+
+## 📊 SESSION 2026-04-23 (très tard) — Plausible Analytics self-hosted ✅
+
+**Objectif** : tracker les visites + afficher "Cette semaine X visites de Y visiteurs" sur la home.
+
+### Infra ajoutée
+- 3 containers Docker : `plausible` (v3.0.1 community edition), `plausible_db` (postgres 16), `plausible_events_db` (clickhouse 24.12)
+- Hostname : **https://stats.stopand.dance** via Cloudflare Tunnel (ingress + CNAME configurés via API Cloudflare)
+- Config ClickHouse : `docker/clickhouse-config.xml` + `clickhouse-user-config.xml` (access_management=1 requis par Plausible v3)
+
+### Intégration Rails
+- `PlausibleStatsService` : fetch `/api/v1/stats/aggregate` avec `period=custom` (7 derniers jours incluant aujourd'hui, car `7d` exclut le jour courant)
+- `UpdateStatsJob` + cron 15 min : cache dans Setting (`stats_visits_7d`, `stats_visitors_7d`, `stats_updated_at`)
+- Layout public : tracker JS `defer` chargé en prod (exclu de `/admin`)
+- Hero home : "Cette semaine : X visite(s) de Y visiteur(s)" avec accord pluriel automatique
+- Admin navbar : bouton "📊 Stats" → dashboard Plausible (target blank)
+
+### Credentials (.env.production)
+- `PLAUSIBLE_API_KEY` (Stats API type, créée dans stats.stopand.dance)
+- `PLAUSIBLE_SITE_ID=stopand.dance`
+- 3 secrets Plausible : `PLAUSIBLE_DB_PASSWORD`, `PLAUSIBLE_SECRET_KEY_BASE`, `PLAUSIBLE_TOTP_VAULT_KEY`
+- Token Cloudflare API étendu avec perm `Zone:DNS:Edit` + `Account:Tunnel:Edit`
+
+### Problèmes rencontrés et résolus
+1. ClickHouse 24+ exige user default avec `access_management=1` (sinon Plausible crash auth)
+2. Token Cloudflare manquait perms Tunnel:Edit puis DNS:Edit → 2 allers-retours dashboard
+3. Plausible `period=7d` exclut aujourd'hui → passé en `period=custom&date=J-6,J`
+4. Setup compte admin + site `stopand.dance` via UI web (inscription auto-owner)
+
+### Privacy notable
+Plausible ne met **pas de cookie**, hash rotatif quotidien → impossible de track un utilisateur dans la durée. Conséquence : "visiteurs unique 7j" surestime les humains réels (1 personne qui revient 7 jours = 7 visiteurs). Compromis privacy assumé.
 
 ---
 
