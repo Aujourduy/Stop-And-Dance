@@ -1,4 +1,4 @@
-<%= form_with model: [:admin, scraped_url], class: "space-y-6" do |f| %>
+<%= form_with model: [:admin, scraped_url], class: "space-y-6", multipart: true do |f| %>
   <% if scraped_url.errors.any? %>
     <div role="alert" class="alert alert-error">
       <ul class="list-disc list-inside">
@@ -32,19 +32,34 @@
     <p class="text-sm opacity-60 mt-1">Nom lisible pour identifier facilement cette source dans l'admin.</p>
   </div>
 
-  <div>
-    <%= f.label :avatar_url, "Avatar URL (affiché sur l'agenda)", class: "label font-bold" %>
-    <%= f.url_field :avatar_url, class: "input input-bordered w-full", placeholder: "https://.../logo.png ou photo du prof" %>
-    <p class="text-sm opacity-60 mt-1">
+  <div class="card bg-base-200 p-4">
+    <h3 class="font-bold mb-2">Avatar (affiché sur l'agenda)</h3>
+    <p class="text-sm opacity-60 mb-3">
       Photo affichée sur les cards de l'agenda pour identifier la source.
       <strong>Prof solo</strong> : photo du prof.
-      <strong>Collectif</strong> : logo du collectif (Swell, etc.).
+      <strong>Collectif</strong> : logo du collectif.
     </p>
+
     <% if scraped_url.avatar_url.present? %>
-      <div class="mt-2">
-        <%= image_tag scraped_url.avatar_url, class: "w-20 h-20 object-cover rounded", alt: "Aperçu" %>
+      <div class="flex items-center gap-4 mb-4">
+        <%= image_tag scraped_url.avatar_url, class: "w-32 h-32 object-cover rounded", alt: "Aperçu" %>
+        <span class="text-sm opacity-60">Avatar actuel (300×300)</span>
       </div>
     <% end %>
+
+    <div class="mb-4">
+      <%= f.label :avatar_file, "Upload d'un fichier (prioritaire sur l'URL)", class: "label font-bold" %>
+      <%= f.file_field :avatar_file, accept: "image/*", class: "file-input file-input-bordered w-full" %>
+      <p class="text-sm opacity-60 mt-1">
+        L'image sera automatiquement recadrée en carré 300×300. Les logos
+        rectangulaires sont paddés avec leur couleur dominante.
+      </p>
+    </div>
+
+    <div>
+      <%= f.label :avatar_url, "…ou coller une URL externe", class: "label font-bold" %>
+      <%= f.url_field :avatar_url, class: "input input-bordered w-full", placeholder: "https://.../logo.png ou photo du prof" %>
+    </div>
   </div>
 
   <div>

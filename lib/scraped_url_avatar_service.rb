@@ -12,6 +12,28 @@ class ScrapedUrlAvatarService
   SIZE = 300
   SQUARE_TOLERANCE = 0.10 # ratio considéré "carré" : 0.9 < h/w < 1.1
 
+  # Upload direct depuis le form admin (file_field). Traite l'image comme
+  # une source MiniMagick, détecte ratio carré/rectangulaire, pad avec la
+  # couleur dominante si rectangulaire. Retourne "/avatars/scraped_url_X.png"
+  # ou { error: "..." }.
+  def self.process_upload(scraped_url, uploaded_file)
+    return { error: "No file" } if uploaded_file.blank?
+
+    FileUtils.mkdir_p(AVATAR_DIR)
+    source = MiniMagick::Image.read(uploaded_file.read)
+    uploaded_file.rewind rescue nil
+
+    filename = "scraped_url_#{scraped_url.id}.png"
+    output_path = AVATAR_DIR.join(filename)
+
+    process_and_write(source, output_path)
+
+    "/avatars/#{filename}"
+  rescue => e
+    Rails.logger.error("ScrapedUrlAvatarService upload error for ##{scraped_url.id}: #{e.message}")
+    { error: e.message }
+  end
+
   def self.download_and_square(scraped_url, url)
     return { error: "No URL" } if url.blank?
     return { error: "Already a local avatar" } if url.start_with?("/avatars/")
@@ -27,12 +49,22 @@ class ScrapedUrlAvatarService
     filename = "scraped_url_#{scraped_url.id}.png"
     output_path = AVATAR_DIR.join(filename)
 
+    process_and_write(source, output_path)
+
+    "/avatars/#{filename}"
+  rescue => e
+    Rails.logger.error("ScrapedUrlAvatarService error for ##{scraped_url.id}: #{e.message}")
+    { error: e.message }
+  end
+
+  # Logique commune (download & upload) : si source carrée, resize cover ;
+  # sinon, pad avec la couleur dominante. Écrit dans output_path.
+  def self.process_and_write(source, output_path)
     width = source.width.to_f
     height = source.height.to_f
     ratio = height / width
 
     if (1 - SQUARE_TOLERANCE..1 + SQUARE_TOLERANCE).cover?(ratio)
-      # Déjà carré → simple resize avec cover
       source.combine_options do |c|
         c.resize "#{SIZE}x#{SIZE}^"
         c.gravity "center"
@@ -41,15 +73,9 @@ class ScrapedUrlAvatarService
       source.format "png"
       source.write(output_path)
     else
-      # Rectangulaire → détecter couleur dominante et padder
       bg_color = dominant_color(source)
       square_with_padding(source, bg_color, output_path)
     end
-
-    "/avatars/#{filename}"
-  rescue => e
-    Rails.logger.error("ScrapedUrlAvatarService error for ##{scraped_url.id}: #{e.message}")
-    { error: e.message }
   end
 
   # Détecte la couleur dominante via ImageMagick : flatten sur blanc (pour
