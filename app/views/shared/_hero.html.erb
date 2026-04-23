@@ -8,10 +8,10 @@
       </p>
 
       <% stats = Setting.instance %>
-      <% if stats.stats_visits_7d.to_i >= 10 %>
+      <% if stats.stats_updated_at.present? %>
         <p class="text-sm md:text-base opacity-70 mt-6">
-          Cette semaine : <strong class="text-primary"><%= stats.stats_visits_7d %> visites</strong>
-          de <strong class="text-primary"><%= stats.stats_visitors_7d %> visiteurs</strong>
+          Cette semaine : <strong class="text-primary"><%= stats.stats_visits_7d.to_i %> visites</strong>
+          de <strong class="text-primary"><%= stats.stats_visitors_7d.to_i %> visiteurs</strong>
         </p>
       <% end %>
     </div>
