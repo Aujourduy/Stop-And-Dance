@@ -9,22 +9,28 @@ require "json"
 # Auth : Bearer token API (créé dans le dashboard Plausible)
 class PlausibleStatsService
   BASE_URL = "https://stats.stopand.dance".freeze
-  PERIOD = "7d".freeze
 
   def self.fetch_and_cache
-    setting = Setting.instance
-    return { error: "No API key" } if setting.plausible_api_key.blank?
-    return { error: "No site ID" } if setting.plausible_site_id.blank?
+    api_key = ENV["PLAUSIBLE_API_KEY"]
+    site_id = ENV["PLAUSIBLE_SITE_ID"] || "stopand.dance"
+    return { error: "No API key (set PLAUSIBLE_API_KEY)" } if api_key.blank?
+
+    # Période custom = 7 derniers jours INCLUANT aujourd'hui
+    # (le paramètre "7d" de Plausible exclut le jour courant → pas ce qu'on veut).
+    today = Date.current
+    from = today - 6
+    date_range = "#{from.iso8601},#{today.iso8601}"
 
     uri = URI("#{BASE_URL}/api/v1/stats/aggregate")
     uri.query = URI.encode_www_form(
-      site_id: setting.plausible_site_id,
-      period: PERIOD,
+      site_id: site_id,
+      period: "custom",
+      date: date_range,
       metrics: "visits,visitors"
     )
 
     req = Net::HTTP::Get.new(uri)
-    req["Authorization"] = "Bearer #{setting.plausible_api_key}"
+    req["Authorization"] = "Bearer #{api_key}"
 
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -37,7 +43,7 @@ class PlausibleStatsService
     visits = data.dig("visits", "value").to_i
     visitors = data.dig("visitors", "value").to_i
 
-    setting.update!(
+    Setting.instance.update!(
       stats_visits_7d: visits,
       stats_visitors_7d: visitors,
       stats_updated_at: Time.current
