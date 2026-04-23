@@ -1,9 +1,10 @@
 <div class="lg:hidden" data-controller="mobile-drawer">
   <%# Mobile header %>
   <header class="navbar bg-neutral text-neutral-content sticky top-0 z-50">
-    <div class="navbar-start gap-4">
-      <%= link_to root_path, class: "flex items-center" do %>
+    <div class="navbar-start gap-2">
+      <%= link_to root_path, class: "flex items-center gap-1" do %>
         <%= image_tag "logo/favicon.ico", alt: "Stop & Dance", class: "h-6 w-6" %>
+        <span class="bg-moutarde text-black font-bold text-[9px] px-1 py-px leading-none rounded">BETA</span>
       <% end %>
       <button data-action="click->mobile-drawer#toggle" class="btn btn-circle btn-primary btn-sm" aria-label="Open navigation menu">
         ☰
@@ -19,6 +20,11 @@
       <%= link_to "Signaler", contact_form_url, target: "_blank", rel: "noopener", class: "btn btn-xs btn-error text-white" %>
     </div>
   </header>
+
+  <%# Beta banner mobile — statique, disparaît au scroll %>
+  <div class="bg-moutarde text-black text-center text-xs font-semibold py-1.5 px-3 leading-snug">
+    Beta publique — aidez-moi à construire l'agenda
+  </div>
 
   <%# Drawer overlay %>
   <div data-mobile-drawer-target="overlay" class="hidden fixed inset-0 bg-black/50 z-40" data-action="click->mobile-drawer#close" aria-hidden="true"></div>
