@@ -1,9 +1,37 @@
 # État du Projet - Stop & Dance
 
-**Dernière mise à jour :** 2026-04-23 (nuit tardive)
+**Dernière mise à jour :** 2026-04-23 (nuit)
 **Branch :** main
-**Dernier commit main :** f35b812 (+ identité visuelle logo S en attente de commit)
+**Dernier commit main :** 1e3ba23 (Cropper visuel avatar)
 **Statut :** ✅ PROJET COMPLET — **Prod en ligne : https://stopand.dance** + badge beta + admin sécurisé
+
+---
+
+## 🎨 SESSION 2026-04-23 (nuit) — Scraping collectifs, Cropper, page /merci ✅
+
+### Stories coanimation (Story 1-4)
+- **Modèle** `event_participations` (many-to-many Event ↔ Professor) avec rétrocompat `professor_id`
+- **UI** : card + modal affichent "Avec X × Y" pour coanimations, section fiche prof
+- **ScrapedUrl.avatar_url** + service crop dominant-color pour les logos rectangulaires
+- **Scraping Swell Dance** via API bsport JSON (pas Cloudflare) — 12 ateliers avec coanimations détectées
+- **Scraping Les Champs d'Amour** via HelloAsso + Playwright anti-détection (Cloudflare + click "Voir tous" + enrich pages détail pour les horaires) — 11 ateliers Ecstatic Dance
+
+### Fixes critiques
+- **Prompt Claude** : règles strictes contre heures inventées (suspicious_hour? nullifie heures < 7h ou ≥ 23h) + règles dates (calendrier 2025 vs 2026) + normalisation noms profs (pas de préfixe "DJ")
+- **Filtre recherche agenda** : dismiss du focus pendant saisie (commit 5359aeb avait ajouté `turbo_action: advance` qui perdait le focus) + suppression 4 doublons Stimulus controllers (`app/assets/javascripts/controllers/` vs `app/javascript/controllers/`) qui faisaient que Propshaft servait de vieux fichiers
+- **Upload avatar ScrapedUrl** : 3 bugs cumulés
+  - Dockerfile prod n'installait pas `imagemagick` → ajouté
+  - Controller update écrasait avatar_url avant process_upload → inversion ordre (pattern Professor)
+  - `<input type="url">` bloquait submit quand avatar_url = chemin local → text_field
+- **URL publique séparée** (`ScrapedUrl.public_url`) : clic "Voir la page source" ouvrait JSON brut pour Swell → nouveau champ pour afficher `swell.dance` humain
+
+### Nouvelles features
+- **Page `/merci`** : URL de retour post-submit formulaire Tally (3 blocs : confirmation + humanisation "jeune papa sous une semaine" + CTA agenda/accueil)
+- **Cropper.js v2** sur les 2 forms admin (Professor + ScrapedUrl) : sélection zone carrée interactive, aperçu 300×300 en temps réel, submit remplace le fichier par le blob cropé via DataTransfer API
+
+### Déploiement
+- Multiples déploiements prod (docker compose + cloudflared)
+- Dernier deploy : 22:37 CEST avec Cropper.js v2 fonctionnel en prod
 
 ---
 
