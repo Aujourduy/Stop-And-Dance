@@ -1,9 +1,9 @@
 # État du Projet - Stop & Dance
 
-**Dernière mise à jour :** 2026-04-23
+**Dernière mise à jour :** 2026-04-23 (soir)
 **Branch :** main
-**Dernier commit main :** e6dea63
-**Statut :** ✅ PROJET COMPLET — **Prod en ligne : https://stopand.dance**
+**Dernier commit main :** 2258473
+**Statut :** ✅ PROJET COMPLET — **Prod en ligne : https://stopand.dance** + badge beta + admin sécurisé
 
 ---
 
@@ -66,8 +66,37 @@
 ### ⏳ TODO post-deploy immédiat
 
 1. Passer SSL/TLS en "Complet (strict)" dans le dashboard Cloudflare
-2. Révoquer le token API Cloudflare dans `~/.env-cloudflare`
+2. Révoquer le token API Cloudflare dans `~/.env-cloudflare` (TTL expire 2026-04-24 23:59)
 3. Supprimer (ou garder ?) la page `/contact` + route `contact` + action `pages#contact` (plus utilisée depuis centralisation du lien Tally)
+
+### 🎨 Session soir 2026-04-23 — Badge beta + transfert DB + admin
+
+**Badge beta publique (desktop + mobile) :**
+- Navbar desktop : badge moutarde centré "Beta publique — aidez-moi à construire l'agenda"
+- Mobile : chip "BETA" moutarde collé au logo + bandeau moutarde plein largeur sous le header
+- Commits `a17ed6a` + `3606b5c`
+
+**Transfert DB dev → prod :**
+- `pg_dump --clean --if-exists --no-owner --no-privileges` depuis `stopanddance_development`
+- Drop + recreate DB `stopanddance_production`, restore dump
+- Résultat : 220 events / 87 profs / 64 URLs / 42 photos (photos déjà dans l'image web via `COPY . .`)
+- Dump conservé dans `tmp/dev-dump.sql` (47MB, gitignored) jusqu'à la prochaine session
+
+**Admin sécurisé :**
+- Filtre IP Tailscale retiré de `Admin::ApplicationController` — incompatible avec Cloudflare Tunnel (`request.remote_ip` = IP Cloudflare, jamais 100.64.0.0/10)
+- Tentative Cloudflare Access (Google OAuth) abandonnée : le client OAuth Google pré-existant avait été supprimé côté Google Cloud → erreur `deleted_client`
+- Décision : HTTP Basic Auth seul (password 40 chars regénéré, ancien fuité dans le chat révoqué)
+- App Cloudflare Access supprimée via API (plus de config Zero Trust sur `/admin`)
+- Commit `2258473`
+
+**Incident sécurité traité :**
+- J'ai (Claude) affiché le `ADMIN_PASSWORD` en clair dans une réponse
+- Password régénéré (40 chars), `.env.production` mis à jour, containers recreate
+- Mémoire persistante ajoutée (`feedback_never_echo_secrets.md`) pour éviter la récidive
+
+**Fichiers temp à nettoyer ou garder :**
+- `tmp/dev-dump.sql` (47MB) — supprimer après validation prod, ou garder comme snapshot
+- `tmp/ui-test-beta-banner/` — screenshots validation, peut rester ou être supprimé
 
 ### 🐛 Pièges rencontrés / leçons
 
