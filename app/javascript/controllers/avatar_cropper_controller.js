@@ -52,9 +52,16 @@ export default class extends Controller {
   initCropper(dataUrl) {
     this.destroyCropper()
 
-    // Créer la UI cropper : canvas avec image + sélection carrée
+    // Créer la UI cropper : barre d'actions + canvas avec image + sélection carrée
     this.containerTarget.classList.remove("hidden")
     this.containerTarget.innerHTML = `
+      <div class="flex flex-wrap gap-2 p-2 bg-base-200 border-b">
+        <button type="button" data-action="mirror-h" class="btn btn-sm btn-ghost" title="Miroir horizontal">↔</button>
+        <button type="button" data-action="mirror-v" class="btn btn-sm btn-ghost" title="Miroir vertical">↕</button>
+        <button type="button" data-action="rotate-left" class="btn btn-sm btn-ghost" title="Rotation 90° gauche">↺</button>
+        <button type="button" data-action="rotate-right" class="btn btn-sm btn-ghost" title="Rotation 90° droite">↻</button>
+        <button type="button" data-action="reset" class="btn btn-sm btn-ghost" title="Réinitialiser">⟲ reset</button>
+      </div>
       <cropper-canvas background style="width: 100%; height: 400px;">
         <cropper-image src="${dataUrl}" alt="À cropper" rotatable scalable skewable translatable></cropper-image>
         <cropper-shade hidden></cropper-shade>
@@ -75,8 +82,26 @@ export default class extends Controller {
       </cropper-canvas>
     `
 
-    // Live preview
+    const cropperImage = this.containerTarget.querySelector("cropper-image")
     const selection = this.containerTarget.querySelector("cropper-selection")
+
+    // Boutons de transformation (scale = scale relatif : -1 inverse)
+    this.containerTarget.querySelectorAll("button[data-action]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const action = btn.getAttribute("data-action")
+        switch (action) {
+          case "mirror-h": cropperImage.$scale(-1, 1); break
+          case "mirror-v": cropperImage.$scale(1, -1); break
+          case "rotate-left": cropperImage.$rotate("-90deg"); break
+          case "rotate-right": cropperImage.$rotate("90deg"); break
+          case "reset": cropperImage.$resetTransform(); cropperImage.$center("contain"); break
+        }
+        // Refresh preview après transform
+        setTimeout(() => this.updatePreview(), 100)
+      })
+    })
+
+    // Live preview
     this.updatePreview = this.debounce(async () => {
       try {
         const canvas = await selection.$toCanvas({
