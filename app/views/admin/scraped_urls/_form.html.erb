@@ -47,13 +47,31 @@
       </div>
     <% end %>
 
-    <div class="mb-4">
+    <div class="mb-4" data-controller="avatar-cropper"
+         data-avatar-cropper-size-value="300">
       <%= f.label :avatar_file, "Upload d'un fichier (prioritaire sur l'URL)", class: "label font-bold" %>
-      <%= f.file_field :avatar_file, accept: "image/*", class: "file-input file-input-bordered w-full" %>
+      <%= f.file_field :avatar_file,
+                       accept: "image/*",
+                       class: "file-input file-input-bordered w-full",
+                       data: {
+                         avatar_cropper_target: "input",
+                         action: "change->avatar-cropper#fileSelected"
+                       } %>
       <p class="text-sm opacity-60 mt-1">
-        L'image sera automatiquement recadrée en carré 300×300. Les logos
-        rectangulaires sont paddés avec leur couleur dominante.
+        Choisis ton fichier puis ajuste la zone à cropper (carré). Un aperçu
+        300×300 apparaît à droite.
       </p>
+
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start">
+        <div data-avatar-cropper-target="container" class="hidden border rounded bg-base-100"></div>
+        <div>
+          <p class="text-sm font-bold mb-1">Aperçu 300×300</p>
+          <canvas data-avatar-cropper-target="preview"
+                  class="border rounded bg-base-100"
+                  width="300" height="300"
+                  style="width: 200px; height: 200px;"></canvas>
+        </div>
+      </div>
     </div>
 
     <div>

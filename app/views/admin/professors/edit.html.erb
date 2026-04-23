@@ -40,7 +40,8 @@
         <%= form.url_field :site_web, class: "input input-bordered w-full", placeholder: "https://..." %>
       </div>
 
-      <div>
+      <div data-controller="avatar-cropper"
+           data-avatar-cropper-size-value="300">
         <%= form.label :photo, "Photo (upload)", class: "label font-bold" %>
         <% if @professor.avatar_url.present? %>
           <div class="flex items-center gap-4 mb-3">
@@ -52,8 +53,27 @@
             <span class="text-sm opacity-60">Photo actuelle (300×300)</span>
           </div>
         <% end %>
-        <%= form.file_field :photo, accept: "image/*", class: "file-input file-input-bordered w-full" %>
-        <p class="text-sm opacity-60 mt-1">L'image sera automatiquement recadrée en carré 300×300px.</p>
+        <%= form.file_field :photo,
+                            accept: "image/*",
+                            class: "file-input file-input-bordered w-full",
+                            data: {
+                              avatar_cropper_target: "input",
+                              action: "change->avatar-cropper#fileSelected"
+                            } %>
+        <p class="text-sm opacity-60 mt-1">
+          Choisis ton fichier puis ajuste la zone à cropper. Un aperçu 300×300 apparaît à droite.
+        </p>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start">
+          <div data-avatar-cropper-target="container" class="hidden border rounded bg-base-100"></div>
+          <div>
+            <p class="text-sm font-bold mb-1">Aperçu 300×300</p>
+            <canvas data-avatar-cropper-target="preview"
+                    class="border rounded bg-base-100"
+                    width="300" height="300"
+                    style="width: 200px; height: 200px;"></canvas>
+          </div>
+        </div>
       </div>
 
       <div>
