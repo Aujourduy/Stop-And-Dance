@@ -1,0 +1,34 @@
+<div class="container mx-auto px-4 py-16 max-w-2xl">
+  <div class="text-center mb-8">
+    <h1 class="font-script italic text-primary text-5xl mb-6">Message bien reçu</h1>
+    <p class="text-2xl">Merci !</p>
+  </div>
+
+  <div class="card bg-base-100 shadow-sm">
+    <div class="card-body text-base-content space-y-4">
+      <p>
+        Stop &amp; Dance est un projet passionné fait sur mon temps libre.
+        Jeune papa avec un job à côté, je réponds personnellement à chaque message —
+        en général <strong>sous une semaine</strong>.
+      </p>
+      <p>
+        Merci de votre patience.
+      </p>
+    </div>
+  </div>
+
+  <div class="divider my-10">En attendant</div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <%= link_to evenements_path,
+                class: "btn btn-primary btn-lg",
+                data: { debug_id: "merci-cta-agenda" } do %>
+      Découvrir l'agenda
+    <% end %>
+    <%= link_to root_path,
+                class: "btn btn-outline btn-primary btn-lg",
+                data: { debug_id: "merci-cta-accueil" } do %>
+      Retour à l'accueil
+    <% end %>
+  </div>
+</div>

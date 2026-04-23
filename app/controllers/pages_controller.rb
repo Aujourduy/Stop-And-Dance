@@ -8,6 +8,9 @@ class PagesController < ApplicationController
   def contact
   end
 
+  def merci
+  end
+
   def actualites
   end
 
