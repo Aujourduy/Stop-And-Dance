@@ -9,9 +9,11 @@
 
       <% stats = Setting.instance %>
       <% if stats.stats_updated_at.present? %>
+        <% v = stats.stats_visits_7d.to_i %>
+        <% u = stats.stats_visitors_7d.to_i %>
         <p class="text-sm md:text-base opacity-70 mt-6">
-          Cette semaine : <strong class="text-primary"><%= stats.stats_visits_7d.to_i %> visites</strong>
-          de <strong class="text-primary"><%= stats.stats_visitors_7d.to_i %> visiteurs</strong>
+          Cette semaine : <strong class="text-primary"><%= v %> <%= "visite".pluralize(v) %></strong>
+          de <strong class="text-primary"><%= u %> <%= "visiteur".pluralize(u) %></strong>
         </p>
       <% end %>
     </div>
