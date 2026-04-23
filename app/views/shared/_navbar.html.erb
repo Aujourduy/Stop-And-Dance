@@ -3,14 +3,14 @@
     <%= link_to root_path, class: "flex items-center" do %>
       <%= image_tag "logo/favicon.ico", alt: "Stop & Dance", class: "h-6 w-6" %>
     <% end %>
-    <button data-action="click->mobile-drawer#toggle" class="btn btn-circle btn-primary btn-sm" aria-label="Open navigation menu">
-      ☰
+    <button data-action="click->mobile-drawer#toggle" class="btn btn-circle bg-terracotta hover:bg-terracotta border-none text-white text-xl" aria-label="Open navigation menu">
+      <i class="fa-solid fa-bars"></i>
     </button>
-    <%= link_to evenements_path, class: "flex items-center" do %>
-      <%= image_tag "figma/Group 4.svg", alt: "Agenda", class: "h-6 w-auto" %>
+    <%= link_to evenements_path, class: "btn btn-circle bg-moutarde hover:bg-moutarde border-none text-white text-xl", aria: { label: "Agenda" } do %>
+      <i class="fa-regular fa-calendar"></i>
     <% end %>
-    <%= link_to actualites_path, class: "flex items-center" do %>
-      <%= image_tag "figma/Group 5.svg", alt: "Actualités", class: "h-6 w-auto" %>
+    <%= link_to actualites_path, class: "btn btn-circle bg-green-600 hover:bg-green-700 border-none text-white text-xl", aria: { label: "Actualités" } do %>
+      <i class="fa-regular fa-newspaper"></i>
     <% end %>
   </div>
 
