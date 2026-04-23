@@ -30,6 +30,10 @@
           <% end %>
         <% end %>
         <%= link_to "Paramètres", edit_admin_settings_path, class: "btn btn-ghost btn-sm" %>
+        <%= link_to "📊 Stats", "https://stats.stopand.dance/stopand.dance",
+                    target: "_blank", rel: "noopener",
+                    class: "btn btn-ghost btn-sm",
+                    title: "Dashboard Plausible Analytics" %>
         <%= link_to "← Site public", root_path, class: "btn btn-ghost btn-sm" %>
       </div>
     </nav>
