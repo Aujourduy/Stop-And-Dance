@@ -2,10 +2,7 @@
   <%# Mobile header %>
   <header class="navbar bg-neutral text-neutral-content sticky top-0 z-50">
     <div class="navbar-start gap-2">
-      <%= link_to root_path, class: "btn btn-circle border-none p-0 overflow-hidden relative", aria: { label: "Accueil" } do %>
-        <%= image_tag "logo/favicon.svg", alt: "Stop & Dance", class: "w-full h-full object-cover" %>
-        <span class="absolute -bottom-1 -right-1 bg-moutarde text-black font-bold text-[8px] px-1 py-px leading-none rounded">BETA</span>
-      <% end %>
+      <%= link_to root_path, class: "btn btn-circle bg-bordeaux hover:bg-bordeaux-dark border-none text-white font-hero text-3xl leading-none relative", aria: { label: "Accueil" } do %>S<span class="absolute -bottom-1 -right-1 bg-moutarde text-black font-sans font-bold text-[8px] px-1 py-px leading-none rounded">BETA</span><% end %>
       <button data-action="click->mobile-drawer#toggle" class="btn btn-circle bg-terracotta hover:bg-terracotta border-none text-white text-xl" aria-label="Open navigation menu">
         <i class="fa-solid fa-bars"></i>
       </button>

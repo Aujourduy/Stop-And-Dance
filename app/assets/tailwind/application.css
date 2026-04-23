@@ -44,7 +44,8 @@
   --color-bordeaux-dark: #4C131C;
 
   /* Custom font families */
-  --font-script: 'Shrikhand', Georgia, serif;
+  --font-script: Georgia, serif;
+  --font-hero: 'Shrikhand', Georgia, serif;
   --font-sans: Inter, system-ui, sans-serif;
 
   /* Custom responsive breakpoints */

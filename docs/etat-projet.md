@@ -1,41 +1,54 @@
 # État du Projet - Stop & Dance
 
-**Dernière mise à jour :** 2026-04-23 (nuit)
+**Dernière mise à jour :** 2026-04-23 (nuit tardive)
 **Branch :** main
-**Dernier commit main :** 933fdda
+**Dernier commit main :** f35b812 (+ identité visuelle logo S en attente de commit)
 **Statut :** ✅ PROJET COMPLET — **Prod en ligne : https://stopand.dance** + badge beta + admin sécurisé
 
 ---
 
-## 🎨 SESSION 2026-04-23 (nuit) — Refonte navbar icônes ✅
+## 🎨 SESSION 2026-04-23 (nuit tardive) — Identité visuelle Shrikhand ✅
 
-**Remplacement des 3 liens navbar (burger / agenda / news) par des boutons ronds colorés avec icônes FontAwesome.**
+**Police Shrikhand (groovy 70s italique native Google Fonts) appliquée au titre hero "Stop & Dance" et au logo navbar sous forme d'un "S" blanc sur rond bordeaux. Favicon refait en harmonie.**
 
-### Changements UI
+### Titre hero (home)
 
-- **FontAwesome 6.5.2** chargé via CDN cdnjs dans `application.html.erb`
-- **3 boutons ronds** (btn-circle + text-xl) :
-  - Burger (`fa-solid fa-bars`) sur terracotta
-  - Agenda (`fa-regular fa-calendar`) sur moutarde
-  - News (`fa-regular fa-newspaper`) sur vert (bg-green-600)
-- **Logo Stop & Dance** également mis en rond même taille (btn-circle + overflow-hidden + object-cover) — 4 ronds homogènes dans la navbar
-- Badge "BETA" sur mobile repositionné en overlay absolu sur le rond logo
+- Google Fonts Shrikhand chargée dans `application.html.erb`
+- Variable dédiée `--font-hero: 'Shrikhand', Georgia, serif` dans `@theme` (Tailwind v4)
+- Classe `font-hero` appliquée **uniquement** sur le `<h1>` hero — `--font-script` reste Georgia pour tous les autres H1/H2/H6 (footer, filtres, events, about, contact, etc.) → pas de régression typo.
+
+### Logo navbar + favicon
+
+- Logo navbar (desktop + mobile) : remplacement du PNG terracotta par un **"S" Shrikhand blanc sur rond bordeaux `#6E1E2A`** (classe `font-hero`)
+- 4 ronds homogènes navbar : bordeaux (logo S) / terracotta (burger) / moutarde (agenda) / vert (news)
+- Badge BETA mobile conservé en overlay moutarde avec `font-sans` (ne subit pas Shrikhand)
+- **Favicon entièrement régénéré** à partir du "S" Shrikhand rasterisé (Shrikhand installée localement dans `~/.local/share/fonts/`, rendu via ImageMagick) :
+  - `favicon.svg` — vrai SVG vectoriel (remplace l'ancien wrapper PNG base64 de 80 KB)
+  - `favicon.ico` — multi-résolution 16/32/48/64
+  - `favicon-96x96.png`, `apple-touch-icon.png` (180), `web-app-manifest-192x192.png`, `web-app-manifest-512x512.png`
+- `logo-sd.png` conservé (non utilisé directement mais gardé en archive)
 
 ### Fichiers modifiés
 
-- `app/views/layouts/application.html.erb` (CDN FontAwesome)
-- `app/views/shared/_navbar.html.erb` (desktop)
-- `app/views/shared/_mobile_drawer.html.erb` (mobile)
+- `app/assets/tailwind/application.css` — ajout `--font-hero`, `--font-script` restauré à Georgia
+- `app/views/layouts/application.html.erb` — lien Google Fonts Shrikhand
+- `app/views/shared/_hero.html.erb` — classe `font-hero`
+- `app/views/shared/_navbar.html.erb` — logo rond "S" Shrikhand
+- `app/views/shared/_mobile_drawer.html.erb` — idem + badge BETA overlay
+- `app/assets/images/logo/` — favicon.svg + favicon.ico + 4 PNG régénérés
 
-### Commits
+### Validation Playwright (`tmp/ui-test-2026-04-23-logo-s/`)
+
+- Hero home : `Shrikhand, Georgia, serif` ✓
+- Logo navbar : `Shrikhand, Georgia, serif` ✓
+- Footer h6 / Evenements h1 / About h1 : `Georgia, serif` ✓ (revenus à l'état original)
+- Screenshots desktop 1440px + mobile 375px OK
+
+### Commits précédents de la session
 
 - `40dfcd6` — feat: Navbar — boutons ronds colorés avec icônes FontAwesome
 - `933fdda` — feat: Logo en rond de même taille que les boutons navbar
-
-### Validation
-
-- Screenshots Playwright (desktop 1440px + mobile 375px) dans `tmp/ui-test-2026-04-23-navbar-icons/`
-- Navigations testées : burger ouvre drawer, agenda → /evenements, news → /actualites
+- `f35b812` — feat: Police Shrikhand pour le hero "Stop & Dance"
 
 ---
 
