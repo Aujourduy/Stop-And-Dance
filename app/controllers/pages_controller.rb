@@ -11,6 +11,9 @@ class PagesController < ApplicationController
   def merci
   end
 
+  def donation
+  end
+
   def actualites
   end
 

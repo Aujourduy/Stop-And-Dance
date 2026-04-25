@@ -103,13 +103,14 @@
           </p>
         </div>
       </div>
-      <div class="card bg-base-100 shadow-sm border border-base-200">
+      <%= link_to donation_url, target: "_blank", rel: "noopener",
+                  class: "card bg-base-100 shadow-sm border border-base-200 hover:border-primary transition" do %>
         <div class="card-body p-5">
           <div class="text-3xl mb-2">💛</div>
           <h3 class="font-bold mb-2">Donation</h3>
           <p class="text-sm opacity-80">Participer aux frais de serveur et d'abonnements aux services.</p>
         </div>
-      </div>
+      <% end %>
     </div>
   </section>
 

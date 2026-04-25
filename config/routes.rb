@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   get "/a-propos", to: "pages#about", as: :about
   get "/contact", to: "pages#contact"
   get "/merci", to: "pages#merci", as: :merci
+  get "/donation", to: "pages#donation", as: :donation
   # Page publique "Les proposants" : liste profs + recherche + modal
   resources :proposants, only: [ :index, :show ], controller: "proposants"
   get "/actualites", to: "pages#actualites", as: :actualites  # Stub page

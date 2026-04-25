@@ -1,0 +1,50 @@
+<div class="container mx-auto px-4 py-12 max-w-2xl">
+  <header class="text-center mb-10 mt-4">
+    <div class="text-5xl mb-4">💛</div>
+    <h1 class="font-script italic text-primary text-4xl sm:text-5xl mb-4 leading-tight">Soutenir Stop & Dance</h1>
+    <p class="text-base-content opacity-70 italic">Merci pour ton geste, il compte beaucoup.</p>
+  </header>
+
+  <article class="prose prose-lg max-w-none mb-10">
+    <p>
+      Stop &amp; Dance est un projet <strong>gratuit pour tout le monde</strong>,
+      construit sur mon temps libre.
+      Mais il a quand même un coût : serveur, nom de domaine, services tiers
+      pour le scraping et l'analyse des sites des professeur·e·s.
+    </p>
+
+    <p>
+      Si tu trouves que le site te rend service, ou simplement que ça vaut la
+      peine d'exister, tu peux soutenir le projet avec une donation libre.
+      <strong>Chaque euro compte</strong> et part directement dans les frais
+      de fonctionnement.
+    </p>
+
+    <p>
+      Pas de pression : si la donation n'est pas pour toi, parler du site autour
+      de toi est aussi une vraie aide. 🫶
+    </p>
+  </article>
+
+  <div class="text-center mb-10">
+    <%= link_to donation_url,
+                target: "_blank",
+                rel: "noopener",
+                class: "btn btn-primary btn-lg",
+                data: { debug_id: "donation-cta" } do %>
+      💛 Faire un don via Lydia
+    <% end %>
+    <p class="text-sm opacity-60 mt-3">
+      Cagnotte sécurisée — montant libre — Lydia (sans frais pour le donateur).
+    </p>
+  </div>
+
+  <div class="bg-base-200 rounded-box p-6 text-center">
+    <p class="text-sm">
+      D'autres façons d'aider :
+      <%= link_to "ajouter un cours absent", contact_form_url, target: "_blank", rel: "noopener", class: "link link-primary" %>
+      ·
+      <%= link_to "découvrir l'agenda", evenements_path, class: "link link-primary" %>
+    </p>
+  </div>
+</div>
