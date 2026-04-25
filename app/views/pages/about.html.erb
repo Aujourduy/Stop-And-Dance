@@ -1,19 +1,18 @@
 <div class="container mx-auto px-4 py-12 max-w-3xl">
   <header class="text-center mb-12">
     <h1 class="font-script italic text-primary text-4xl sm:text-5xl mb-4 leading-tight">Qui suis-je</h1>
-    <p class="text-base-content opacity-70 italic">Une rencontre avec la danse libre, il y a 17 ans…</p>
+    <p class="text-lg text-base-content opacity-70 italic">Une rencontre avec la danse libre, il y a 17 ans…</p>
   </header>
 
-  <article class="prose prose-lg max-w-none mb-12">
-    <p class="text-lg leading-relaxed">
+  <%# Tout le corps en text-lg (18px) pour lisibilité homogène %>
+  <article class="text-lg leading-relaxed space-y-5 mb-12">
+    <p>
       Depuis ma première rencontre avec la danse libre, un stage de Danse des 5 Rythmes
       <strong>il y a 17 ans (2008)</strong>, je n'ai pas arrêté de danser.
       Chaque semaine. Plusieurs fois par semaine.
     </p>
 
-    <p class="text-lg leading-relaxed">
-      C'est une passion. Un art de vivre. Mon expression personnelle.
-    </p>
+    <p>C'est une passion. Un art de vivre. Mon expression personnelle.</p>
 
     <p>
       Tellement heureux d'avoir découvert cet espace que j'ai tout de suite voulu
@@ -41,10 +40,10 @@
 
     <div class="divider my-8"></div>
 
-    <p class="text-lg leading-relaxed">
+    <p>
       <strong>Aujourd'hui, tout ce que j'ai voulu pour un site agenda de danses libres
       et exploratoires se concrétise :</strong>
-      <a href="<%= root_path %>" class="link link-primary font-bold">StopAnd.Dance</a>
+      <%= link_to "StopAnd.Dance", root_path, class: "link link-primary font-bold" %>
     </p>
 
     <p>
@@ -56,7 +55,7 @@
       Vive l'informatique — et surtout vive les IA. ✨
     </p>
 
-    <p class="text-lg leading-relaxed">
+    <p>
       Je suis heureux de te proposer ce site où il y aura
       <strong>tous les cours de danse libres ou exploratoires de France</strong>.
       Telle est ma vision.
@@ -66,7 +65,7 @@
   <%# Section "Si toi aussi…" %>
   <section class="bg-base-200 rounded-box p-6 sm:p-8 mb-12">
     <h2 class="font-script italic text-primary text-3xl mb-6 text-center">Si toi aussi…</h2>
-    <ul class="space-y-4 text-base-content">
+    <ul class="space-y-4 text-lg leading-relaxed text-base-content">
       <li class="flex gap-3">
         <span class="text-primary text-xl">→</span>
         <span>tu trouves que ces espaces de danse sont une <strong>source de vie et de beauté</strong>,</span>
@@ -88,34 +87,32 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="card bg-base-100 shadow-sm border border-base-200">
         <div class="card-body p-5">
-          <div class="text-3xl mb-2">📣</div>
-          <h3 class="font-bold mb-2">Bouche à oreille</h3>
-          <p class="text-sm opacity-80">Parle de ce site autour de toi et sur les réseaux sociaux.</p>
+          <div class="text-4xl mb-2"><i class="fa-solid fa-bullhorn text-primary"></i></div>
+          <h3 class="font-bold mb-2 text-lg">Bouche à oreille</h3>
+          <p class="text-lg leading-relaxed opacity-80">Parle de ce site autour de toi et sur les réseaux sociaux.</p>
         </div>
       </div>
-      <div class="card bg-base-100 shadow-sm border border-base-200">
+      <%= link_to contact_form_url, target: "_blank", rel: "noopener",
+                  class: "card bg-base-100 shadow-sm border border-base-200 hover:border-primary transition" do %>
         <div class="card-body p-5">
-          <div class="text-3xl mb-2">✍️</div>
-          <h3 class="font-bold mb-2">Ajouter des cours</h3>
-          <p class="text-sm opacity-80">
-            Connais des profs absents de l'agenda ?
-            <%= link_to "Envoie-moi un message", contact_form_url, target: "_blank", rel: "noopener", class: "link link-primary" %>.
-          </p>
+          <div class="text-4xl mb-2"><i class="fa-solid fa-pen-to-square text-primary"></i></div>
+          <h3 class="font-bold mb-2 text-lg">Ajouter un prof</h3>
+          <p class="text-lg leading-relaxed opacity-80">Connais un·e prof absent·e de l'agenda ? Envoie-moi un message.</p>
         </div>
-      </div>
+      <% end %>
       <%= link_to donation_url, target: "_blank", rel: "noopener",
                   class: "card bg-base-100 shadow-sm border border-base-200 hover:border-primary transition" do %>
         <div class="card-body p-5">
-          <div class="text-3xl mb-2">💛</div>
-          <h3 class="font-bold mb-2">Donation</h3>
-          <p class="text-sm opacity-80">Participer aux frais de serveur et d'abonnements aux services.</p>
+          <div class="text-4xl mb-2"><i class="fa-solid fa-hand-holding-heart text-primary"></i></div>
+          <h3 class="font-bold mb-2 text-lg">Donation</h3>
+          <p class="text-lg leading-relaxed opacity-80">Participer aux frais de serveur et d'abonnements aux services.</p>
         </div>
       <% end %>
     </div>
   </section>
 
   <%# Signature %>
-  <section class="bg-primary/10 rounded-box p-6 sm:p-8 text-center">
+  <section class="bg-primary/10 rounded-box p-6 sm:p-8 text-center text-lg leading-relaxed">
     <p class="text-2xl font-script italic text-primary mb-4">Je suis Duy DANG</p>
     <p class="mb-3">
       <strong>Ma raison d'être :</strong>
