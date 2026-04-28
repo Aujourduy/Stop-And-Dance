@@ -1,49 +1,45 @@
-<div class="container mx-auto px-0 lg:px-4 py-8" data-controller="mobile-filters">
-  <%# Mobile filter pill — sticky en haut, isolé dans un turbo-frame pour MAJ au filtrage %>
+<div class="container mx-auto px-0 lg:px-4 py-8 max-w-3xl" data-controller="mobile-filters">
+  <%# Filter pill (sticky top, toutes tailles) %>
   <%= turbo_frame_tag "filter-pill" do %>
     <%= render "filter_pill" %>
   <% end %>
 
-  <%# Mobile filter overlay (hidden by default) %>
+  <%# Newsletter — collée juste sous le pill, toujours visible %>
+  <div class="px-4 lg:px-0 mb-6">
+    <%= render "shared/newsletter_signup" %>
+  </div>
+
+  <%# Drawer overlay (toutes tailles) %>
   <div data-mobile-filters-target="overlay"
-       class="hidden fixed inset-0 bg-black/50 z-50 lg:hidden"
+       class="hidden fixed inset-0 bg-black/50 z-50"
        data-action="click->mobile-filters#close">
   </div>
 
+  <%# Drawer panel filtres %>
   <aside data-mobile-filters-target="panel"
-         class="hidden fixed top-0 right-0 h-full w-80 bg-white z-50 overflow-y-auto transform transition-transform lg:hidden filter-overlay">
+         class="hidden fixed top-0 right-0 h-full w-80 bg-base-100 z-50 overflow-y-auto transform transition-transform filter-overlay">
     <%= render "shared/filters" %>
   </aside>
 
-  <div class="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8">
-    <%# Main column: Event list (70% on desktop) %>
-    <div>
-      <%= turbo_frame_tag "events-list", data: { controller: "infinite-scroll" } do %>
-        <h1 class="text-3xl font-script italic mb-8 px-4 lg:px-0">
-          <%= @filtered ? "Agenda filtré" : "Agenda complet" %> : Ateliers (<%= @atelier_count %>) et Stages (<%= @stage_count %>)
-        </h1>
+  <%# Liste events %>
+  <%= turbo_frame_tag "events-list", data: { controller: "infinite-scroll" } do %>
+    <h1 class="text-3xl font-script italic mb-8 px-4 lg:px-0">
+      <%= @filtered ? "Agenda filtré" : "Agenda complet" %> : Ateliers (<%= @atelier_count %>) et Stages (<%= @stage_count %>)
+    </h1>
 
-        <%= render "events_list", events: @events %>
+    <%= render "events_list", events: @events %>
 
-        <%# Infinite scroll trigger %>
-        <% if @pagy.next %>
-          <%= turbo_frame_tag "page-#{@pagy.next}",
-                              src: evenements_path(page: @pagy.next, format: :turbo_stream),
-                              loading: :lazy do %>
-            <div class="text-center py-8">
-              <span class="loading loading-spinner loading-md text-primary"></span>
-            </div>
-          <% end %>
-        <% end %>
+    <%# Infinite scroll trigger %>
+    <% if @pagy.next %>
+      <%= turbo_frame_tag "page-#{@pagy.next}",
+                          src: evenements_path(page: @pagy.next, format: :turbo_stream),
+                          loading: :lazy do %>
+        <div class="text-center py-8">
+          <span class="loading loading-spinner loading-md text-primary"></span>
+        </div>
       <% end %>
-    </div>
-
-    <%# Right sidebar: Filters (30% on desktop, hidden on mobile) %>
-    <aside class="hidden lg:block">
-      <%= render "shared/filters" %>
-      <%= render "shared/newsletter_signup" %>
-    </aside>
-  </div>
+    <% end %>
+  <% end %>
 </div>
 
 <%# Modal container for event details (Turbo Frame) %>
