@@ -16,7 +16,14 @@ require "cloudinary"
 # - WebP/AVIF auto via f_auto si on l'active dans la transformation URL
 class ScrapedUrlAvatarService
   SIZE = 300
-  FOLDER = "stopanddance/avatars".freeze
+
+  # Folder Cloudinary segmenté par environnement Rails pour ne pas que
+  # dev/prod/test se marchent dessus (1 upload prod ne doit pas écraser
+  # 1 upload dev). Folders : stop-and-dance-prod/avatars,
+  # stop-and-dance-dev/avatars, stop-and-dance-test/avatars.
+  def self.folder
+    "stop-and-dance-#{Rails.env}/avatars"
+  end
 
   # Upload direct depuis le form admin. Le blob arrive déjà cropé carré
   # par Cropper.js v2 côté navigateur — on l'upload tel quel.
@@ -29,7 +36,7 @@ class ScrapedUrlAvatarService
 
     result = Cloudinary::Uploader.upload(
       uploaded_file,
-      folder: FOLDER,
+      folder: folder,
       public_id: public_id,
       overwrite: true,
       invalidate: true,                  # purge cache CDN si update
@@ -61,7 +68,7 @@ class ScrapedUrlAvatarService
     # c_pad + b_auto:border (auto-détection couleur des bords).
     result = Cloudinary::Uploader.upload(
       url,
-      folder: FOLDER,
+      folder: folder,
       public_id: public_id,
       overwrite: true,
       invalidate: true,
@@ -79,7 +86,7 @@ class ScrapedUrlAvatarService
   end
 
   def self.delete_avatar(scraped_url)
-    public_id = "#{FOLDER}/scraped_url_#{scraped_url.id}"
+    public_id = "#{folder}/scraped_url_#{scraped_url.id}"
     Cloudinary::Uploader.destroy(public_id, resource_type: "image")
   rescue => e
     Rails.logger.warn("Cloudinary destroy failed for #{public_id}: #{e.message}")

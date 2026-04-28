@@ -10,7 +10,11 @@ require "cloudinary"
 #   trouvée par le scraping) puis upload sur Cloudinary
 class ProfessorPhotoService
   SIZE = 300
-  FOLDER = "stopanddance/professors".freeze
+
+  # Folder Cloudinary segmenté par environnement Rails (dev/prod/test).
+  def self.folder
+    "stop-and-dance-#{Rails.env}/professors"
+  end
 
   def self.process_upload(professor, uploaded_file)
     return { error: "No file" } if uploaded_file.blank?
@@ -19,7 +23,7 @@ class ProfessorPhotoService
 
     result = Cloudinary::Uploader.upload(
       uploaded_file,
-      folder: FOLDER,
+      folder: folder,
       public_id: public_id,
       overwrite: true,
       invalidate: true,
@@ -44,7 +48,7 @@ class ProfessorPhotoService
 
     result = Cloudinary::Uploader.upload(
       url,
-      folder: FOLDER,
+      folder: folder,
       public_id: public_id,
       overwrite: true,
       invalidate: true,
@@ -62,7 +66,7 @@ class ProfessorPhotoService
   end
 
   def self.delete_photos(professor)
-    public_id = "#{FOLDER}/prof_#{professor.id}"
+    public_id = "#{folder}/prof_#{professor.id}"
     Cloudinary::Uploader.destroy(public_id, resource_type: "image")
   rescue => e
     Rails.logger.warn("Cloudinary destroy failed for #{public_id}: #{e.message}")
