@@ -24,7 +24,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Shrikhand&display=swap" rel="stylesheet">
+    <%# Fraunces (display, axes wght/SOFT/WONK) + Inter (body) + Shrikhand (logo "S") %>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..900,0..100,0..1;1,9..144,400..900,0..100,0..1&family=Inter:wght@400;500;600;700&family=Shrikhand&display=swap" rel="stylesheet">
     <%= javascript_importmap_tags %>
 
     <%# Plausible Analytics (self-hosted) — tracking automatique des pages publiques %>
@@ -33,7 +34,7 @@
     <% end %>
   </head>
 
-  <body class="bg-base-100" data-theme="stopanddance" <%= "data-controller=debug-design" if Rails.env.development? %>>
+  <body class="bg-base-100" data-theme="bydou" <%= "data-controller=debug-design" if Rails.env.development? %>>
     <%# Debug Design Mode (Development only) %>
     <% if Rails.env.development? %>
       <div data-debug-design-target="banner" class="hidden fixed top-0 left-0 right-0 bg-red-600 text-white text-center py-2 font-bold" style="z-index: 2147483647;">

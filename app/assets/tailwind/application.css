@@ -3,27 +3,45 @@
   themes: light --default;
 }
 
-/* Custom DaisyUI theme matching Stop & Dance identity */
+/* DaisyUI theme: Bydou (Système de Design v2)
+   Voir docs/identite-visuel.md pour le rationnel complet. */
 @plugin "daisyui/theme" {
-  name: "stopanddance";
+  name: "bydou";
   default: true;
   color-scheme: light;
-  --color-base-100: #F5E6D3;
-  --color-base-200: #E8D4BB;
-  --color-base-300: #D4BFA3;
-  --color-base-content: #1A1A1A;
-  --color-primary: #C2623F;
-  --color-primary-content: #FFFFFF;
-  --color-secondary: #D4A017;
-  --color-secondary-content: #FFFFFF;
-  --color-accent: #1A1A1A;
-  --color-accent-content: #FFFFFF;
-  --color-neutral: #1A1A1A;
-  --color-neutral-content: #F5E6D3;
-  --color-info: #3B82F6;
-  --color-success: #22C55E;
-  --color-warning: #D4A017;
-  --color-error: #EF4444;
+
+  /* Bases — crème lumière + brun profond (anti-blanc/noir clinique) */
+  --color-base-100: #F8F3EA;       /* Crème lumière — fond principal */
+  --color-base-200: #E8DCCA;       /* Sable ombré — fond alterné, cards */
+  --color-base-300: #B29D7E;       /* Sable — fonds doux, sections calmes */
+  --color-base-content: #2D231C;   /* Brun profond — texte principal */
+
+  /* Primary — Terracotta : identité forte, CTA principaux, titres porteurs */
+  --color-primary: #BF462E;
+  --color-primary-content: #F8F3EA;
+
+  /* Secondary — Eucalyptus : actions informatives, contraste structurel */
+  --color-secondary: #6C9D9A;
+  --color-secondary-content: #F8F3EA;
+
+  /* Accent — Corail vif : CTA exclusivement (10% strict) */
+  --color-accent: #F2815A;
+  --color-accent-content: #2D231C;
+
+  /* Neutral — brun profond contrasté */
+  --color-neutral: #2D231C;
+  --color-neutral-content: #F8F3EA;
+
+  /* États sémantiques */
+  --color-info: #1F3158;           /* Bleu chàm — profondeur, frameworks */
+  --color-info-content: #F8F3EA;
+  --color-success: #6C9D9A;        /* Eucalyptus */
+  --color-success-content: #F8F3EA;
+  --color-warning: #BB8777;        /* Argile rose — soutien chaud */
+  --color-warning-content: #2D231C;
+  --color-error: #8B2A1A;          /* Terracotta foncé */
+  --color-error-content: #F8F3EA;
+
   --rounded-box: 0.75rem;
   --rounded-btn: 0.5rem;
   --rounded-badge: 1rem;
@@ -31,22 +49,52 @@
 
 /* Theme configuration for custom design tokens */
 @theme {
-  /* Custom brand colors */
-  --color-terracotta: #C2623F;
-  --color-terracotta-light: #D97E5C;
-  --color-terracotta-dark: #A5502F;
-  --color-beige: #F5E6D3;
-  --color-beige-dark: #E8D4BB;
-  --color-dark-bg: #1A1A1A;
-  --color-moutarde: #D4A017;
-  --color-moutarde-dark: #B8860B;
+  /* === Palette Bydou v2 (couleurs nommées pour Tailwind) === */
+
+  /* Couleurs principales (60-30-10) */
+  --color-terracotta: #BF462E;     /* Primary (anciennement #C2623F) */
+  --color-terracotta-light: #D9614A;
+  --color-terracotta-dark: #8B2A1A;
+  --color-eucalyptus: #6C9D9A;     /* Secondary */
+  --color-eucalyptus-dark: #527975;
+  --color-corail: #F2815A;         /* Accent CTA — 10% strict */
+
+  /* Couleurs de soutien */
+  --color-argile: #BB8777;         /* Hover states, micro-éléments */
+  --color-sable: #B29D7E;          /* Neutre chaud */
+  --color-cham: #1F3158;           /* Bleu chàm — pull-quotes, frameworks */
+
+  /* Neutres système */
+  --color-creme: #F8F3EA;          /* Crème lumière (anciennement beige) */
+  --color-sable-ombre: #E8DCCA;    /* Sable ombré (anciennement beige-dark) */
+  --color-brun: #2D231C;           /* Brun profond (anciennement dark-bg) */
+
+  /* === Aliases legacy (rétrocompat avec le code existant) === */
+  --color-beige: #F8F3EA;          /* alias → creme */
+  --color-beige-dark: #E8DCCA;     /* alias → sable-ombre */
+  --color-dark-bg: #2D231C;        /* alias → brun */
+
+  /* Logo asset historique (conservé tel quel — distinctif) */
   --color-bordeaux: #6E1E2A;
   --color-bordeaux-dark: #4C131C;
 
-  /* Custom font families */
-  --font-script: Georgia, serif;
-  --font-hero: 'Shrikhand', Georgia, serif;
-  --font-sans: Inter, system-ui, sans-serif;
+  /* Moutarde temporairement conservé pour le badge BETA et navbar
+     (à migrer vers eucalyptus dans une prochaine itération si besoin) */
+  --color-moutarde: #D4A017;
+  --color-moutarde-dark: #B8860B;
+
+  /* === Typographie Bydou v2 === */
+  --font-display: 'Fraunces', Georgia, serif;        /* Titres, headlines */
+  --font-sans: 'Inter', system-ui, sans-serif;       /* Body, UI, métadonnées */
+
+  /* Aliases legacy typographie */
+  --font-script: 'Fraunces', Georgia, serif;         /* alias → display (Fraunces remplace Georgia) */
+  --font-hero: 'Shrikhand', Georgia, serif;          /* Logo "S" navbar — asset distinctif conservé */
+
+  /* === Hiérarchie texte (3 opacités du brun profond) === */
+  --color-text-primary: rgba(45, 35, 28, 1);
+  --color-text-secondary: rgba(45, 35, 28, 0.7);
+  --color-text-tertiary: rgba(45, 35, 28, 0.45);
 
   /* Custom responsive breakpoints */
   --breakpoint-xs: 390px;
@@ -57,8 +105,22 @@
   --breakpoint-2xl: 1728px;
 }
 
-/* Accessibility: Focus indicators */
+/* Body : Inter par défaut, ratio de ligne confortable */
 @layer base {
+  body {
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.7;
+    letter-spacing: 0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+  }
+
+  /* Accessibility: Focus indicators */
   a:focus, button:focus, input:focus, select:focus, textarea:focus {
     @apply outline-2 outline-offset-2 outline-terracotta;
   }
@@ -67,6 +129,6 @@
 /* Custom layer for reusable patterns */
 @layer components {
   .btn-primary {
-    @apply bg-terracotta hover:bg-terracotta-dark text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200;
+    @apply bg-terracotta hover:bg-terracotta-dark text-creme font-medium py-3 px-6 rounded-lg transition-colors duration-200;
   }
 }
