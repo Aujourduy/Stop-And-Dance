@@ -27,6 +27,9 @@ services:
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       PLAUSIBLE_API_KEY: ${PLAUSIBLE_API_KEY}
       PLAUSIBLE_SITE_ID: ${PLAUSIBLE_SITE_ID:-stopand.dance}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
     volumes:
       - ./log:/rails/log
       - ~/.claude:/root/.claude  # Claude CLI auth persistence
@@ -46,6 +49,9 @@ services:
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       PLAUSIBLE_API_KEY: ${PLAUSIBLE_API_KEY}
       PLAUSIBLE_SITE_ID: ${PLAUSIBLE_SITE_ID:-stopand.dance}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
     command: bundle exec rake solid_queue:start
     volumes:
       - ./log:/rails/log

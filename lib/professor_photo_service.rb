@@ -1,51 +1,70 @@
-require "mini_magick"
+require "open-uri"
+require "cloudinary"
 
+# Upload des photos de Professor sur Cloudinary.
+#
+# Architecture identique à ScrapedUrlAvatarService :
+# - process_upload : upload depuis form admin (Cropper.js produit déjà
+#   un blob carré 300×300, on upload tel quel)
+# - download_from_url : télécharge depuis une URL externe (typiquement
+#   trouvée par le scraping) puis upload sur Cloudinary
 class ProfessorPhotoService
-  PHOTO_DIR = Rails.root.join("public", "photos", "professors")
   SIZE = 300
+  FOLDER = "stopanddance/professors".freeze
 
   def self.process_upload(professor, uploaded_file)
     return { error: "No file" } if uploaded_file.blank?
 
-    FileUtils.mkdir_p(PHOTO_DIR)
+    public_id = "prof_#{professor.id}"
 
-    filename = "prof_#{professor.id}.jpg"
-    output_path = PHOTO_DIR.join(filename)
+    result = Cloudinary::Uploader.upload(
+      uploaded_file,
+      folder: FOLDER,
+      public_id: public_id,
+      overwrite: true,
+      invalidate: true,
+      resource_type: "image",
+      transformation: [
+        { width: SIZE, height: SIZE, crop: "fill", gravity: "auto" },
+        { quality: "auto", fetch_format: "auto" }
+      ]
+    )
 
-    image = MiniMagick::Image.read(uploaded_file.read)
-    uploaded_file.rewind
-
-    image.combine_options do |c|
-      c.resize "#{SIZE}x#{SIZE}^"
-      c.gravity "center"
-      c.extent "#{SIZE}x#{SIZE}"
-      c.quality 85
-    end
-    image.format "jpg"
-    image.write(output_path)
-
-    "/photos/professors/#{filename}"
+    result["secure_url"]
   rescue => e
+    Rails.logger.error("ProfessorPhotoService upload error for ##{professor.id}: #{e.message}")
     { error: e.message }
-  end
-
-  def self.delete_photos(professor)
-    path = PHOTO_DIR.join("prof_#{professor.id}.jpg")
-    FileUtils.rm_f(path)
   end
 
   def self.download_from_url(professor, url)
     return { error: "No URL" } if url.blank?
+    return { error: "Already a Cloudinary URL" } if url.include?("res.cloudinary.com")
 
-    require "open-uri"
-    tempfile = URI.parse(url).open
-    uploaded = ActionDispatch::Http::UploadedFile.new(
-      tempfile: tempfile,
-      filename: "download.jpg",
-      type: "image/jpeg"
+    public_id = "prof_#{professor.id}"
+
+    result = Cloudinary::Uploader.upload(
+      url,
+      folder: FOLDER,
+      public_id: public_id,
+      overwrite: true,
+      invalidate: true,
+      resource_type: "image",
+      transformation: [
+        { width: SIZE, height: SIZE, crop: "fill", gravity: "auto" },
+        { quality: "auto", fetch_format: "auto" }
+      ]
     )
-    process_upload(professor, uploaded)
+
+    result["secure_url"]
   rescue => e
+    Rails.logger.error("ProfessorPhotoService download error for ##{professor.id}: #{e.message}")
     { error: e.message }
+  end
+
+  def self.delete_photos(professor)
+    public_id = "#{FOLDER}/prof_#{professor.id}"
+    Cloudinary::Uploader.destroy(public_id, resource_type: "image")
+  rescue => e
+    Rails.logger.warn("Cloudinary destroy failed for #{public_id}: #{e.message}")
   end
 end
