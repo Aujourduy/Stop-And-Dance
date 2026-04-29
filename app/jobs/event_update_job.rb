@@ -28,8 +28,11 @@ class EventUpdateJob < ApplicationJob
     # Expand recurring events into individual dates
     expanded_events = result[:events].flat_map { |e| RecurrenceExpander.expand(e) }
 
-    # Clean slate: delete all existing events for this URL before recreating
-    old_count = Event.where(scraped_url: scraped_url).delete_all
+    # Clean slate : delete les events VISIBLES de cette URL avant recréation.
+    # Les events cachés (hidden_at présent) sont PRÉSERVÉS — ils ne réapparaîtront
+    # pas même si la source les contient encore. Permet de "blacklister" un event
+    # depuis l'admin sans qu'il revienne au prochain scrape.
+    old_count = Event.where(scraped_url: scraped_url, hidden_at: nil).delete_all
 
     # Create events
     expanded_events.each do |event_data|

@@ -4,13 +4,30 @@
 
 <div class="bg-white rounded-lg shadow p-6 mb-6">
   <div class="flex justify-between items-start mb-4 gap-2">
-    <h1 class="text-2xl font-bold"><%= @event.titre %></h1>
+    <h1 class="text-2xl font-bold">
+      <%= @event.titre %>
+      <% if @event.hidden? %>
+        <span class="badge badge-warning ml-2 align-middle">Caché</span>
+      <% end %>
+    </h1>
     <div class="flex gap-2 shrink-0">
       <%= link_to "Modifier", edit_admin_event_path(@event), class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+      <% if @event.hidden? %>
+        <%= button_to "Republier",
+                      toggle_visibility_admin_event_path(@event),
+                      method: :patch,
+                      class: "bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" %>
+      <% else %>
+        <%= button_to "Cacher",
+                      toggle_visibility_admin_event_path(@event),
+                      method: :patch,
+                      form: { data: { turbo_confirm: "Cacher « #{@event.titre} » ? Il restera caché aux prochains scrapes." } },
+                      class: "bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700" %>
+      <% end %>
       <%= button_to "Supprimer",
                     admin_event_path(@event),
                     method: :delete,
-                    form: { data: { turbo_confirm: "Supprimer définitivement « #{@event.titre} » ? Cette action est irréversible." } },
+                    form: { data: { turbo_confirm: "Supprimer définitivement « #{@event.titre} » ? Cette action est irréversible. Si l'event existe encore sur la source, il sera RECRÉÉ au prochain scrape (préfère 'Cacher' dans ce cas)." } },
                     class: "bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" %>
     </div>
   </div>

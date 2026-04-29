@@ -1,15 +1,33 @@
 <%= turbo_stream.append "admin-events-tbody" do %>
   <% @events.each do |event| %>
-    <tr class="hover">
-      <td><%= link_to event.titre, admin_event_path(event), class: "link link-primary", data: { turbo_frame: "_top" } %></td>
+    <tr class="hover <%= 'opacity-50' if event.hidden? %>">
+      <td>
+        <%= link_to event.titre, admin_event_path(event), class: "link link-primary", data: { turbo_frame: "_top" } %>
+        <% if event.hidden? %>
+          <span class="badge badge-warning badge-xs ml-1">Caché</span>
+        <% end %>
+      </td>
       <td class="text-sm"><%= event.date_debut.strftime("%d/%m/%Y") %></td>
       <td class="text-sm"><%= event.display_professors.presence || event.professor&.nom %></td>
       <td class="text-right">
         <%= link_to "Modifier", edit_admin_event_path(event), class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
+        <% if event.hidden? %>
+          <%= button_to "Republier",
+                        toggle_visibility_admin_event_path(event),
+                        method: :patch,
+                        form: { turbo_frame: "_top" },
+                        class: "btn btn-ghost btn-xs text-success" %>
+        <% else %>
+          <%= button_to "Cacher",
+                        toggle_visibility_admin_event_path(event),
+                        method: :patch,
+                        form: { data: { turbo_confirm: "Cacher « #{event.titre} » ?" }, turbo_frame: "_top" },
+                        class: "btn btn-ghost btn-xs text-warning" %>
+        <% end %>
         <%= button_to "Supprimer",
                       admin_event_path(event),
                       method: :delete,
-                      form: { data: { turbo_confirm: "Supprimer définitivement « #{event.titre} » ?" }, turbo_frame: "_top" },
+                      form: { data: { turbo_confirm: "Supprimer « #{event.titre} » ? Sera recréé si encore sur la source." }, turbo_frame: "_top" },
                       class: "btn btn-ghost btn-xs text-error" %>
       </td>
     </tr>

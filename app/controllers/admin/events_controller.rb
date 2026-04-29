@@ -1,6 +1,6 @@
 class Admin::EventsController < Admin::ApplicationController
   include Pagy::Method
-  before_action :find_event, only: [ :show, :edit, :update, :destroy ]
+  before_action :find_event, only: [ :show, :edit, :update, :destroy, :toggle_visibility ]
 
   def index
     # Detect if filters or sort are active
@@ -60,6 +60,18 @@ class Admin::EventsController < Admin::ApplicationController
     titre = @event.titre
     @event.destroy
     redirect_to admin_events_path, notice: "Événement « #{titre} » supprimé.", status: :see_other
+  end
+
+  def toggle_visibility
+    if @event.hidden?
+      @event.unhide!
+      redirect_back fallback_location: admin_event_path(@event),
+                    notice: "Événement « #{@event.titre} » republié."
+    else
+      @event.hide!
+      redirect_back fallback_location: admin_event_path(@event),
+                    notice: "Événement « #{@event.titre} » caché. Il restera caché aux prochains scrapes."
+    end
   end
 
   private

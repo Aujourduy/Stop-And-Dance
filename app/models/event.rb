@@ -25,7 +25,25 @@ class Event < ApplicationRecord
   before_validation :generate_slug
 
   # Scopes — use date_debut_date for date-only queries
-  scope :futurs, -> { where("date_debut_date >= ?", Date.current) }
+  # NOTE : `futurs` exclut les events cachés (hidden_at présent). C'est le
+  # scope utilisé partout sur les pages publiques. Pour l'admin (qui doit
+  # voir aussi les cachés), utiliser Event.where(...) sans `.futurs`.
+  scope :futurs, -> { where("date_debut_date >= ?", Date.current).where(hidden_at: nil) }
+  scope :visible, -> { where(hidden_at: nil) }
+  scope :hidden, -> { where.not(hidden_at: nil) }
+
+  # Visibility helpers
+  def hidden?
+    hidden_at.present?
+  end
+
+  def hide!
+    update!(hidden_at: Time.current)
+  end
+
+  def unhide!
+    update!(hidden_at: nil)
+  end
 
   # Helper methods
   def type_event_humanized

@@ -65,7 +65,11 @@ Rails.application.routes.draw do
       end
     end
     resources :change_logs, only: [ :index, :show ]
-    resources :events, only: [ :index, :show, :edit, :update, :destroy ]
+    resources :events, only: [ :index, :show, :edit, :update, :destroy ] do
+      member do
+        patch :toggle_visibility
+      end
+    end
     resources :professors, only: [ :index, :edit, :update ] do
       member do
         post :mark_reviewed

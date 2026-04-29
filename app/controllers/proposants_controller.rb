@@ -4,9 +4,10 @@ class ProposantsController < ApplicationController
   def index
     today = Date.current
 
-    # IDs des profs ayant >=1 event futur (priorité d'affichage en tête)
+    # IDs des profs ayant >=1 event futur visible (priorité d'affichage en tête)
     with_futurs_ids = Professor.joins(:events)
                                .where("events.date_debut_date >= ?", today)
+                               .where(events: { hidden_at: nil })
                                .distinct.pluck(:id)
 
     scope = Professor.all

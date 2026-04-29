@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_23_210037) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_29_220928) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -90,6 +90,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_210037) do
     t.boolean "gratuit", default: false
     t.time "heure_debut"
     t.time "heure_fin"
+    t.datetime "hidden_at"
     t.string "lieu"
     t.string "photo_url"
     t.decimal "prix_normal", precision: 8, scale: 2
@@ -103,6 +104,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_210037) do
     t.datetime "updated_at", null: false
     t.index ["date_debut"], name: "index_events_on_date_debut"
     t.index ["gratuit"], name: "index_events_on_gratuit"
+    t.index ["hidden_at"], name: "index_events_on_hidden_at"
     t.index ["professor_id"], name: "index_events_on_professor_id"
     t.index ["scraped_url_id"], name: "index_events_on_scraped_url_id"
     t.index ["slug"], name: "index_events_on_slug", unique: true
@@ -177,8 +179,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_23_210037) do
     t.text "claude_global_instructions"
     t.datetime "created_at", null: false
     t.string "openrouter_default_model", default: "meta-llama/llama-3.3-70b-instruct:free"
-    t.string "plausible_api_key"
-    t.string "plausible_site_id"
     t.datetime "stats_updated_at"
     t.integer "stats_visitors_7d"
     t.integer "stats_visits_7d"
