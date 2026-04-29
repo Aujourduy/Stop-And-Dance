@@ -49,7 +49,7 @@ namespace :cloudinary do
       # pour éviter le re-crop d'images déjà 300×300)
       result = Cloudinary::Uploader.upload(
         source,
-        folder: ScrapedUrlAvatarService::folder,
+        folder: ScrapedUrlAvatarService.folder,
         public_id: "scraped_url_#{s.id}",
         overwrite: true,
         invalidate: true,
@@ -102,7 +102,7 @@ namespace :cloudinary do
 
       result = Cloudinary::Uploader.upload(
         source,
-        folder: ProfessorPhotoService::folder,
+        folder: ProfessorPhotoService.folder,
         public_id: "prof_#{p.id}",
         overwrite: true,
         invalidate: true,

@@ -58,6 +58,11 @@
             <td class="text-sm"><%= event.display_professors.presence || event.professor&.nom %></td>
             <td class="text-right">
               <%= link_to "Modifier", edit_admin_event_path(event), class: "btn btn-ghost btn-xs", data: { turbo_frame: "_top" } %>
+              <%= button_to "Supprimer",
+                            admin_event_path(event),
+                            method: :delete,
+                            form: { data: { turbo_confirm: "Supprimer définitivement « #{event.titre} » ?" }, turbo_frame: "_top" },
+                            class: "btn btn-ghost btn-xs text-error" %>
             </td>
           </tr>
         <% end %>

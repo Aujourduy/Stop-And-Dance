@@ -65,7 +65,7 @@ Rails.application.routes.draw do
       end
     end
     resources :change_logs, only: [ :index, :show ]
-    resources :events, only: [ :index, :show, :edit, :update ]
+    resources :events, only: [ :index, :show, :edit, :update, :destroy ]
     resources :professors, only: [ :index, :edit, :update ] do
       member do
         post :mark_reviewed

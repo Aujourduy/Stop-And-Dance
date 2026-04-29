@@ -3,9 +3,16 @@
 </div>
 
 <div class="bg-white rounded-lg shadow p-6 mb-6">
-  <div class="flex justify-between items-start mb-4">
+  <div class="flex justify-between items-start mb-4 gap-2">
     <h1 class="text-2xl font-bold"><%= @event.titre %></h1>
-    <%= link_to "Modifier", edit_admin_event_path(@event), class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+    <div class="flex gap-2 shrink-0">
+      <%= link_to "Modifier", edit_admin_event_path(@event), class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+      <%= button_to "Supprimer",
+                    admin_event_path(@event),
+                    method: :delete,
+                    form: { data: { turbo_confirm: "Supprimer définitivement « #{@event.titre} » ? Cette action est irréversible." } },
+                    class: "bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" %>
+    </div>
   </div>
 
   <dl class="space-y-4">

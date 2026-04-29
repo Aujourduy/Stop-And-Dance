@@ -1,6 +1,6 @@
 class Admin::EventsController < Admin::ApplicationController
   include Pagy::Method
-  before_action :find_event, only: [ :show, :edit, :update ]
+  before_action :find_event, only: [ :show, :edit, :update, :destroy ]
 
   def index
     # Detect if filters or sort are active
@@ -54,6 +54,12 @@ class Admin::EventsController < Admin::ApplicationController
         render :edit, status: :unprocessable_entity
       end
     end
+  end
+
+  def destroy
+    titre = @event.titre
+    @event.destroy
+    redirect_to admin_events_path, notice: "Événement « #{titre} » supprimé.", status: :see_other
   end
 
   private
