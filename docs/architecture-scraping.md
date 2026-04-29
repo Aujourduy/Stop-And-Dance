@@ -630,6 +630,105 @@ OPENROUTER_RATE_LIMIT_SLEEP=3       # Pause entre appels LLM
 - [ ] Cache LLM crawler (même URL + même hash → réutiliser verdict)
 - [ ] Détection changement fine (hash par page, pas seulement racine)
 - [ ] Support iCal/Google Calendar direct
+- [ ] **Validation 2-IA contre hallucinations Claude** (voir section dédiée ci-dessous)
+
+### Validation 2-IA contre hallucinations Claude
+
+#### Problème observé
+
+Claude CLI hallucine régulièrement sur les events extraits du markdown :
+
+| Cas observé | Source markdown | Sortie Claude |
+|---|---|---|
+| **Garance Marseille** (avril 2026) | "Mardi 28 avril" sans heure | date `2026-04-27` (J-1) + heure `23:00:00` inventée |
+| **Préfixes DJ** | "avec DJ Mike Polarny" | nom du prof = "DJ Mike Polarny" au lieu de "Mike Polarny" |
+| **Dates vs jours de semaine** | "Mardi 28 avril" sans année | calendrier 2025 vs 2026 confondu → décalage J±1 |
+| **Heures inventées** | aucune heure mentionnée | génère des heures plausibles type 19h-21h |
+
+Mitigations actuelles (insuffisantes) :
+- Prompt enrichi avec règles strictes (RÈGLE HORAIRES, RÈGLE DATES, RÈGLE NOMS)
+- Filet de sécurité côté code : `EventUpdateJob#suspicious_hour?` nullifie heures < 7h ou ≥ 23h
+
+→ **Ces mitigations ne couvrent pas tous les cas**. Une seconde IA validatrice donnerait un filet plus robuste.
+
+#### Architecture cible : pipeline 2-IA
+
+**État actuel (1 IA)** :
+```
+HTML → Markdown → [Claude CLI extraction] → JSON events → DB
+                       ↑
+                  (hallucinations possibles, non détectées)
+```
+
+**Cible (2 IA)** :
+```
+HTML → Markdown
+   │
+   ├─→ [IA 1: Claude CLI extraction] → JSON events brut
+   │
+   └─→ [IA 2: Validateur (modèle différent)] → audit
+       Compare JSON proposé vs Markdown source :
+       - Vérifie chaque date/heure citée existe textuellement dans le MD
+       - Détecte heures inventées (absentes du MD)
+       - Détecte décalages calendaires (jour de semaine ≠ date numérique)
+       - Détecte préfixes parasites (DJ, Dr., M., Mme)
+       - Vérifie cohérence noms profs vs descriptions
+
+   ↓ Si IA 2 valide → JSON propre → DB
+   ↓ Si IA 2 détecte anomalie → AdminNotification + flag review_required
+```
+
+#### Choix techniques
+
+**IA 2 — Modèle différent de Claude pour diversité** :
+- Option A : OpenRouter (modèles concurrents : Gemini, GPT-4, Llama, Mistral) — déjà utilisé pour `OpenRouterClassifier` du crawler
+- Option B : Claude différent (Sonnet/Haiku/Opus) — moins fort en diversité
+- Option C : Validation déterministe **sans IA** — regex/parsing strict (heures absentes du MD = warning)
+
+**Reco** : **A + C combinés**
+- C en premier filtre (rapide, gratuit, déterministe) — attrape les cas triviaux
+- A en deuxième filtre (IA externe) — attrape les cas subtils
+
+**Niveaux d'action sur détection** :
+- 🟢 **Pass** : aucune anomalie détectée → save event
+- 🟡 **Warning** : anomalie probable → save event mais flag `review_required: true` + AdminNotification
+- 🔴 **Reject** : hallucination certaine (ex: date introuvable dans MD) → ne pas save, log error
+
+**Coût estimé** : OpenRouter Gemini Flash ≈ 0.075$/M tokens input. Une validation = ~5k tokens (markdown + JSON) = ~0.0004$/event. À 100 events/scrape × 60 scrapes/jour = ~2.5$/mois. Acceptable.
+
+#### Composants à créer
+
+```
+lib/
+  event_validator.rb              # Service principal
+  event_validators/
+    deterministic_validator.rb    # Regex/parsing (filtre C)
+    llm_validator.rb              # OpenRouter (filtre A)
+```
+
+**Intégration dans `EventUpdateJob`** :
+```ruby
+# Après fetch Claude, avant save
+validation = EventValidator.audit(events_from_claude, markdown_source)
+
+case validation.status
+when :pass    then save_events(events_from_claude)
+when :warning then save_events_with_flag(events_from_claude, validation.warnings)
+when :reject  then notify_admin_and_skip(validation.errors)
+end
+```
+
+**Modèle Event** : ajout colonne `review_required: boolean` + `validation_warnings: jsonb` pour tracer les anomalies détectées.
+
+**UI Admin** : badge "À vérifier" sur les events flaggés dans `/admin/events`, filtre dédié.
+
+#### Phasing d'implémentation
+
+1. **Phase 1** : `DeterministicValidator` (filtre C uniquement) — détecte heures absentes du MD, dates incohérentes (jour de semaine), préfixes parasites. ~2h de dev. Couvre 80% des cas.
+2. **Phase 2** : `LlmValidator` via OpenRouter — couverture des cas subtils. ~3h de dev.
+3. **Phase 3** : UI admin pour review manuel des flags. ~2h de dev.
+
+**Total : ~7h** sur 3 sprints.
 
 ## Diagramme de classes
 
