@@ -179,7 +179,8 @@ class SiteCrawler
   end
 
   def same_domain?(url)
-    URI.parse(url).host == @root_host
+    uri = URI.parse(url)
+    %w[http https].include?(uri.scheme) && uri.host == @root_host
   rescue URI::InvalidURIError
     false
   end
@@ -195,6 +196,7 @@ class SiteCrawler
   def create_scraped_urls_for_yes_pages
     @site_crawl.crawled_pages.classified_yes.each do |page|
       next if ScrapedUrl.exists?(url: page.url)
+      next unless page.url =~ URI::DEFAULT_PARSER.make_regexp([ "http", "https" ])
 
       new_scraped_url = ScrapedUrl.create!(
         url: page.url,
