@@ -111,7 +111,7 @@ class SiteCrawler
       verdict = classification[:verdict]
       error = classification[:error]
     else
-      verdict = "no"
+      verdict = false
       error = nil
     end
 
@@ -130,6 +130,11 @@ class SiteCrawler
     [ page, nil ]
   end
 
+  NON_HTML_EXTENSIONS = %w[
+    .jpg .jpeg .png .gif .webp .svg .bmp .ico .pdf .doc .docx .xls .xlsx .ppt .pptx
+    .zip .rar .tar .gz .mp4 .mp3 .avi .mov .webm .wav .ogg .css .js .json .xml .rss
+  ].freeze
+
   def extract_links(base_url, html)
     doc = Nokogiri::HTML(html)
     links = []
@@ -141,13 +146,23 @@ class SiteCrawler
       begin
         absolute = URI.join(base_url, href).to_s
         normalized = normalize_url(absolute)
-        links << normalized if same_domain?(normalized)
+        next unless same_domain?(normalized)
+        next if non_html_extension?(normalized)
+        links << normalized
       rescue URI::InvalidURIError
         next
       end
     end
 
     links.uniq
+  end
+
+  def non_html_extension?(url)
+    path = (URI.parse(url).path || "").downcase
+    ext = File.extname(path)
+    NON_HTML_EXTENSIONS.include?(ext)
+  rescue URI::InvalidURIError
+    false
   end
 
   def js_only_content?(html)
