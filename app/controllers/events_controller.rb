@@ -83,19 +83,26 @@ class EventsController < ApplicationController
       scope = scope.where(gratuit: true)
     end
 
-    # Filter by lieu (basic text search, case-insensitive)
+    # Filter by lieu (case + accent insensitive via PG unaccent extension)
     if params[:lieu].present?
       lieu_query = "%#{params[:lieu]}%"
-      scope = scope.where("lieu ILIKE ?", lieu_query)
+      scope = scope.where("unaccent(lieu) ILIKE unaccent(?)", lieu_query)
     end
 
     # Full-text search (AND logic: all words must match across event fields + professor name)
+    # Insensible aux accents : "clement" trouve "Clément", "francois" trouve "François".
     if params[:q].present?
       words = params[:q].strip.split(/\s+/)
       words.each do |word|
         pattern = "%#{word}%"
         scope = scope.where(
-          "events.titre ILIKE :p OR events.description ILIKE :p OR events.lieu ILIKE :p OR events.adresse_complete ILIKE :p OR events.tags::text ILIKE :p OR professors.nom ILIKE :p OR professors.prenom ILIKE :p",
+          "unaccent(events.titre) ILIKE unaccent(:p) " \
+          "OR unaccent(events.description) ILIKE unaccent(:p) " \
+          "OR unaccent(events.lieu) ILIKE unaccent(:p) " \
+          "OR unaccent(events.adresse_complete) ILIKE unaccent(:p) " \
+          "OR unaccent(events.tags::text) ILIKE unaccent(:p) " \
+          "OR unaccent(professors.nom) ILIKE unaccent(:p) " \
+          "OR unaccent(professors.prenom) ILIKE unaccent(:p)",
           p: pattern
         )
       end
