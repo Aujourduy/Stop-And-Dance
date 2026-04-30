@@ -103,6 +103,22 @@ class ClaudeCliIntegration
 
       Parse le contenu ci-dessous et extrais tous les événements (ateliers/stages de danse).
 
+      RÈGLE FILTRE — DANSE UNIQUEMENT, CRITIQUE :
+      - N'extraire QUE les événements où la DANSE est la pratique principale.
+      - Exemples de pratiques danse à inclure : 5 Rythmes, Contact Improvisation, Ecstatic Dance,
+        Movement Medicine, Biodanza, Open Floor, Authentic Movement, Butoh, Danse-Thérapie,
+        Soul Motion, Conscious Dance, danse libre, danse intuitive, danses du monde, tango, etc.
+      - Exclure tout événement qui n'est PAS de la danse, même s'il est sur le site d'un prof :
+        ❌ clown, théâtre, mime, performance non-dansée
+        ❌ yoga seul, méditation seule, qi-gong seul, tai-chi seul, pilates
+        ❌ massage, soin énergétique, constellation familiale
+        ❌ conférences, formations verbales, retraites silencieuses
+        ❌ stages de chant, voix, cercles de parole
+        ❌ stages de développement personnel sans danse
+      - Cas mixtes : inclure SEULEMENT si la danse est explicitement annoncée comme pratique
+        principale (ex. "Yoga & Danse" OK, "Yoga + méditation" non).
+      - En cas de doute, EXCLURE plutôt qu'inclure.
+
       #{global_instructions.present? ? "CONSIGNES GLOBALES :\n#{global_instructions}\n\n" : ""}
 
       #{notes_correctrices.present? ? "NOTES CORRECTRICES (pour cette URL spécifiquement) :\n#{notes_correctrices}\n\n" : ""}
