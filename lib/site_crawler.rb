@@ -65,6 +65,21 @@ class SiteCrawler
 
   MIN_VISIBLE_TEXT = 500
 
+  EVENT_URL_KEYWORDS = %w[
+    agenda agendas stage stages atelier ateliers date dates event events evenement evenements
+    evenement evènement evènements événement événements calendrier programme programmes
+    workshop workshops retraite retraites cours seminaire seminaires séminaire séminaires
+    formation formations actualite actualites actualité actualités prochain prochains
+  ].freeze
+
+  def event_candidate_url?(url)
+    path = (URI.parse(url).path || "").downcase
+    return true if path == "" || path == "/"
+    EVENT_URL_KEYWORDS.any? { |kw| path.include?(kw) }
+  rescue URI::InvalidURIError
+    false
+  end
+
   def crawl_page(url, depth)
     # Try HTTParty first (fast), fallback to Playwright if JS-only content detected
     result = Scrapers::HtmlScraper.fetch(url)
@@ -87,14 +102,24 @@ class SiteCrawler
     end
 
     content_hash = Digest::SHA256.hexdigest(html)
-    cleaned = HtmlCleaner.clean_and_convert(html)
-    classification = OpenRouterClassifier.classify(markdown: cleaned[:markdown], model: @llm_model)
+
+    # Heuristique URL : ne classifier au LLM que les URLs candidates
+    # (racine + URLs avec mots-clés d'event). Économise le quota free tier.
+    if event_candidate_url?(url)
+      cleaned = HtmlCleaner.clean_and_convert(html)
+      classification = OpenRouterClassifier.classify(markdown: cleaned[:markdown], model: @llm_model)
+      verdict = classification[:verdict]
+      error = classification[:error]
+    else
+      verdict = "no"
+      error = nil
+    end
 
     page = @site_crawl.crawled_pages.create!(
       url: url, depth: depth, content_hash: content_hash,
       http_status: result[:status] || 200,
-      llm_verdict: classification[:verdict],
-      error_message: classification[:error]
+      llm_verdict: verdict,
+      error_message: error
     )
     [ page, html ]
   rescue => e
