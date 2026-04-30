@@ -32,7 +32,8 @@ services:
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
     volumes:
       - ./log:/rails/log
-      - ~/.claude:/root/.claude  # Claude CLI auth persistence
+      - ~/.claude:/home/rails/.claude:ro  # Claude CLI auth (rails user HOME)
+      - ~/.local/share/claude:/home/rails/.local/share/claude:ro  # Claude CLI binary
     restart: unless-stopped
     networks:
       - app_network
@@ -55,7 +56,8 @@ services:
     command: bundle exec rake solid_queue:start
     volumes:
       - ./log:/rails/log
-      - ~/.claude:/root/.claude  # Claude CLI needed for scraping jobs
+      - ~/.claude:/home/rails/.claude:ro  # Claude CLI auth (rails user HOME)
+      - ~/.local/share/claude:/home/rails/.local/share/claude:ro  # Claude CLI binary
     restart: unless-stopped
     networks:
       - app_network

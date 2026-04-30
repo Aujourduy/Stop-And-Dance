@@ -3,8 +3,27 @@ require "tempfile"
 require "json"
 
 class ClaudeCliIntegration
-  CLAUDE_CLI_PATH = "/home/dang/.local/bin/claude"
   TIMEOUT_SECONDS = 300 # URLs volumineuses (ex. aggrégateurs multi-profs) peuvent dépasser 120s
+
+  # Trouve le binaire Claude CLI selon priorité :
+  # 1. ENV CLAUDE_CLI_PATH (override explicite)
+  # 2. ~/.local/share/claude/versions/X.Y.Z (binaire auto-détecté, dernière version)
+  # 3. ~/.local/bin/claude (symlink standard)
+  # 4. /usr/local/bin/claude (install système)
+  def self.cli_path
+    return ENV["CLAUDE_CLI_PATH"] if ENV["CLAUDE_CLI_PATH"].present?
+
+    # Auto-détecter la dernière version dans ~/.local/share/claude/versions/
+    versions_dir = File.expand_path("~/.local/share/claude/versions")
+    if Dir.exist?(versions_dir)
+      latest = Dir.children(versions_dir).sort_by { |v| Gem::Version.new(v) rescue Gem::Version.new("0") }.last
+      candidate = File.join(versions_dir, latest) if latest
+      return candidate if candidate && File.executable?(candidate)
+    end
+
+    # Fallbacks
+    [ File.expand_path("~/.local/bin/claude"), "/usr/local/bin/claude" ].find { |p| File.executable?(p) }
+  end
 
   def self.parse_and_generate(scraped_url, html, notes_correctrices)
     # Clean HTML and convert to Markdown for better Claude parsing
@@ -204,7 +223,7 @@ class ClaudeCliIntegration
 
     prompt_content = File.read(prompt_file_path)
 
-    Open3.popen2e(CLAUDE_CLI_PATH, "--dangerously-skip-permissions") do |stdin, stdout_err, wait_thr|
+    Open3.popen2e(cli_path, "--dangerously-skip-permissions") do |stdin, stdout_err, wait_thr|
       stdin.write(prompt_content)
       stdin.close
 
